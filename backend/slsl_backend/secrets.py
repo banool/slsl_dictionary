@@ -10,6 +10,9 @@ REQUIRED = [
     "sql_host",
     "sql_port",
     "deployment_mode",
+    "admin_username",
+    "admin_password",
+    "admin_email",
 ]
 
 try:

@@ -11,11 +11,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
-
 from pathlib import Path
 
 from slsl_backend.secrets import secrets
-
 
 DEPLOYMENT_MODE_OPTIONS = ["prod", "dev"]
 
@@ -62,6 +60,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "slsl_backend",
 ]
 
 MIDDLEWARE = [

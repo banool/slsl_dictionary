@@ -6,8 +6,4 @@ fmt:
 	- find . -type f -name "*.py" | xargs poetry run isort
 	- find . -type f -name "*.py" | xargs poetry run black
 
-lint:
-	- poetry run mypy .
-	- poetry run flake8 .
-
 .PHONY: fmt lint

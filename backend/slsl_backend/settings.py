@@ -12,6 +12,9 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 
 import os
 from pathlib import Path
+from urllib.parse import urlparse
+
+from storages.backends.gcloud import GoogleCloudStorage
 
 from slsl_backend.secrets import secrets
 
@@ -49,7 +52,15 @@ if deployment_mode == "dev":
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = secrets["secret_key"]
-ALLOWED_HOSTS = secrets["allowed_hosts"]
+
+# From here: https://cloud.google.com/python/django/run#csrf_configurations.
+CLOUDRUN_SERVICE_URL = os.environ.get("CLOUDRUN_SERVICE_URL")
+if CLOUDRUN_SERVICE_URL:
+    ALLOWED_HOSTS = [urlparse(CLOUDRUN_SERVICE_URL).netloc]
+    CSRF_TRUSTED_ORIGINS = [CLOUDRUN_SERVICE_URL]
+    SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+else:
+    ALLOWED_HOSTS = ["*"]
 
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
@@ -60,6 +71,7 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "nested_admin",
     "slsl_backend",
 ]
 
@@ -108,6 +120,33 @@ DATABASES = {
     }
 }
 
+# File Storage
+# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
+
+
+class StaticStorage(GoogleCloudStorage):
+    # This class is necessary to override the bucket used. See here:
+    # https://stackoverflow.com/q/18536576/3846032
+    def __init__(self, *args, **kwargs):
+        kwargs['bucket']  = secrets["static_bucket"]
+        super().__init__(*args, **kwargs)
+
+
+class MediaStorage(GoogleCloudStorage):
+    # This class is necessary to override the bucket used. See here:
+    # https://stackoverflow.com/q/18536576/3846032
+    def __init__(self, *args, **kwargs):
+        kwargs['bucket']  = secrets["media_bucket"]
+        super().__init__(*args, **kwargs)
+
+
+STORAGES = {
+    "default": MediaStorage,
+    "staticfiles": StaticStorage,
+}
+
+GS_DEFAULT_ACL = "publicRead"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.1/ref/settings/#auth-password-validators
@@ -125,6 +164,14 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
+]
+
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.ScryptPasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
 ]
 
 # Logging

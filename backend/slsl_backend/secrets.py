@@ -1,7 +1,7 @@
 import json
+import os
 
 REQUIRED = [
-    "allowed_hosts",
     "secret_key",
     "sql_engine",
     "sql_database",
@@ -13,14 +13,27 @@ REQUIRED = [
     "admin_username",
     "admin_password",
     "admin_email",
+    "static_bucket",
+    "media_bucket",
 ]
 
 try:
+    # Try secrets.json first.
     with open("secrets.json", "r") as f:
         secrets = json.load(f)
 except FileNotFoundError:
-    with open("/secrets/secrets.json", "r") as f:
-        secrets = json.load(f)
+    try:
+        # Then /secrets/secrets.json.
+        with open("/secrets/secrets.json", "r") as f:
+            secrets = json.load(f)
+    except FileNotFoundError:
+        # Then just env vars.
+        REQUIRED = [r.upper() for r in REQUIRED]
+        secrets = {}
+        for secret in REQUIRED:
+            value = os.environ.get(secret)
+            if value is not None:
+                secrets[secret] = value
 
 
 invalid = []

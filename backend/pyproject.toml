@@ -3,12 +3,15 @@ name = "backend"
 version = "0.1.0"
 description = "Admin backend for SLSL Dictionary"
 authors = ["Daniel Porteous <danielporteous1@gmail.com>"]
+packages = [{ include = "slsl_backend" }]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 Django = "^4.1.6"
 uvicorn = {extras = ["standard"], version = "^0.20.0"}
 gunicorn = "^20.1.0"
+django-nested-admin = "^4.0.2"
+django-storages = {extras = ["google"], version = "^1.13.2"}
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
@@ -17,5 +20,5 @@ isort = "^5.12.0"
 autoflake = "^2.0.1"
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core==1.0.0"]
 build-backend = "poetry.core.masonry.api"

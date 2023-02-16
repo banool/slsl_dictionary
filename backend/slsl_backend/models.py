@@ -14,10 +14,8 @@ class Entry(models.Model):
 
     # Because we're only dealing with 3 languages ever, it is fine to make these
     # explicit fields, particularly since these are all "keys" into the data.
-    # TODO: Verify this assumption that there will always be an English version.
-    # If there is not, it might make sense to have `words` instead and then do
-    # the same thing we're doing with Definition. In which case we could probably
-    # do away with related_words.
+    # As for which are required, the current data model is that English is required
+    # while Tamil and Sinhala are optional.
     word_in_english = models.CharField(max_length=256, verbose_name="Word in English")
     word_in_tamil = models.CharField(
         max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
@@ -26,7 +24,7 @@ class Entry(models.Model):
         max_length=256, null=True, blank=True, verbose_name="Word in Sinhala"
     )
 
-    # This can be used to help with search.
+    # This can be used to help with search. These can be any language.
     # TODO: Make a new form field type to accept these.
     related_words = models.CharField(
         max_length=256,
@@ -38,8 +36,10 @@ class Entry(models.Model):
                 message="Please enter a comma separated list",
             )
         ],
-        help_text='Comma separated, for example: "great, good, awesome"',
+        help_text='Comma separated, for example: "great, awesome, fantastic"',
     )
+
+    # blah = models.FileField(upload_to='router_specifications')
 
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
@@ -73,13 +73,29 @@ class Language(models.TextChoices):
     SINHALA = "SIN", _("Sinhala")
 
 
+# This links back to the Entry, implying there can be multiple SubEntries per Entry.
+# per SubEntry.
+class SubEntry(models.Model):
+    class Meta:
+        verbose_name_plural = "sub-entries"
+
+    # Link back to the Entry.
+    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+
+
+# This links back to the SubEntry, implying there can be multiple Videos per SubEntry.
+class Video(models.Model):
+    # Link back to the SubEntry.
+    sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
+
+
 # Unlike the Auslan data, we choose to allow only one definition per language plus
 # category pair. This approach flattens the data as much as possible. In the various
 # frontends we can reorganize however we wish.
-# TODO: Use django stuff for this.
+# This links back to the SubEntry, implying there can be multiple Definitions per SubEntry.
 class Definition(models.Model):
     # Link back to the Entry.
-    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+    sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
 
     language = models.CharField(
         max_length=3,

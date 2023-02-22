@@ -1,11 +1,11 @@
-#!/bin/sh
+#!/bin/bash
 
 PORT=$1
 ENV=$2
 
 set -e
 
-if [[ "$ENV" = "prod" ||  "$ENV" = "dev" ]]; then
+if [[ "$ENV" = "prod" || "$ENV" = "dev" ]]; then
     echo "ENV: $ENV"
 else
     echo "ERROR: Invalid env: $ENV"

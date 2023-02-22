@@ -60,6 +60,10 @@ if CLOUDRUN_SERVICE_URL:
 else:
     ALLOWED_HOSTS = ["*"]
 
+additional_allowed_hosts = secrets.get("additional_allowed_hosts")
+if additional_allowed_hosts:
+    ALLOWED_HOSTS += additional_allowed_hosts.split(",")
+
 SITE_ROOT = os.path.dirname(os.path.realpath(__file__))
 
 INSTALLED_APPS = [

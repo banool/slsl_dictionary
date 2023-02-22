@@ -116,7 +116,7 @@ DATABASES = {
         "USER": secrets["sql_user"],
         "PASSWORD": secrets["sql_password"],
         "HOST": secrets["sql_host"],
-        "PORT": secrets["sql_port"],
+        "PORT": int(secrets["sql_port"]),
     }
 }
 

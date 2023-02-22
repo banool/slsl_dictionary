@@ -25,4 +25,10 @@ export function enableGCPServices<ServiceKey extends string[]>(
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-export const gcpServices = enableGCPServices(projectId, "compute", "run", "cloudfunctions", "sqladmin");
+export const gcpServices = enableGCPServices(
+  projectId,
+  "compute",
+  "run",
+  "cloudfunctions",
+  "sqladmin"
+);

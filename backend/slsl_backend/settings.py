@@ -118,7 +118,7 @@ DATABASES = {
     }
 }
 
-if secrets["sql_unix_socket"]:
+if secrets.get("sql_unix_socket"):
     # If a unix socket is configured, try to connect using that.
     DATABASES["default"]["HOST"] = secrets["sql_unix_socket"]
 else:

@@ -9,7 +9,7 @@ import { appServiceAccount, role1, role2, role3, role4 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "f8328c3ce8311b26876bd2e6f0ecf6a841a4cd9a";
+const GIT_SHA = "d128804ddaf563ae3658592f8ababf6592ae6d90";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
@@ -36,9 +36,10 @@ export const service = new gcp.cloudrun.Service(
           "autoscaling.knative.dev/minScale": "1",
           "autoscaling.knative.dev/maxScale": "5",
           "run.googleapis.com/execution-environment": "gen2",
-          // This makes sure we only get billed when handling a request, though this
-          // means request handling will be take more time as the container spins up.
-          "run.googleapis.com/cpu-throttling": "true",
+          // If this is true it makes sure we only get billed when handling a request,
+          // though this means request handling will be take more time as the container
+          // spins up.
+          "run.googleapis.com/cpu-throttling": "false",
           // This configures the Cloud Run service to use the Cloud SQL proxy.
           "run.googleapis.com/cloudsql-instances":
             databaseInstance.connectionName,

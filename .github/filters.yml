@@ -1,0 +1,17 @@
+# Taken from https://github.com/banool/aclip/blob/main/.github/filters.yml
+force: &force
+  - ".force"
+
+ci: &ci
+  - ".github/**/*"
+
+backend:
+  - *force
+  - 'backend/**'
+
+frontend:
+  - *force
+  - 'frontend/lib/**'
+  - 'frontend/ios/**'
+  - 'frontend/android/**'
+  - 'frontend/web/**'

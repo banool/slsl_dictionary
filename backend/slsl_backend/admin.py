@@ -1,6 +1,4 @@
 from django.contrib import admin
-from django.urls import reverse
-from django.utils.safestring import mark_safe
 
 from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 

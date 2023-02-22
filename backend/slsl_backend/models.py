@@ -16,7 +16,7 @@ class Entry(models.Model):
     # explicit fields, particularly since these are all "keys" into the data.
     # As for which are required, the current data model is that English is required
     # while Tamil and Sinhala are optional.
-    word_in_english = models.CharField(max_length=256, verbose_name="Word in English")
+    word_in_english = models.CharField(max_length=256, verbose_name="Word in English", null=False, unique=True)
     word_in_tamil = models.CharField(
         max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
     )
@@ -82,11 +82,23 @@ class SubEntry(models.Model):
     # Link back to the Entry.
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
 
+    def __str__(self):
+        return f""
+
 
 # This links back to the SubEntry, implying there can be multiple Videos per SubEntry.
 class Video(models.Model):
     # Link back to the SubEntry.
     sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
+
+    # This manages the file that this video captures. In local dev mode this will
+    # just use the development server file management (which is either in memory
+    # or in a temp dir depending on the size). In prod this will use a real cloud
+    # bucket. See settings.py for more.
+    media = models.FileField()
+
+    def __str__(self):
+        return f"Video"
 
 
 # Unlike the Auslan data, we choose to allow only one definition per language plus
@@ -94,7 +106,7 @@ class Video(models.Model):
 # frontends we can reorganize however we wish.
 # This links back to the SubEntry, implying there can be multiple Definitions per SubEntry.
 class Definition(models.Model):
-    # Link back to the Entry.
+    # Link back to the SubEntry.
     sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
 
     language = models.CharField(
@@ -108,6 +120,9 @@ class Definition(models.Model):
         default=DefinitionCategory.AS_A_NOUN,
     )
     definition = models.TextField()
+
+    def __str__(self):
+        return f"Definition"
 
 
 class MediaBackend(models.TextChoices):

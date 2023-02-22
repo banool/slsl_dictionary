@@ -41,4 +41,4 @@ COPY run.sh .
 RUN ./.venv/bin/pip install *.whl
 
 # Run the program.
-CMD ["./run.sh"]
+ENTRYPOINT ["./run.sh"]

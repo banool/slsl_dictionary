@@ -7,6 +7,11 @@ from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInl
 from . import models
 
 
+# TODO: Find a way to hide the string representation, e.g. Definition, Video, etc.
+# It doesn't add anything useful. Then once that's done, make the __str__ representation
+# actually more useful, e.g. the video file name. It is helpful for the history / debugging.
+
+
 class DefinitionInline(NestedTabularInline):
     model = models.Definition
     extra = 0

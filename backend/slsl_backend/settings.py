@@ -121,6 +121,7 @@ DATABASES = {
 }
 
 # File Storage
+# todo update this message TODO
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 
@@ -140,12 +141,22 @@ class MediaStorage(GoogleCloudStorage):
         super().__init__(*args, **kwargs)
 
 
-STORAGES = {
-    "default": MediaStorage,
-    "staticfiles": StaticStorage,
-}
+if deployment_mode == "prod":
+    STORAGES = {
+        "default": MediaStorage,
+        "staticfiles": StaticStorage,
+    }
+    GS_DEFAULT_ACL = "publicRead"
+    MEDIA_ROOT = "todo/"
 
-GS_DEFAULT_ACL = "publicRead"
+# todo figure out why this isn't working
+MEDIA_ROOT = "/tmp"
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/4.1/howto/static-files/
+
+STATIC_URL = "static/"
+STATIC_ROOT = "static"
 
 
 # Password validation
@@ -224,13 +235,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = True
-
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
-STATIC_ROOT = "static"
 
 
 # Default primary key field type

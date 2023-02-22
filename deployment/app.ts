@@ -1,27 +1,16 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 import * as fs from "fs";
-import { SLSL } from "./common";
-import * as url from "url";
+import { LOCATION, SLSL } from "./common";
+import { envVars } from "./config";
 
 const project = new pulumi.Config("gcp").require("project");
 
 const GIT_SHA = "8a9ac076c34efc851957d39ae2a8d2fda16111c5";
 
+// todo idk if i need this
+/*
 const cloudRunServiceAccount = pulumi.interpolate`serviceAccount:service-${project.project.number}@serverless-robot-prod.iam.gserviceaccount.com`;
-
-new gcp.artifactregistry.RepositoryIamMember(
-  SLSL + "-pull-from-global-docker-repo",
-  {
-    repository: "aptos-internal",
-    member: cloudRunServiceAccount,
-    role: "roles/artifactregistry.reader",
-    project: GLOBAL_GCP_PROJECT,
-    location: US_WEST1,
-  },
-  { dependsOn: [project.project] },
-);
-
 new gcp.projects.IAMMember(
   SLSL + "-can-use-serverless-vpc-connector",
   {
@@ -31,40 +20,19 @@ new gcp.projects.IAMMember(
   },
   { dependsOn: [project.project] },
 );
+*/
 
-const imageNameInGCP = pulumi.interpolate`${getDockerRepoInternal()}/node-checker:${GIT_SHA}`;
+// todo update this with the full github path.
+// though first investigate if there are any costs to pulling the image from outside
+const imageName = pulumi.interpolate`${getDockerRepoInternal()}/node-checker:${GIT_SHA}`;
 
-// Map of config name to root key secret name if necessary.
-// For a config to be included in the deployment, it must be listed here.
-const configs = new Map<string, string | null>([
-  ["devnet_fullnode", null],
-  ["testnet_fullnode", null],
-  ["mainnet_fullnode", null],
-]);
-
-// Map of config name to config content.
-const configContent = new Map(
-  Array.from(configs, ([key, _value]) => [
-    key,
-    fs.readFileSync(`${__dirname}/configs/${key}.yaml`, { encoding: "utf-8" }),
-  ]),
-);
-
-// This is just used to force a redpeploy if we want, since you can't just make
+// This is just used to force a redeploy if we want, since you can't just make
 // cloud run services restart.
 const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, { encoding: "utf-8" });
 
-const inContainerConfigsDir = "/configs";
-
-// Build the run command.
-var runCommand = "mkdir -p /configs && ";
-for (const [key, value] of configs) {
-  runCommand += `printf "$${key}" > ${inContainerConfigsDir}/${key}.yaml && `;
-  if (value != null) {
-    runCommand += `sed -i -e "s/REPLACE_ME_WITH_MINT_KEY/$${value}/g" ${key}.yaml && `;
-  }
-}
-runCommand += `/usr/local/bin/aptos-node-checker server run --baseline-config-paths ${inContainerConfigsDir}/* --listen-address 0.0.0.0 --listen-port 8080`;
+const port = "8000";
+const env = "prod";
+const runArgs = [port, env];
 
 export const service = new gcp.cloudrun.Service(
   SLSL,
@@ -77,36 +45,25 @@ export const service = new gcp.cloudrun.Service(
         "run.googleapis.com/launch-stage": "BETA",
       },
     },
-    project: project.projectId,
-    location: US_WEST1,
+    project: project,
+    location: LOCATION,
     template: {
       metadata: {
         annotations: {
           "autoscaling.knative.dev/minScale": "1",
-          "autoscaling.knative.dev/maxScale": "50",
+          "autoscaling.knative.dev/maxScale": "5",
           "run.googleapis.com/execution-environment": "gen2",
           "run.googleapis.com/cpu-throttling": "false",
-          // Access to private IPs should go through Serverless VPC connector
         },
       },
       spec: {
-        serviceAccountName: appServiceAccount.email,
-        timeoutSeconds: 45,
-        containerConcurrency: 50,
+        timeoutSeconds: 30,
+        containerConcurrency: 10,
         containers: [
           {
-            image: imageNameInGCP,
-            commands: ["/bin/bash"],
-            args: ["-c", runCommand],
-            envs: [
-              ...envFromMap({
-                RUST_LOG: "info",
-                RUST_BACKTRACE: "0",
-                RANDOM_NUMBER: `"${randomNumber}"`,
-              }),
-              ...envFromMap(Object.fromEntries(configContent)),
-              ...secretEnvVarRefs,
-            ],
+            image: imageName,
+            args: runArgs,
+            envs: envVars,
             ports: [
               {
                 name: "http1",
@@ -115,12 +72,12 @@ export const service = new gcp.cloudrun.Service(
             ],
             resources: {
               limits: {
-                cpu: "8",
-                memory: "32Gi",
+                cpu: "2",
+                memory: "2Gi",
               },
               requests: {
-                cpu: "8",
-                memory: "32Gi",
+                cpu: "0.5",
+                memory: "500Mi",
               },
             },
           },

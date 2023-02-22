@@ -4,20 +4,16 @@
 
 Install Poetry: https://python-poetry.org/docs/#installation.
 
-First, enter the virtual environment:
+Change anything relevant in `secrets.json`. This contains no actual secrets, this file is just used for development.
+
+Run the local development server on port 8000:
 ```
-poetry shell
+poetry run ./run.sh 8000
 ```
 
-Setup the DB:
+To make migrations if you changed any models, do this:
 ```
-python manage.py migrate
-python manage.py initadmin
-```
-
-Run:
-```
-python manage.py runserver
+poetry run python manage.py makemigrations slsl_backend
 ```
 
 ## Building development secrets

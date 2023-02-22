@@ -128,12 +128,15 @@ else:
 # todo update this message TODO
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
-STATIC_URL = "static/"
+STATIC_URL = "/static/"
 
 if deployment_mode == "prod":
     DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
     STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
     GS_BUCKET_NAME = secrets["bucket_name"]
+    # https://github.com/jschneier/django-storages/issues/941
+    GS_QUERYSTRING_AUTH = False
+    GS_IS_GZIPPED = True
 else:
     STATIC_ROOT = "static"
 

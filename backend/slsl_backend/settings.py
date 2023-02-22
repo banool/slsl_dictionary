@@ -134,7 +134,6 @@ if deployment_mode == "prod":
     DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
     STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
     GS_BUCKET_NAME = secrets["bucket_name"]
-    GS_DEFAULT_ACL = "publicRead"
 else:
     STATIC_ROOT = "static"
 

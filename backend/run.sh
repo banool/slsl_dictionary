@@ -3,8 +3,21 @@
 PORT=$1
 ENV=$2
 
-echo "PORT: $PORT"
-echo "ENV: $ENV"
+set -e
+
+if [[ "$ENV" = "prod" ||  "$ENV" = "dev" ]]; then
+    echo "ENV: $ENV"
+else
+    echo "ERROR: Invalid env: $ENV"
+    exit 1
+fi
+
+if [ -z "$PORT" ]; then
+    echo "ERROR: No port specified"
+    exit 1
+else
+    echo "PORT: $PORT"
+fi
 
 echo "Starting..."
 
@@ -24,13 +37,10 @@ python manage.py collectstatic -c --noinput
 
 # Run the server.
 if [ "$ENV" = "dev" ]; then
-    python manage.py runserver
-elif [ "$ENV" = "prod" ]; then
+    python manage.py runserver $PORT
+else
     # Make the tep dir for the workers to use.
     mkdir -p /tmp/slsl_workers
     # Run the web server.
     gunicorn --log-file=- --workers=2 --threads=4 --reload --worker-class=gthread --worker-tmp-dir /tmp/slsl_workers --bind 0.0.0.0:$PORT --forwarded-allow-ips='*' slsl_backend.asgi:application -k uvicorn.workers.UvicornWorker
-else
-    echo "Invalid env: $ENV"
-    exit 1
 fi

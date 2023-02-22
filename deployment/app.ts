@@ -10,7 +10,9 @@ import { buildEnvObject } from "./utils";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "dd3aef1d8237314befece7656d14494236db00fd";
+const GIT_SHA = "beec9dc0fb29fa65b67de6540f06ed6645eee508";
+//const IMAGE_TAG = `sha-${GIT_SHA}`;
+const IMAGE_TAG = `main`;
 
 // todo idk if i need this
 /*
@@ -26,7 +28,7 @@ new gcp.projects.IAMMember(
 );
 */
 
-const imageName = `banool/slsl-backend:sha-${GIT_SHA}`;
+const imageName = `banool/slsl-backend:sha-${IMAGE_TAG}`;
 
 // This is just used to force a redeploy if we want, since you can't just make
 // cloud run services restart.

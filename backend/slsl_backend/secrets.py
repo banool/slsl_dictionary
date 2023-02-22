@@ -19,6 +19,7 @@ OTHER = [
     "sql_host",
     "sql_port",
     "sql_unix_socket",
+    "bucket_name"
 ]
 
 try:

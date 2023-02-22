@@ -14,8 +14,6 @@ import os
 from pathlib import Path
 from urllib.parse import urlparse
 
-from storages.backends.gcloud import GoogleCloudStorage
-
 from slsl_backend.secrets import secrets
 
 DEPLOYMENT_MODE_OPTIONS = ["prod", "dev"]
@@ -126,40 +124,19 @@ else:
     DATABASES["default"]["HOST"] = secrets["sql_host"]
     DATABASES["default"]["PORT"] = secrets["sql_port"]
 
-# File Storage
+# File Storage: Media and static files
 # todo update this message TODO
 # https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
-
-class StaticStorage(GoogleCloudStorage):
-    # This class is necessary to override the bucket used. See here:
-    # https://stackoverflow.com/q/18536576/3846032
-    def __init__(self, *args, **kwargs):
-        kwargs['bucket']  = secrets["static_bucket"]
-        super().__init__(*args, **kwargs)
-
-
-class MediaStorage(GoogleCloudStorage):
-    # This class is necessary to override the bucket used. See here:
-    # https://stackoverflow.com/q/18536576/3846032
-    def __init__(self, *args, **kwargs):
-        kwargs['bucket']  = secrets["media_bucket"]
-        super().__init__(*args, **kwargs)
-
+STATIC_URL = "static/"
 
 if deployment_mode == "prod":
-    STORAGES = {
-        "default": MediaStorage,
-        "staticfiles": StaticStorage,
-    }
+    DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
+    STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
+    GS_BUCKET_NAME = secrets["bucket_name"]
     GS_DEFAULT_ACL = "publicRead"
-    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
-
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.1/howto/static-files/
-
-STATIC_URL = "static/"
+else:
+    STATIC_ROOT = "static"
 
 
 # Password validation

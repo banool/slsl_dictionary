@@ -1,15 +1,13 @@
 import * as pulumi from "@pulumi/pulumi";
 import { buildEnvObject } from "./utils";
 import * as fs from "fs";
-import { database } from "./db";
+import { database, databaseInstance } from "./db";
 
 // We start off with env vars that aren't secret / only known when we run `pulumi up`.
 // We know the host / port for the DB ahead of time because we're using the CloudSQL
 // proxy, which handles connecting to the actual DB.
 const envRegular = [
   buildEnvObject("sql_engine", "django.db.backends.postgresql"),
-  buildEnvObject("sql_host", "127.0.0.1"),
-  buildEnvObject("sql_port", "5432"),
   buildEnvObject("deployment_mode", "prod"),
   // Remove these:
   buildEnvObject("media_bucket", "todo"),
@@ -43,6 +41,8 @@ const envRandom = [buildEnvObject("random_number", randomNumber)];
 // Add the database name, which we only know after making the DB in db.ts
 const envDbName = [buildEnvObject("sql_database", database.name)];
 
+const envUnixSocket = [buildEnvObject("sql_unix_socket", pulumi.interpolate`/cloudsql/${databaseInstance.connectionName}`)];
+
 // We use pulumi.all to combine all that into a single Output. Some values for keys in
 // this output are themselves Outputs (the secrets).
 var envVars = pulumi.all([
@@ -50,6 +50,7 @@ var envVars = pulumi.all([
   ...envSecrets,
   ...envRandom,
   ...envDbName,
+  ...envUnixSocket,
 ]);
 
 export { envVars };

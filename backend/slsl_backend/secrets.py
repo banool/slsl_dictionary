@@ -44,7 +44,7 @@ if "sql_unix_socket" in secrets:
 if "sql_host" in secrets and "sql_port" not in secrets:
     raise RuntimeError("You must set both a host and a port for the DB connection")
 
-if "sql_unix_socket" not in secrets and "sql_host" not in secrets:
+if not ("sql_unix_socket" in secrets or "sql_host" in secrets):
     raise RuntimeError("You must set a unix socket or a host/port for the DB connection")
 
 

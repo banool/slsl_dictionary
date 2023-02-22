@@ -13,12 +13,6 @@ export const databaseInstance = new gcp.sql.DatabaseInstance(
     databaseVersion: "POSTGRES_14",
     settings: {
       tier: "db-f1-micro",
-      /*
-      ipConfiguration: {
-        ipv4Enabled: false,
-        privateNetwork: pulumi.interpolate`projects/${projectId}/global/networks/default`,
-      }
-      */
     },
     deletionProtection: true,
   }

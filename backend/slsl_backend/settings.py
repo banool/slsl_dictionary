@@ -115,10 +115,16 @@ DATABASES = {
         "NAME": secrets["sql_database"],
         "USER": secrets["sql_user"],
         "PASSWORD": secrets["sql_password"],
-        "HOST": secrets["sql_host"],
-        "PORT": int(secrets["sql_port"]),
     }
 }
+
+if secrets["sql_socket"]:
+    # If a unix socket is configured, try to connect using that.
+    DATABASES["default"]["OPTIONS"] = {"unix_socket": ["sql_unix_socket"]}
+else:
+    # Otherwise try to connect with host + port.
+    DATABASES["default"]["HOST"] = secrets["sql_host"]
+    DATABASES["default"]["PORT"] = secrets["sql_port"]
 
 # File Storage
 # todo update this message TODO

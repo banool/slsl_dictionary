@@ -42,5 +42,5 @@ else
     # Make the tep dir for the workers to use.
     mkdir -p /tmp/slsl_workers
     # Run the web server.
-    gunicorn --log-file=- --workers=2 --threads=2 --reload --worker-class=gthread --worker-tmp-dir /tmp/slsl_workers --bind 0.0.0.0:$PORT --timeout 60 --log-level debug --forwarded-allow-ips='*' slsl_backend.asgi:application -k uvicorn.workers.UvicornWorker
+    gunicorn --log-file=- --workers=2 --threads=2 --reload --worker-class=gthread --worker-tmp-dir /tmp/slsl_workers --bind 0.0.0.0:$PORT --timeout 60 --forwarded-allow-ips='*' slsl_backend.asgi:application -k uvicorn.workers.UvicornWorker
 fi

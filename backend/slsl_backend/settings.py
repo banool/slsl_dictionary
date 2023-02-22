@@ -153,16 +153,13 @@ if deployment_mode == "prod":
         "staticfiles": StaticStorage,
     }
     GS_DEFAULT_ACL = "publicRead"
-    MEDIA_ROOT = "todo/"
-
-# todo figure out why this isn't working
-MEDIA_ROOT = "/tmp"
+    DEFAULT_FILE_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
+    STATICFILES_STORAGE = "storages.backends.gcloud.GoogleCloudStorage"
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.1/howto/static-files/
 
 STATIC_URL = "static/"
-STATIC_ROOT = "static"
 
 
 # Password validation

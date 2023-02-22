@@ -1,11 +1,12 @@
 import * as pulumi from "@pulumi/pulumi";
 import { buildEnvObject } from "./utils";
+import * as fs from "fs";
 
 // We start off with env vars that aren't secret / only known when we run `pulumi up`.
 // We know the host / port for the DB ahead of time because we're using the CloudSQL
 // proxy, which handles connecting to the actual DB.
-export var envVars = pulumi.output([
-  buildEnvObject("sql_engine", "django.db.backends.postgres"),
+const envRegular = [
+  buildEnvObject("sql_engine", "django.db.backends.postgresql"),
   buildEnvObject("sql_database", "slsl"),
   buildEnvObject("sql_host", "127.0.0.1"),
   buildEnvObject("sql_port", "5432"),
@@ -13,7 +14,9 @@ export var envVars = pulumi.output([
   // Remove these:
   buildEnvObject("media_bucket", "todo"),
   buildEnvObject("static_bucket", "todo"),
-]);
+];
+
+const config = new pulumi.Config();
 
 const SECRET_KEYS = [
   "secret_key",
@@ -24,13 +27,19 @@ const SECRET_KEYS = [
   "admin_email",
 ];
 
-const config = new pulumi.Config();
+// Add to that env objects where the value is a pulumi.Output containing a secret.
+const envSecrets = SECRET_KEYS.map((key) => buildEnvObject(key, config.requireSecret(key)));
 
-// Here we add the secrets from Pulumi to the env vars. After this, all we need are the
-// env vars that we determine from other infra pieces, like the DB, buckets, etc. We do
-// that in app.ts.
-for (var secretKey of SECRET_KEYS) {
-  envVars.apply((arr) => {
-    [...arr, buildEnvObject(secretKey, config.requireSecret(secretKey))];
-  });
-}
+// Add to that the random number. This is just used to force a redeploy if we want,
+// since you can't just make cloud run services restart manually otherwise.
+const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, {
+  encoding: "utf-8",
+});
+
+const envRandom = [buildEnvObject("random_number", randomNumber)];
+
+// We use pulumi.all to combine all that into a single Output. Some values for keys in
+// this output are themselves Outputs (the secrets).
+var envVars = pulumi.all([...envRegular, ...envSecrets, ...envRandom]);
+
+export { envVars };

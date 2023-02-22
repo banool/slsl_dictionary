@@ -10,9 +10,8 @@ import { buildEnvObject } from "./utils";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "beec9dc0fb29fa65b67de6540f06ed6645eee508";
-//const IMAGE_TAG = `sha-${GIT_SHA}`;
-const IMAGE_TAG = `main`;
+const GIT_SHA = "fd8d77041ad0638054d49791692b1f03f3ce246f";
+const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 // todo idk if i need this
 /*
@@ -28,23 +27,7 @@ new gcp.projects.IAMMember(
 );
 */
 
-const imageName = `banool/slsl-backend:sha-${IMAGE_TAG}`;
-
-// This is just used to force a redeploy if we want, since you can't just make
-// cloud run services restart.
-const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, {
-  encoding: "utf-8",
-});
-
-// Add the random number to the env vars.
-envVars.apply((arr) => {
-  [...arr, buildEnvObject("random_number", randomNumber)];
-});
-
-// Add the host for the DB.
-envVars.apply((arr) => {
-  [...arr, buildEnvObject("sql_host", "localhost")];
-});
+const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
 
 const port = "8080";
 const env = "prod";

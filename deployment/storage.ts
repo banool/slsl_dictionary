@@ -1,18 +1,19 @@
 import * as gcp from "@pulumi/gcp";
 import { LOCATION } from "./common";
 
-// Create a bucket for media files.
-export const mediaBucket = new gcp.storage.Bucket("slsl-media", {
+// Create a bucket that we'll use for both static and media files.
+export const mainBucket = new gcp.storage.Bucket("slsl-main-bucket", {
   location: LOCATION,
   uniformBucketLevelAccess: true,
 });
 
-// Create a bucket for static files.
-export const staticBucket = new gcp.storage.Bucket("slsl-static", {
-  location: LOCATION,
-  uniformBucketLevelAccess: true,
-});
-
-// Export the DNS name of the buckets.
-export const mediaBucketName = mediaBucket.url;
-export const staticBucketName = staticBucket.url;
+// Make the bucket accessible to the public internet.
+new gcp.storage.BucketIAMMember(
+  "public-access",
+  {
+    member: "allUsers",
+    role: "roles/storage.objectViewer",
+    bucket: mainBucket.name,
+  },
+  { dependsOn: [mainBucket] }
+);

@@ -4,12 +4,12 @@ import { LOCATION, SLSL } from "./common";
 import { envVars } from "./config";
 import { database, databaseInstance, databaseUser } from "./db";
 import { gcpServices } from "./project";
-import { mediaBucket, staticBucket } from "./storage";
-import { appServiceAccount, role1, role2, role3, role4 } from "./iam";
+import { mainBucket } from "./storage";
+import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "50bee2fc58c3d7504e3cf063db397bcaf07fb3a9";
+const GIT_SHA = "adb26088c8859f799e562b99c40c08e0810b02b2";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
@@ -34,7 +34,7 @@ export const service = new gcp.cloudrun.Service(
       metadata: {
         annotations: {
           "autoscaling.knative.dev/minScale": "1",
-          "autoscaling.knative.dev/maxScale": "5",
+          "autoscaling.knative.dev/maxScale": "1",
           "run.googleapis.com/execution-environment": "gen2",
           // If this is true it makes sure we only get billed when handling a request,
           // though this means request handling will be take more time as the container
@@ -86,13 +86,11 @@ export const service = new gcp.cloudrun.Service(
       gcpServices.run,
       database,
       databaseUser,
-      mediaBucket,
-      staticBucket,
+      mainBucket,
       appServiceAccount,
       role1,
       role2,
       role3,
-      role4,
     ],
     customTimeouts: {
       create: "5m",
@@ -104,4 +102,17 @@ export const service = new gcp.cloudrun.Service(
       'template.metadata.annotations["run.googleapis.com/client-name"]',
     ],
   }
+);
+
+// Make service accessible to the public internet.
+new gcp.cloudrun.IamMember(
+  "public-access",
+  {
+    member: "allUsers",
+    role: "roles/run.invoker",
+    service: service.name,
+    project: projectId,
+    location: service.location,
+  },
+  { dependsOn: [service] }
 );

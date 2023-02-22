@@ -1,4 +1,6 @@
 config:
+  deployment:additional_allowed_hosts:
+    secure: AAABALqRHkVMhjQGv9H8Z9YZhyfF5RHdiBx5NBdVCD8FxB5db9gGwrsoRkyiWbvDkxVwTWb00vXzbPZuoSwb
   deployment:admin_email:
     secure: AAABALfqkO93RuT+UtHNn6RxmBv/AZCoqjBHP7p5876qCr0CZPIkDoj/zEb2CoAH5vT/dDKS6HN+
   deployment:admin_password:
@@ -8,7 +10,7 @@ config:
   deployment:secret_key:
     secure: AAABAGTHWb4ikLzB+d9H3fnOwSNrZax/ZWSwuTb/w6c21lebP32hvfJvEqqB74SOOEXMZ6e5VoEajZqF64d8SOKFjrFA3bqrpjk3hJqARQCzjQ==
   deployment:sql_password:
-    secure: AAABAKpdP4VPA3o5V8k00hUHRoXoQbmtfpAFPSP4pdY0MPB1pBKDJAz8XjGrEg==
+    secure: AAABAKd5q983sgY2WOlYHaD7h5kWv8C8EwHvF7So0IiqDBd5GFMgGdrc1MnsbNhZ9qRdMTRI
   deployment:sql_user:
     secure: AAABAJ6JH07B0TYp9itAKPAdgFlyAMZnm37teDTDQJRCRPeQaPTMO4Q=
   gcp:project: slsl-dictionary

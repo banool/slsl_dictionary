@@ -2,6 +2,7 @@ import * as pulumi from "@pulumi/pulumi";
 import { buildEnvObject } from "./utils";
 import * as fs from "fs";
 import { database, databaseInstance } from "./db";
+import { mainBucket } from "./storage";
 
 // We start off with env vars that aren't secret / only known when we run `pulumi up`.
 // We know the host / port for the DB ahead of time because we're using the CloudSQL
@@ -23,6 +24,7 @@ const SECRET_KEYS = [
   "admin_username",
   "admin_password",
   "admin_email",
+  "additional_allowed_hosts",
 ];
 
 // Add to that env objects where the value is a pulumi.Output containing a secret.
@@ -41,7 +43,16 @@ const envRandom = [buildEnvObject("random_number", randomNumber)];
 // Add the database name, which we only know after making the DB in db.ts
 const envDbName = [buildEnvObject("sql_database", database.name)];
 
-const envUnixSocket = [buildEnvObject("sql_unix_socket", pulumi.interpolate`/cloudsql/${databaseInstance.connectionName}`)];
+// Add an env var so the app knows what unix socket to use for connecting to the DB.
+const envUnixSocket = [
+  buildEnvObject(
+    "sql_unix_socket",
+    pulumi.interpolate`/cloudsql/${databaseInstance.connectionName}`
+  ),
+];
+
+// Add an env var for the bucket name.
+const envBucket = [buildEnvObject("bucket_name", mainBucket.name)];
 
 // We use pulumi.all to combine all that into a single Output. Some values for keys in
 // this output are themselves Outputs (the secrets).
@@ -51,6 +62,7 @@ var envVars = pulumi.all([
   ...envRandom,
   ...envDbName,
   ...envUnixSocket,
+  ...envBucket,
 ]);
 
 export { envVars };

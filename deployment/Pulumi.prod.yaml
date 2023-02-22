@@ -1,2 +1,14 @@
 config:
+  deployment:admin_email:
+    secure: AAABALfqkO93RuT+UtHNn6RxmBv/AZCoqjBHP7p5876qCr0CZPIkDoj/zEb2CoAH5vT/dDKS6HN+
+  deployment:admin_password:
+    secure: AAABAEJkJn1T02MVgn6b0VV7hY9HCkujVLUz9su6M6BJ0ntmwO7qsCw/EhzONKpeTQuqYw==
+  deployment:admin_username:
+    secure: AAABAI2AQiiWFuLWJXwrcYbSC1WxkPOkT+bBa3M/58UDEeb3LXk=
+  deployment:secret_key:
+    secure: AAABAGTHWb4ikLzB+d9H3fnOwSNrZax/ZWSwuTb/w6c21lebP32hvfJvEqqB74SOOEXMZ6e5VoEajZqF64d8SOKFjrFA3bqrpjk3hJqARQCzjQ==
+  deployment:sql_password:
+    secure: AAABAKpdP4VPA3o5V8k00hUHRoXoQbmtfpAFPSP4pdY0MPB1pBKDJAz8XjGrEg==
+  deployment:sql_user:
+    secure: AAABAJ6JH07B0TYp9itAKPAdgFlyAMZnm37teDTDQJRCRPeQaPTMO4Q=
   gcp:project: slsl-dictionary

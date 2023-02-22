@@ -8,6 +8,11 @@ echo "ENV: $ENV"
 
 echo "Starting..."
 
+if [ "$ENV" = "prod" ]; then
+    # Source the venv inside the container.
+    . .venv/bin/activate
+fi
+
 # Set up DB if needed.
 python manage.py migrate --noinput
 
@@ -23,6 +28,7 @@ if [ "$ENV" = "dev" ]; then
 elif [ "$ENV" = "prod" ]; then
     # Make the tep dir for the workers to use.
     mkdir -p /tmp/slsl_workers
+    # Run the web server.
     gunicorn --log-file=- --workers=2 --threads=4 --reload --worker-class=gthread --worker-tmp-dir /tmp/slsl_workers --bind 0.0.0.0:$PORT --forwarded-allow-ips='*' slsl_backend.asgi:application -k uvicorn.workers.UvicornWorker
 else
     echo "Invalid env: $ENV"

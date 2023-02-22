@@ -28,7 +28,6 @@ except FileNotFoundError:
             secrets = json.load(f)
     except FileNotFoundError:
         # Then just env vars.
-        REQUIRED = [r.upper() for r in REQUIRED]
         secrets = {}
         for secret in REQUIRED:
             value = os.environ.get(secret)

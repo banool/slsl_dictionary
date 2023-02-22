@@ -1,11 +1,21 @@
 {
     "name": "deployment",
     "main": "index.ts",
-    "devDependencies": {
-        "@types/node": "^16"
-    },
     "dependencies": {
-        "@pulumi/pulumi": "^3.0.0",
-        "@pulumi/gcp": "^6.0.0"
+        "@pulumi/gcp": "^6.50.0",
+        "@pulumi/pulumi": "^3.55.0",
+        "lodash-es": "^4.17.21"
+    },
+    "devDependencies": {
+        "@types/lodash-es": "^4.17.6",
+        "@types/node": "^18.14.0",
+        "prettier": "^2.8.4",
+        "prettier-plugin-sh": "^0.11.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^4.9.5"
+    },
+    "scripts": {
+        "fmt": "prettier --ignore-path .gitignore --write '**/*.(ts|sh|mts)'",
+        "lint": "tsc --noEmit && prettier --ignore-path .gitignore --check '**/*.(ts|sh|mts)'"
     }
 }

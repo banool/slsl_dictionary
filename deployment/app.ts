@@ -3,10 +3,14 @@ import * as pulumi from "@pulumi/pulumi";
 import * as fs from "fs";
 import { LOCATION, SLSL } from "./common";
 import { envVars } from "./config";
+import { database, dbUser } from "./db";
+import { gcpServices } from "./project";
+import { mediaBucket, staticBucket } from "./storage";
+import { buildEnvObject } from "./utils";
 
-const project = new pulumi.Config("gcp").require("project");
+const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "8a9ac076c34efc851957d39ae2a8d2fda16111c5";
+const GIT_SHA = "dd3aef1d8237314befece7656d14494236db00fd";
 
 // todo idk if i need this
 /*
@@ -22,15 +26,25 @@ new gcp.projects.IAMMember(
 );
 */
 
-// todo update this with the full github path.
-// though first investigate if there are any costs to pulling the image from outside
-const imageName = pulumi.interpolate`${getDockerRepoInternal()}/node-checker:${GIT_SHA}`;
+const imageName = `banool/slsl-backend:sha-${GIT_SHA}`;
 
 // This is just used to force a redeploy if we want, since you can't just make
 // cloud run services restart.
-const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, { encoding: "utf-8" });
+const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, {
+  encoding: "utf-8",
+});
 
-const port = "8000";
+// Add the random number to the env vars.
+envVars.apply((arr) => {
+  [...arr, buildEnvObject("random_number", randomNumber)];
+});
+
+// Add the host for the DB.
+envVars.apply((arr) => {
+  [...arr, buildEnvObject("sql_host", "localhost")];
+});
+
+const port = "8080";
 const env = "prod";
 const runArgs = [port, env];
 
@@ -41,11 +55,10 @@ export const service = new gcp.cloudrun.Service(
     autogenerateRevisionName: true,
     metadata: {
       annotations: {
-        // "run.googleapis.com/ingress": "internal-and-cloud-load-balancing",
         "run.googleapis.com/launch-stage": "BETA",
       },
     },
-    project: project,
+    project: projectId,
     location: LOCATION,
     template: {
       metadata: {
@@ -92,29 +105,15 @@ export const service = new gcp.cloudrun.Service(
     ],
   },
   {
-    dependsOn: [gcpServices.run, project],
+    dependsOn: [gcpServices.run, database, dbUser, mediaBucket, staticBucket],
     customTimeouts: {
       create: "5m",
       update: "3m",
       delete: "5m",
     },
     ignoreChanges: [
-      // "template.spec.containers[0].image",
       'metadata.annotations["run.googleapis.com/client-name"]',
       'template.metadata.annotations["run.googleapis.com/client-name"]',
     ],
-  },
-);
-
-// make service accessible accessible from GCP Cloud Load Balancing
-new gcp.cloudrun.IamMember(
-  "public-access",
-  {
-    member: "allUsers",
-    role: "roles/run.invoker",
-    service: service.name,
-    project: project.projectId,
-    location: service.location,
-  },
-  { dependsOn: [project.project] },
+  }
 );

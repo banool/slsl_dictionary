@@ -33,6 +33,7 @@ FROM base as final
 # Copy across files from the build into the final image.
 COPY --from=builder /app/.venv ./.venv
 COPY --from=builder /app/dist .
+COPY --from=builder /app/manage.py .
 
 # Copy in the run script.
 COPY run.sh .

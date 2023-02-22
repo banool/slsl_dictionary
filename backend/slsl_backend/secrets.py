@@ -15,6 +15,12 @@ REQUIRED = [
     "media_bucket",
 ]
 
+OTHER = [
+    "sql_host",
+    "sql_port",
+    "sql_unix_socket",
+]
+
 try:
     # Try secrets.json first.
     with open("secrets.json", "r") as f:
@@ -27,7 +33,7 @@ except FileNotFoundError:
     except FileNotFoundError:
         # Then just env vars.
         secrets = {}
-        for secret in REQUIRED:
+        for secret in REQUIRED + OTHER:
             value = os.environ.get(secret)
             if value is not None:
                 secrets[secret] = value

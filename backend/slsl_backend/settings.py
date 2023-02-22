@@ -118,9 +118,9 @@ DATABASES = {
     }
 }
 
-if secrets["sql_socket"]:
+if secrets["sql_unix_socket"]:
     # If a unix socket is configured, try to connect using that.
-    DATABASES["default"]["OPTIONS"] = {"unix_socket": ["sql_unix_socket"]}
+    DATABASES["default"]["HOST"] = secrets["sql_unix_socket"]
 else:
     # Otherwise try to connect with host + port.
     DATABASES["default"]["HOST"] = secrets["sql_host"]

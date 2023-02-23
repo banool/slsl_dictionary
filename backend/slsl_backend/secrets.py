@@ -19,6 +19,7 @@ OTHER = [
     "sql_unix_socket",
     "bucket_name",
     "additional_allowed_hosts",
+    "dump_auth_token",
 ]
 
 POSSIBLE_FILENAMES = ["/secrets/secrets.json", "prod_secrets.json", "secrets.json"]

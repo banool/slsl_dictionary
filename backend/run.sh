@@ -33,7 +33,7 @@ python manage.py migrate --noinput
 python manage.py initadmin
 
 # Collect static files for admin page.
-python manage.py collectstatic -c --noinput
+# python manage.py collectstatic -c --noinput
 
 # Run the server.
 if [ "$ENV" = "dev" ]; then

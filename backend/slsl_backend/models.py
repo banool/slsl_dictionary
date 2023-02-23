@@ -127,24 +127,3 @@ class Definition(models.Model):
 
     def __str__(self):
         return f"Definition"
-
-
-class MediaBackend(models.TextChoices):
-    GCP_CDN = "GCP_CDN", _("GCP CDN")
-
-
-# TODO: In the form there needs to be a way to obscure this. Really the form
-# should show the admin the video and give them an option to replace it, rather
-# than show them the info in this handle explicitly.
-class MediaHandle(models.Model):
-    # Link back to the Entry.
-    entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
-
-    backend = models.CharField(
-        max_length=16,
-        choices=MediaBackend.choices,
-        default=MediaBackend.GCP_CDN,
-    )
-    mime_type = models.CharField(max_length=128)
-    # TODO: Come up with scheme so we know what the length will be.
-    handle = models.CharField(max_length=256)

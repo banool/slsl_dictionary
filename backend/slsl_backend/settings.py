@@ -148,6 +148,8 @@ if secrets.get("bucket_name"):
         "application/x-javascript",
         "image/svg+xml",
         "video/mp4",
+        "video/x-m4v",
+        "video/quicktime",
     ]
     # If this is true, new uploads with the same filename overwrite the previous one.
     # Since the videos we're using share the same filename in some cases, we turn this

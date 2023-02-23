@@ -108,7 +108,7 @@ class Video(models.Model):
     # or in a temp dir depending on the size). In prod this will use a real cloud
     # bucket. See settings.py for more.
     media = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=["mp4", "m4v"])]
+        validators=[FileExtensionValidator(allowed_extensions=["mp4", "m4v", ".mov"])]
     )
 
     def __str__(self):

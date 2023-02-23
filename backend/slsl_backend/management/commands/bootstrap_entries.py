@@ -97,6 +97,9 @@ class Command(BaseCommand):
 
         fnames = sorted(os.listdir(os.path.join(directory, subdirname)))
         for fname in fnames:
+            if not (fname.endswith(".mp4") or fname.endswith(".m4v")):
+                print(f"Skipping video not ending in .mp4 or .m4v: {fname}")
+                continue
             word = self.determine_word(fname)
             word_to_video_fnames.setdefault(word, []).append(os.path.join(directory, subdirname, fname))
 

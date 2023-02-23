@@ -1,6 +1,6 @@
 import re
 
-from django.core.validators import RegexValidator
+from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
@@ -16,7 +16,9 @@ class Entry(models.Model):
     # explicit fields, particularly since these are all "keys" into the data.
     # As for which are required, the current data model is that English is required
     # while Tamil and Sinhala are optional.
-    word_in_english = models.CharField(max_length=256, verbose_name="Word in English", null=False, unique=True)
+    word_in_english = models.CharField(
+        max_length=256, verbose_name="Word in English", null=False, unique=True
+    )
     word_in_tamil = models.CharField(
         max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
     )
@@ -95,7 +97,9 @@ class Video(models.Model):
     # just use the development server file management (which is either in memory
     # or in a temp dir depending on the size). In prod this will use a real cloud
     # bucket. See settings.py for more.
-    media = models.FileField()
+    media = models.FileField(
+        validators=[FileExtensionValidator(allowed_extensions=["mp4", "m4v"])]
+    )
 
     def __str__(self):
         return f"Video"

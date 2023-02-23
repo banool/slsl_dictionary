@@ -129,18 +129,30 @@ else:
     DATABASES["default"]["PORT"] = secrets["sql_port"]
 
 # File Storage: Media and static files
-# todo update this message TODO
-# https://django-storages.readthedocs.io/en/latest/backends/amazon-S3.html
 
 STATIC_URL = "/static/"
 
-if deployment_mode == "prod":
+if secrets.get("bucket_name"):
     DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
     STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
     GS_BUCKET_NAME = secrets["bucket_name"]
     # https://github.com/jschneier/django-storages/issues/941
     GS_QUERYSTRING_AUTH = False
+    # Compress uploaded files with gzip.
     GS_IS_GZIPPED = True
+    # Content types to compress.
+    GZIP_CONTENT_TYPES = [
+        "text/css",
+        "text/javascript",
+        "application/javascript",
+        "application/x-javascript",
+        "image/svg+xml",
+        "video/mp4",
+    ]
+    # If this is true, new uploads with the same filename overwrite the previous one.
+    # Since the videos we're using share the same filename in some cases, we turn this
+    # off, in which case it will instead add additional characters to the filename.
+    GS_FILE_OVERWRITE = False
 else:
     STATIC_ROOT = "static"
 
@@ -164,11 +176,11 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 PASSWORD_HASHERS = [
-    'django.contrib.auth.hashers.ScryptPasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
-    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
-    'django.contrib.auth.hashers.Argon2PasswordHasher',
-    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    "django.contrib.auth.hashers.ScryptPasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2PasswordHasher",
+    "django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher",
+    "django.contrib.auth.hashers.Argon2PasswordHasher",
+    "django.contrib.auth.hashers.BCryptSHA256PasswordHasher",
 ]
 
 # Logging

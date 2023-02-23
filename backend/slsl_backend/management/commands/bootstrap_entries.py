@@ -24,11 +24,12 @@ from slsl_backend import models
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('directory')
+        parser.add_argument("directory")
         parser.add_argument("--limit", type=int)
+        parser.add_argument("--dry-run", action="store_true")
 
     def handle(self, *args, **options):
-        directory = options['directory']
+        directory = options["directory"]
         limit = options.get("limit")
 
         subdirnames = sorted(os.listdir(directory))
@@ -48,6 +49,12 @@ class Command(BaseCommand):
 
         num_processed = 0
 
+        if options.get("dry_run"):
+            import json
+
+            print(json.dumps(category_to_word_to_video_fnames, indent=4))
+            sys.exit(0)
+
         # Get all Entries so we know what to skip.
         existing_words = [e.word_in_english for e in models.Entry.objects.all()]
 
@@ -59,7 +66,7 @@ class Command(BaseCommand):
                     print(f"Skipping {word} because it already exists in the DB")
                     continue
 
-                print(f"Working on word {word}")
+                print(f"Working on word {word}: {video_fnames}")
 
                 # Create the Entry
                 entry = models.Entry()
@@ -97,16 +104,26 @@ class Command(BaseCommand):
 
         fnames = sorted(os.listdir(os.path.join(directory, subdirname)))
         for fname in fnames:
-            if not (fname.endswith(".mp4") or fname.endswith(".m4v")):
+            if not (
+                fname.endswith(".mp4")
+                or fname.endswith(".m4v")
+                or fname.endswith(".mov")
+            ):
                 print(f"Skipping video not ending in .mp4 or .m4v: {fname}")
                 continue
             word = self.determine_word(fname)
-            word_to_video_fnames.setdefault(word, []).append(os.path.join(directory, subdirname, fname))
+            word_to_video_fnames.setdefault(word, []).append(
+                os.path.join(directory, subdirname, fname)
+            )
 
         return (category, word_to_video_fnames)
 
     def determine_word(self, fname):
-        word = fname.split(".")[-2]
+        # Special case for .(a|b).ext file names.
+        if fname.split(".")[-2].lower() in ["a", "b"]:
+            word = fname.split(".")[-3]
+        else:
+            word = fname.split(".")[-2]
         word = word.split("_")[-1]
         word = word.lstrip().rstrip()
         word = " ".join([s.title() for s in camel_case_split(word)])
@@ -137,5 +154,7 @@ class Command(BaseCommand):
 
 
 def camel_case_split(identifier):
-    matches = re.finditer('.+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)', identifier)
+    matches = re.finditer(
+        ".+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)", identifier
+    )
     return [m.group(0) for m in matches]

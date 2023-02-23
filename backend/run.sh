@@ -2,6 +2,7 @@
 
 PORT=$1
 ENV=$2
+SKIP_COLLECTSTATIC=$3
 
 set -e
 
@@ -33,7 +34,11 @@ python manage.py migrate --noinput
 python manage.py initadmin
 
 # Collect static files for admin page.
-# python manage.py collectstatic -c --noinput
+if [ "$SKIP_COLLECTSTATIC" = "true" ]; then
+    echo "Skipping collectstatic"
+else
+    python manage.py collectstatic -c --noinput
+fi
 
 # Run the server.
 if [ "$ENV" = "dev" ]; then

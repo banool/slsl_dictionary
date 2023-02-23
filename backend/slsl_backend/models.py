@@ -11,6 +11,7 @@ COMMA_SEPARATED_LIST_REGEX = re.compile(r"(^$)|(\w+)(,\s*\w+)*")
 class Entry(models.Model):
     class Meta:
         verbose_name_plural = "entries"
+        ordering = ["word_in_english"]
 
     # Because we're only dealing with 3 languages ever, it is fine to make these
     # explicit fields, particularly since these are all "keys" into the data.

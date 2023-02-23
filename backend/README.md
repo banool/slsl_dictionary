@@ -42,9 +42,15 @@ For the secrets:
 - `sql_password`, `admin_username`, `admin_password`: Same as with `sql_user`
 - `bucket_name`: Find the bucket name here: https://console.cloud.google.com/storage/browser?project=slsl-dictionary
 
-Then in run.sh comment out the `collectstatic` line, it doesn't work right now when running in this setup.
-
 Finally, run the server locally like this:
 ```
-poetry run ./run.sh 8080 dev
+poetry run ./run.sh 8080 dev true
 ```
+
+You can also use this setup to do the inital video upload:
+```
+ln -s /Users/dport/gdrive/Videos\ for\ SLSL\ Dictionary/ blah
+poetry run python manage.py bootstrap_entries blah/1-1\ Sri\ Lankan\ Sign\ Language\ Vocabulary\ Words/ --limit 10
+```
+
+Note the symlink is necessary to avoid this issue: https://stackoverflow.com/questions/22019371/django-how-to-allow-a-suspicious-file-operation-copy-a-file.

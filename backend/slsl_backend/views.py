@@ -1,8 +1,10 @@
 from django.forms.models import model_to_dict
-from django.http import JsonResponse, HttpResponseForbidden, HttpResponseBadRequest
+from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+
+from slsl_backend.secrets import secrets
 
 from . import models
-from slsl_backend.secrets import secrets
+
 
 # Get the entire DB as JSON, to be stored in a bucket to then be served to clients.
 def get_dump(request):
@@ -14,7 +16,7 @@ def get_dump(request):
             return HttpResponseForbidden("Authorization header required")
         if not their_auth_token.startswith("Bearer "):
             HttpResponseBadRequest("Authorization header must start with Bearer")
-        their_auth_token = their_auth_token[len("Bearer "):]
+        their_auth_token = their_auth_token[len("Bearer ") :]
         if their_auth_token != our_auth_token:
             return HttpResponseForbidden("Auth token was incorrect")
 

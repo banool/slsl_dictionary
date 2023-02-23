@@ -26,6 +26,15 @@ class Entry(models.Model):
         max_length=256, null=True, blank=True, verbose_name="Word in Sinhala"
     )
 
+    # This is an optional field that we might use down the line for some kind of
+    # predefined word list feature.
+    category = models.CharField(
+        max_length=128,
+        null=True,
+        blank=True,
+        help_text="This is a field we might use down the line for some kind of predefined word list feature.",
+    )
+
     # This can be used to help with search. These can be any language.
     # TODO: Make a new form field type to accept these.
     related_words = models.CharField(

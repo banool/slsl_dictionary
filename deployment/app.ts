@@ -9,7 +9,7 @@ import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "adb26088c8859f799e562b99c40c08e0810b02b2";
+const GIT_SHA = "738dc8d665678917464eea4bf45b23a049335783";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
@@ -66,8 +66,8 @@ export const service = new gcp.cloudrun.Service(
                 memory: "2Gi",
               },
               requests: {
-                cpu: "0.5",
-                memory: "500Mi",
+                cpu: "1",
+                memory: "750Mi",
               },
             },
           },

@@ -25,6 +25,7 @@ const SECRET_KEYS = [
   "admin_password",
   "admin_email",
   "additional_allowed_hosts",
+  "dump_auth_token",
 ];
 
 // Add to that env objects where the value is a pulumi.Output containing a secret.

@@ -46,3 +46,13 @@ export const role3 = new gcp.storage.BucketIAMMember(
   },
   { dependsOn: [appServiceAccount] }
 );
+
+export const role4 = new gcp.projects.IAMMember(
+  SLSL + "-sa-cloud-function-invoker",
+  {
+    member: appServiceAccountRef,
+    project: projectId,
+    role: "roles/cloudfunctions.invoker",
+  },
+  { dependsOn: [appServiceAccount] }
+);

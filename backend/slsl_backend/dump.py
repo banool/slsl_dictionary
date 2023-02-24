@@ -54,6 +54,6 @@ def build_dump():
     # Throw out the Entry IDs and just take the values.
     out = {"data": list(id_to_entry.values())}
 
-    LOG.info(f"Returning data dump containing {len(out)} entries")
+    LOG.info(f"Returning data dump containing {len(id_to_entry)} entries")
 
     return out

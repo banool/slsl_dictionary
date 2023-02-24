@@ -7,6 +7,8 @@ config:
     secure: AAABAEJkJn1T02MVgn6b0VV7hY9HCkujVLUz9su6M6BJ0ntmwO7qsCw/EhzONKpeTQuqYw==
   deployment:admin_username:
     secure: AAABAI2AQiiWFuLWJXwrcYbSC1WxkPOkT+bBa3M/58UDEeb3LXk=
+  deployment:dump_auth_token:
+    secure: AAABAP9YNYjBVSscPDOug1Hos5Shap1dsiEIWotgbIdzDy9CbwVoY1Hn7xD8HwC0zmORDNK1j003v/U=
   deployment:secret_key:
     secure: AAABAGTHWb4ikLzB+d9H3fnOwSNrZax/ZWSwuTb/w6c21lebP32hvfJvEqqB74SOOEXMZ6e5VoEajZqF64d8SOKFjrFA3bqrpjk3hJqARQCzjQ==
   deployment:sql_password:

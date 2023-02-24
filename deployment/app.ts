@@ -9,7 +9,7 @@ import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "738dc8d665678917464eea4bf45b23a049335783";
+const GIT_SHA = "1d6fad0a400542a6e31db1423d1e88f5944c10e9";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;

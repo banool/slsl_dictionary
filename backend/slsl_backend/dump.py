@@ -39,7 +39,7 @@ def build_dump():
         entry_id = sub_entry_id_to_entry_id[definition["sub_entry_id"]]
         entry = id_to_entry[entry_id]
         sub_entries = entry.setdefault("sub_entries", {})
-        sub_entry = sub_entries.setdefault(video.sub_entry_id, {})
+        sub_entry = sub_entries.setdefault(definition["sub_entry_id"], {})
         definitions = sub_entry.setdefault("definitions", [])
         del definition["id"]
         del definition["sub_entry_id"]

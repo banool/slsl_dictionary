@@ -206,10 +206,6 @@ LOGGING = {
         },
     },
     "loggers": {
-        "": {
-            "handlers": ["console"],
-            "level": "DEBUG",
-        },
         "slsl_backend": {
             "handlers": ["console"],
             "level": "DEBUG",

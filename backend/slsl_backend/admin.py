@@ -1,6 +1,7 @@
 from django.contrib import admin
 from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
+from .secrets import secrets
 from . import models
 
 # TODO: Find a way to hide the string representation, e.g. Definition, Video, etc.

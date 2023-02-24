@@ -20,6 +20,7 @@ OTHER = [
     "bucket_name",
     "additional_allowed_hosts",
     "dump_auth_token",
+    "dump_interval_secs",
 ]
 
 POSSIBLE_FILENAMES = ["/secrets/secrets.json", "prod_secrets.json", "secrets.json"]

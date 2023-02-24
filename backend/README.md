@@ -19,12 +19,18 @@ poetry run python manage.py makemigrations
 ## Running locally with the prod DB
 It is possible to run the app locally while connecting to the production database. This can be handy for running migrations, writing to the DB without going through Cloud Run, uploading media content, etc. Notably it's not so good for uploading data to the buckets, because we don't have credentials for that.
 
-First, run the Cloud SQL proxy:
+Login with the gcloud CLI:
+```
+gcloud auth application-default login
+gcloud auth application-default set-quota-project slsl-dictionary
+```
+
+Run the Cloud SQL proxy:
 ```
 cloud-sql-proxy slsl-dictionary:asia-south1:slsl-db-instance-04a74a9 --port 5433
 ```
 
-Next, make a file called `prod_secrets.json` where the following keys are different from `secrets.json`:
+Make a file called `prod_secrets.json` where the following keys are different from `secrets.json`:
 ```
 "deployment_mode": "dev",
 "sql_engine": "django.db.backends.postgresql",
@@ -46,6 +52,8 @@ Finally, run the server locally like this:
 ```
 poetry run ./run.sh 8080 dev true
 ```
+
+If when logging in you are prompted for a password in the pane where the server is running, enter the password for your laptop, I believe this is some keychain stuff (just a guess right now though).
 
 You can also use this setup to do the inital video upload:
 ```

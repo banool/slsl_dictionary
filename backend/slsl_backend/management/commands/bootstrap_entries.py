@@ -66,7 +66,7 @@ class Command(BaseCommand):
                     print(f"Skipping {word} because it already exists in the DB")
                     continue
 
-                print(f"Working on word {word}: {video_fnames}")
+                print(f"Working on word {word}: {[os.path.basename(f) for f in video_fnames]}")
 
                 # Create the Entry
                 entry = models.Entry()
@@ -134,6 +134,7 @@ class Command(BaseCommand):
         for w in word.split(" "):
             words.append(re.sub(r"\d+$", "", w))
         word = " ".join(words)
+        word = word.lstrip().rstrip()
         return word
 
     def determine_category(self, subdirname):

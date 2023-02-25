@@ -7,6 +7,7 @@ import * as fs from "fs";
 import * as archiver from "archiver";
 import { appServiceAccount } from "./iam";
 import { service } from "./app";
+import { RUN_EVERY_N_MINUTES } from "./common";
 
 const ZIP_LOCATION = "/tmp/code.zip";
 
@@ -65,6 +66,7 @@ export const func = new gcp.cloudfunctions.Function(
       bucket_name: mainBucket.name,
       dump_auth_token: config.requireSecret("dump_auth_token"),
       cloud_run_instance_url: service.statuses[0].url,
+      cache_duration_secs: RUN_EVERY_N_MINUTES * 60,
     },
   },
   { dependsOn: [gcpServices.cloudfunctions], replaceOnChanges: ["*"] }

@@ -1,5 +1,5 @@
 import * as gcp from "@pulumi/gcp";
-import { LOCATION } from "./common";
+import { LOCATION, RUN_EVERY_N_MINUTES } from "./common";
 import { func } from "./functions";
 import { appServiceAccount, role4 } from "./iam";
 
@@ -23,7 +23,7 @@ const job = new gcp.cloudscheduler.Job(
       minBackoffDuration: "1s",
       retryCount: 3,
     },
-    schedule: "*/5 * * * *",
+    schedule: `*/${RUN_EVERY_N_MINUTES} * * * *`,
     timeZone: "Europe/London",
   },
   { dependsOn: [role4] }

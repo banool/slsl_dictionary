@@ -91,7 +91,7 @@ class Command(BaseCommand):
                         video.media.save(os.path.basename(fname), content)
 
                 num_processed += 1
-                if num_processed >= limit:
+                if limit and num_processed >= limit:
                     print("Hit the limit, exiting...")
                     sys.exit(0)
 
@@ -119,11 +119,14 @@ class Command(BaseCommand):
         return (category, word_to_video_fnames)
 
     def determine_word(self, fname):
+        word = fname
         # Special case for .(a|b).ext file names.
         if fname.split(".")[-2].lower() in ["a", "b"]:
             word = fname.split(".")[-3]
         else:
             word = fname.split(".")[-2]
+        word = word.replace("_SLSL", "")
+        word = word.replace("_SLSL3", "")
         word = word.split("_")[-1]
         word = word.lstrip().rstrip()
         word = " ".join([s.title() for s in camel_case_split(word)])
@@ -135,6 +138,7 @@ class Command(BaseCommand):
             words.append(re.sub(r"\d+$", "", w))
         word = " ".join(words)
         word = word.lstrip().rstrip()
+        word = word.replace(" Slsl", "")
         return word
 
     def determine_category(self, subdirname):

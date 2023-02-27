@@ -48,11 +48,15 @@ def build_dump():
     # Collapse the sub entries dictionary, since we don't actually care about
     # any kind of numerical index for the sub-entries. Order is preserved since dicts
     # are ordered in Python 3.6+ by insertion order.
+    out = []
     for entry in id_to_entry.values():
+        if "sub_entries" not in entry:
+            continue
         entry["sub_entries"] = list(entry["sub_entries"].values())
+        out.append(entry)
 
     # Throw out the Entry IDs and just take the values.
-    out = {"data": list(id_to_entry.values())}
+    out = {"data": out}
 
     LOG.info(f"Returning data dump containing {len(id_to_entry)} entries")
 

@@ -9,7 +9,7 @@ import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "12ece30aac4e6a584a428e6bb4d13072db22df11";
+const GIT_SHA = "f197b2667bfcfe858a29ae7a3e871538e35d073b";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
@@ -39,7 +39,7 @@ export const service = new gcp.cloudrun.Service(
           // If this is true it makes sure we only get billed when handling a request,
           // though this means request handling will be take more time as the container
           // spins up.
-          "run.googleapis.com/cpu-throttling": "false",
+          "run.googleapis.com/cpu-throttling": "true",
           // This configures the Cloud Run service to use the Cloud SQL proxy.
           "run.googleapis.com/cloudsql-instances":
             databaseInstance.connectionName,

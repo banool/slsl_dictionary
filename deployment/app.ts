@@ -33,7 +33,7 @@ export const service = new gcp.cloudrun.Service(
     template: {
       metadata: {
         annotations: {
-          "autoscaling.knative.dev/minScale": "1",
+          "autoscaling.knative.dev/minScale": "0",
           "autoscaling.knative.dev/maxScale": "1",
           "run.googleapis.com/execution-environment": "gen2",
           // If this is true it makes sure we only get billed when handling a request,

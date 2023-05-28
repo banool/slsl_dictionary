@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+// TODO: This is really janky, use some kind of structured reader instead
+// a la serde.
+
 Set<Word> loadWordsInner(String data) {
   dynamic wordsJson = json.decode(data);
   Set<Word> words = {};

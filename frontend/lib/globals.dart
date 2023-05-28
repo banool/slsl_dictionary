@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:slsl_dictionary/common.dart';
 
 import 'types.dart';
 import 'word_list_logic.dart';
@@ -26,5 +27,5 @@ late bool showFlashcards;
 late Color settingsBackgroundColor;
 
 // Advisory if there is a new one.
-String? advisory;
+AdvisoriesResponse? advisoriesResponse;
 bool advisoryShownOnce = false;

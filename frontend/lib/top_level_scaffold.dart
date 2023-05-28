@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'common.dart';
-import 'globals.dart';
 import 'root.dart';
 
 class TopLevelScaffold extends StatelessWidget {
@@ -116,35 +115,5 @@ class TopLevelScaffold extends StatelessWidget {
         }
         break;
     }
-  }
-
-  List<Widget> getActions(BuildContext context) {
-    final GoRouter route = GoRouter.of(context);
-    final String location = route.location;
-    if (location.startsWith(SEARCH_ROUTE)) {
-      if (advisory != null) {
-        return <Widget>[
-          buildActionButton(
-            context,
-            Icon(Icons.announcement),
-            () async {
-              showAdvisoryDialog(context);
-            },
-          )
-        ];
-      } else {
-        return [];
-      }
-    }
-    return [];
-  }
-
-  void showAdvisoryDialog(BuildContext context) {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text("Announcement"),
-              content: Text(advisory!),
-            ));
   }
 }

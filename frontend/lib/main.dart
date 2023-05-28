@@ -28,7 +28,7 @@ Future<void> setup({Set<Word>? wordsGlobalReplacement}) async {
   print("Set HTTP proxy overrides to $proxy");
 
   // Load up the advisory (if there is one) next.
-  advisory = await getAdvisory();
+  advisoriesResponse = await getAdvisories();
 
   // Build the cache manager.
   String cacheManagerKey = "myVideoCacheManager";
@@ -122,10 +122,11 @@ class ErrorFallback extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Widget advisoryWidget;
-    if (advisory == null) {
+    if (advisoriesResponse == null) {
       advisoryWidget = Container();
     } else {
-      advisoryWidget = Text(advisory!);
+      // TODO Display the advisories properly.
+      advisoryWidget = Text(advisoriesResponse!.advisories[0].lines[0]);
     }
     List<Widget> children = [
       Text(

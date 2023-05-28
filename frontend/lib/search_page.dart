@@ -55,7 +55,7 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (advisory != null && !advisoryShownOnce) {
+    if (advisoriesResponse != null && !advisoryShownOnce) {
       Future.delayed(Duration(milliseconds: 500), () => showAdvisoryDialog());
       advisoryShownOnce = true;
     }
@@ -117,7 +117,7 @@ class _SearchPageState extends State<SearchPage> {
     );
 
     List<Widget> actions = [];
-    if (advisory != null) {
+    if (advisoriesResponse != null) {
       actions.add(buildActionButton(
         context,
         Icon(Icons.announcement),
@@ -135,7 +135,8 @@ class _SearchPageState extends State<SearchPage> {
         context: context,
         builder: (context) => AlertDialog(
               title: Text("Announcement"),
-              content: Text(advisory!),
+              // TODO Do this properly.
+              content: Text(advisoriesResponse!.advisories[0].lines[0]),
             ));
   }
 }

@@ -10,7 +10,7 @@ import 'globals.dart';
 import 'types.dart';
 import 'word_page.dart';
 
-const String APP_NAME = "Auslan Dictionary";
+const String APP_NAME = "SLSL Dictionary";
 
 const MaterialColor MAIN_COLOR = const MaterialColor(
   0xFF7E1430,
@@ -188,7 +188,7 @@ Future<bool> readKnob(String key, bool fallback) async {
   String sharedPrefsKey = "knob_$key";
   try {
     String url =
-        'https://raw.githubusercontent.com/banool/auslan_dictionary/master/assets/knobs/$key';
+        'https://raw.githubusercontent.com/banool/slsl_dictionary/main/assets/knobs/$key';
     var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 4));
     String raw = result.body.replaceAll("\n", "");
     bool out;
@@ -210,13 +210,42 @@ Future<bool> readKnob(String key, bool fallback) async {
   }
 }
 
-Future<String?> getAdvisory() async {
-  String? advisoryRaw;
+class Advisory {
+  String date;
+  List<String> lines;
 
-  // Pull the raw data for the advisory.
+  RichText asMarkdown() {
+    return RichText(text: TextSpan(text: "${date}\n${lines.join("\n")}"));
+  }
+
+  Advisory({
+    required this.date,
+    required this.lines,
+  });
+}
+
+class AdvisoriesResponse {
+  List<Advisory> advisories;
+  bool newAdvisories;
+
+  AdvisoriesResponse({
+    required this.advisories,
+    required this.newAdvisories,
+  });
+}
+
+// Returns the advisories and whether there is a new advisory. It returns them
+// in order from old to new. If we failed to lookup the advisories we return
+// null.
+Future<AdvisoriesResponse?> getAdvisories() async {
+  // Pull the number of advisories we've seen in the past from storage.
+  int numKnownAdvisories = sharedPreferences.getInt(KEY_ADVISORY_VERSION) ?? 0;
+
+  // Get the advisories file.
+  String? advisoryRaw;
   try {
     String url =
-        'https://raw.githubusercontent.com/banool/auslan_dictionary/master/assets/advisory.txt';
+        'https://raw.githubusercontent.com/banool/slsl_dictiionary/main/assets/advisories.md';
     var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 4));
     advisoryRaw = result.body;
   } catch (e) {
@@ -224,38 +253,52 @@ Future<String?> getAdvisory() async {
     return null;
   }
 
-  // Determine the version of the advisory.
-  int newVersion;
-  String advisory;
-  try {
-    List<String> sp = advisoryRaw.split("=====");
-    newVersion = int.parse(sp[0]);
-    advisory = sp[1];
-  } catch (e) {
-    print("Failed to determine advisory version");
-    return null;
+  // Each advisory is a list of strings, the lines from within the section.
+  List<Advisory> advisories = [];
+  var inSection = false;
+  List<String> currentLines = [];
+  String? currentDate;
+  for (var line in advisoryRaw.split("\n")) {
+    // Skip comment lines.
+    if (line.startsWith("////")) {
+      continue;
+    }
+
+    // Skip empty lines if we're not in a action.
+    if (line.length == 1 && line.endsWith("\n") && !inSection) {
+      continue;
+    }
+
+    // Handle the start of a section.
+    if (line.startsWith("START===")) {
+      inSection = true;
+      continue;
+    }
+
+    // Handle the end of a section.
+    if (line.startsWith("END===")) {
+      advisories.add(new Advisory(date: currentDate!, lines: currentLines));
+      currentLines = [];
+      currentDate = null;
+      inSection = false;
+      continue;
+    }
+
+    // Handle the date.
+    if (line.startsWith("DATE===")) {
+      currentDate = line.substring("DATE===".length);
+      continue;
+    }
+
+    if (inSection) {
+      currentLines.add(line);
+    }
   }
 
-  // Pull the latest seen advisory from storage.
-  int lastSeenVersion;
-  try {
-    lastSeenVersion = sharedPreferences.getInt(KEY_ADVISORY_VERSION) ?? 0;
-  } catch (e) {
-    print("Failed to load previous advisory version, just returning advisory");
-    return advisoryRaw;
-  }
+  bool newAdvisories = numKnownAdvisories < advisories.length;
 
-  // Store the new version of the advisory.
-  await sharedPreferences.setInt(KEY_ADVISORY_VERSION, newVersion);
-
-  // Return the advisory only if the new version is newer than the last seen version.
-  if (newVersion > lastSeenVersion) {
-    print("Showing advisory: $advisory");
-    return advisory;
-  } else {
-    print("Not showing advisory because there is no new version");
-    return null;
-  }
+  return new AdvisoriesResponse(
+      advisories: advisories, newAdvisories: newAdvisories);
 }
 
 bool getShowFlashcards() {

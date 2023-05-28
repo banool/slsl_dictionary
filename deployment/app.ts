@@ -1,6 +1,6 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
-import { LOCATION, SLSL } from "./common";
+import { ADMIN_LOCATION, SLSL } from "./common";
 import { envVars } from "./config";
 import { database, databaseInstance, databaseUser } from "./db";
 import { gcpServices } from "./project";
@@ -18,7 +18,7 @@ const port = "8080";
 const env = "prod";
 const runArgs = [port, env];
 
-export const service = new gcp.cloudrun.Service(
+export const adminService = new gcp.cloudrun.Service(
   SLSL,
   {
     name: SLSL,
@@ -29,12 +29,13 @@ export const service = new gcp.cloudrun.Service(
       },
     },
     project: projectId,
-    location: LOCATION,
+    location: ADMIN_LOCATION,
     template: {
       metadata: {
+        namespace: projectId,
         annotations: {
-          "autoscaling.knative.dev/minScale": "0",
-          "autoscaling.knative.dev/maxScale": "1",
+          "autoscaling.knative.dev/minScale": "1",
+          "autoscaling.knative.dev/maxScale": "3",
           "run.googleapis.com/execution-environment": "gen2",
           // If this is true it makes sure we only get billed when handling a request,
           // though this means request handling will be take more time as the container
@@ -48,7 +49,7 @@ export const service = new gcp.cloudrun.Service(
       spec: {
         serviceAccountName: appServiceAccount.email,
         timeoutSeconds: 30,
-        containerConcurrency: 10,
+        containerConcurrency: 50,
         containers: [
           {
             image: imageName,
@@ -62,12 +63,12 @@ export const service = new gcp.cloudrun.Service(
             ],
             resources: {
               limits: {
-                cpu: "2",
-                memory: "2Gi",
+                cpu: "4",
+                memory: "4Gi",
               },
               requests: {
                 cpu: "1",
-                memory: "750Mi",
+                memory: "1Gi",
               },
             },
           },
@@ -110,9 +111,9 @@ new gcp.cloudrun.IamMember(
   {
     member: "allUsers",
     role: "roles/run.invoker",
-    service: service.name,
+    service: adminService.name,
     project: projectId,
-    location: service.location,
+    location: adminService.location,
   },
-  { dependsOn: [service] }
+  { dependsOn: [adminService] }
 );

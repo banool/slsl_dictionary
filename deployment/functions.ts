@@ -1,12 +1,12 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import { gcpServices } from "./project";
-import { mainBucket } from "./storage";
-import { LOCATION, SLSL } from "./common";
+import { adminBucket, mainBucket, mediaBucket } from "./storage";
+import { ADMIN_LOCATION, SLSL } from "./common";
 import * as fs from "fs";
 import * as archiver from "archiver";
 import { appServiceAccount } from "./iam";
-import { service } from "./app";
+import { adminService } from "./app";
 import { RUN_EVERY_N_MINUTES } from "./common";
 
 const ZIP_LOCATION = "/tmp/code.zip";
@@ -38,7 +38,7 @@ zipCode();
 const archive = new gcp.storage.BucketObject(
   `${SLSL}-dump-function-archive`,
   {
-    bucket: mainBucket.name,
+    bucket: adminBucket.name,
     source: new pulumi.asset.FileAsset(ZIP_LOCATION),
     name: "functions/dump_function.zip",
   },
@@ -50,22 +50,24 @@ export const func = new gcp.cloudfunctions.Function(
   `${SLSL}-dump-function`,
   {
     description:
-      "Function to read the DB and dump it to a file in the main bucket",
+      "Function to read the DB and dump it to a file in the media bucket",
     runtime: "python310",
     serviceAccountEmail: appServiceAccount.email,
     minInstances: 0,
     maxInstances: 1,
-    region: LOCATION,
+    region: ADMIN_LOCATION,
     availableMemoryMb: 256,
-    sourceArchiveBucket: mainBucket.name,
+    sourceArchiveBucket: adminBucket.name,
     sourceArchiveObject: archive.name,
     triggerHttp: true,
     httpsTriggerSecurityLevel: "secure-always",
     entryPoint: "main",
     environmentVariables: {
-      bucket_name: mainBucket.name,
+      // Take note of this. The function runs in the admin region but it dumps the data
+      // to the media bucket, which is located near the users of the app.
+      bucket_name: mediaBucket.name,
       dump_auth_token: config.requireSecret("dump_auth_token"),
-      cloud_run_instance_url: service.statuses[0].url,
+      cloud_run_instance_url: adminService.statuses[0].url,
       cache_duration_secs: RUN_EVERY_N_MINUTES * 60,
     },
   },

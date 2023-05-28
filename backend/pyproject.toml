@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Admin backend for SLSL Dictionary"
 authors = ["Daniel Porteous <danielporteous1@gmail.com>"]
 packages = [{ include = "slsl_backend" }]
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.9"
@@ -15,11 +16,16 @@ django-storages = {extras = ["google"], version = "^1.13.2"}
 psycopg2-binary = "^2.9.5"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
+autoflake = "^2.0.1"
 black = "^23.1.0"
 isort = "^5.12.0"
-autoflake = "^2.0.1"
+poethepoet = "^0.19.0"
+pytest = "^5.2"
+
+[tool.poe.tasks]
+isort = "isort **/*.py"
+black = "poetry run python -m black **/*.py"
 
 [build-system]
-requires = ["poetry-core==1.0.0"]
+requires = ["poetry-core>=1.4.2"]
 build-backend = "poetry.core.masonry.api"

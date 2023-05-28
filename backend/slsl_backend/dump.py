@@ -4,13 +4,21 @@ from . import models
 
 LOG = logging.getLogger(__name__)
 
+
 # Get the entire DB as JSON, to be stored in a bucket to then be served to clients.
 def build_dump():
     LOG.info("Building data dump")
 
     # Load all the information we care about from the entries.
     entries = models.Entry.objects.all()
-    entry_data = entries.values("id", "word_in_english", "word_in_tamil", "word_in_sinhala", "related_words", "category")
+    entry_data = entries.values(
+        "id",
+        "word_in_english",
+        "word_in_tamil",
+        "word_in_sinhala",
+        "related_words",
+        "category",
+    )
 
     # Build a map of Entry ID to Entry as a dict.
     id_to_entry = {}
@@ -21,7 +29,9 @@ def build_dump():
 
     # Load up a map of SubEntry ID to Entry ID.
     sub_entries = models.SubEntry.objects.all()
-    sub_entry_id_to_entry_id = {k: v for (k, v) in sub_entries.values_list("id", "entry")}
+    sub_entry_id_to_entry_id = {
+        k: v for (k, v) in sub_entries.values_list("id", "entry")
+    }
 
     # Attach video information to the entry data.
     videos = models.Video.objects.all()

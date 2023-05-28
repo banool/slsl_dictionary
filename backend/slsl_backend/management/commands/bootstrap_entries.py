@@ -49,12 +49,6 @@ class Command(BaseCommand):
 
         num_processed = 0
 
-        if options.get("dry_run"):
-            import json
-
-            print(json.dumps(category_to_word_to_video_fnames, indent=4))
-            sys.exit(0)
-
         # Get all Entries so we know what to skip.
         existing_words = [e.word_in_english for e in models.Entry.objects.all()]
 
@@ -66,29 +60,36 @@ class Command(BaseCommand):
                     print(f"Skipping {word} because it already exists in the DB")
                     continue
 
-                print(f"Working on word {word}: {[os.path.basename(f) for f in video_fnames]}")
+                print(
+                    f"Working on word {word}: {[os.path.basename(f) for f in video_fnames]}"
+                )
 
-                # Create the Entry
-                entry = models.Entry()
-                entry.word_in_english = word
-                if category and not category.startswith("Unknown"):
-                    entry.category = category
-                entry.save()
+                if options.get("dry_run"):
+                    print(
+                        f"Would've created entry for word {word} with {[os.path.basename(f) for f in video_fnames]}"
+                    )
+                else:
+                    # Create the Entry
+                    entry = models.Entry()
+                    entry.word_in_english = word
+                    if category and not category.startswith("Unknown"):
+                        entry.category = category
+                    entry.save()
 
-                # Create the SubEntry, pointing back to the Entry.
-                sub_entry = models.SubEntry()
-                sub_entry.entry = entry
-                sub_entry.save()
+                    # Create the SubEntry, pointing back to the Entry.
+                    sub_entry = models.SubEntry()
+                    sub_entry.entry = entry
+                    sub_entry.save()
 
-                # Attach the Videos to the SubEntry.
-                for fname in video_fnames:
-                    with open(fname, "rb") as f:
-                        content = File(f)
-                        # Create the Video and save the file content to it, which will
-                        # actually result in uploading the file.
-                        video = models.Video()
-                        video.sub_entry = sub_entry
-                        video.media.save(os.path.basename(fname), content)
+                    # Attach the Videos to the SubEntry.
+                    for fname in video_fnames:
+                        with open(fname, "rb") as f:
+                            content = File(f)
+                            # Create the Video and save the file content to it, which will
+                            # actually result in uploading the file.
+                            video = models.Video()
+                            video.sub_entry = sub_entry
+                            video.media.save(os.path.basename(fname), content)
 
                 num_processed += 1
                 if limit and num_processed >= limit:

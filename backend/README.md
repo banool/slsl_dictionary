@@ -57,10 +57,19 @@ poetry run ./run.sh 8080 dev true
 
 If when logging in you are prompted for a password in the pane where the server is running, enter the password for your laptop, I believe this is some keychain stuff (just a guess right now though).
 
-You can also use this setup to do the inital video upload:
+## Initial video upload
+First run the Cloud SQL proxy (see above).
+
+Then:
 ```
 ln -s /Users/dport/gdrive/Videos\ for\ SLSL\ Dictionary/ blah
 poetry run python manage.py bootstrap_entries blah/1-1\ Sri\ Lankan\ Sign\ Language\ Vocabulary\ Words/ --limit 10
 ```
 
 Note the symlink is necessary to avoid this issue: https://stackoverflow.com/questions/22019371/django-how-to-allow-a-suspicious-file-operation-copy-a-file.
+
+## Formatting
+```
+poetry run poe isort
+poetry run poe black
+```

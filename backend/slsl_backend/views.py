@@ -1,4 +1,5 @@
-from django.http import HttpResponseBadRequest, HttpResponseForbidden, JsonResponse
+from django.http import (HttpResponseBadRequest, HttpResponseForbidden,
+                         JsonResponse)
 
 from .dump import build_dump
 from .secrets import secrets

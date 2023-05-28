@@ -20,6 +20,7 @@ from django.core.files.base import File
 from django.core.management.base import BaseCommand
 
 from slsl_backend import models
+from slsl_backend.dump import build_dump_models
 
 
 class Command(BaseCommand):
@@ -49,15 +50,40 @@ class Command(BaseCommand):
 
         num_processed = 0
 
-        # Get all Entries so we know what to skip.
-        existing_words = [e.word_in_english for e in models.Entry.objects.all()]
+        # Get all Entries so we know what we might need to skip.
+        existing_entry_dump = build_dump_models()
+
+        # Create a map of words (in English, which is the primary key) to videos.
+        # For this we flatten out any sub entries' videos into a single list.
+        existing_word_to_video_fnames = {}
+        for e in existing_entry_dump:
+            videos = []
+            for s in e.get("sub_entries", []):
+                videos += s.get("videos", [])
+            existing_word_to_video_fnames[e["word_in_english"]] = videos
 
         for category, word_to_video_fnames in category_to_word_to_video_fnames.items():
             print(f"=== Working on category {category} ===")
             for word, video_fnames in word_to_video_fnames.items():
-                # Skip if an Entry with this word already exists.
-                if word in existing_words:
-                    print(f"Skipping {word} because it already exists in the DB")
+                # See if we need to skip the word, either because there is nothing to
+                # do or because manual intervention is required.
+                if word in existing_word_to_video_fnames:
+                    existing_video_basenames = [
+                        get_filename_no_ext(f)
+                        for f in existing_word_to_video_fnames[word]
+                    ]
+                    new_video_basenames = [get_filename_no_ext(f) for f in video_fnames]
+                    if set(existing_video_basenames) == set(new_video_basenames):
+                        print(
+                            f"Skipping {word} because it already exists in the DB and has the same videos"
+                        )
+                    else:
+                        print(
+                            f"WARNING: Skipping {word} because it already exists in the DB but has different videos"
+                        )
+                        # TODO Add instructions explaining what to do to fix this.
+                        print(f"Existing: {existing_video_basenames}")
+                        print(f"New: {new_video_basenames}")
                     continue
 
                 print(
@@ -164,3 +190,7 @@ def camel_case_split(identifier):
         ".+?(?:(?<=[a-z])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])|$)", identifier
     )
     return [m.group(0) for m in matches]
+
+
+def get_filename_no_ext(path):
+    return os.path.basename(os.path.splitext(os.path.basename(path))[0])

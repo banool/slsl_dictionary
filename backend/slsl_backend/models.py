@@ -85,6 +85,11 @@ class Language(models.TextChoices):
     SINHALA = "SIN", _("Sinhala")
 
 
+class Region(models.TextChoices):
+    ALL_OF_SRI_LANKA = "ALL", _("All of Sri Lanka")
+    NORTH_EAST = "NE", _("North East")
+
+
 # This links back to the Entry, implying there can be multiple SubEntries per Entry.
 # per SubEntry.
 class SubEntry(models.Model):
@@ -93,6 +98,13 @@ class SubEntry(models.Model):
 
     # Link back to the Entry.
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+
+    # All videos in a sub entry should share the same region information.
+    region = models.CharField(
+        max_length=3,
+        choices=Region.choices,
+        default=Region.ALL_OF_SRI_LANKA,
+    )
 
     def __str__(self):
         return f""
@@ -107,8 +119,9 @@ class Video(models.Model):
     # just use the development server file management (which is either in memory
     # or in a temp dir depending on the size). In prod this will use a real cloud
     # bucket. See settings.py for more.
+    # TODO: Consider actually validating that the file is valid H.264 mp4.
     media = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=["mp4", "mov"])]
+        validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
     )
 
     def __str__(self):

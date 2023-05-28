@@ -5,10 +5,7 @@ from . import models
 LOG = logging.getLogger(__name__)
 
 
-# Get the entire DB as JSON, to be stored in a bucket to then be served to clients.
-def build_dump():
-    LOG.info("Building data dump")
-
+def build_dump_models():
     # Load all the information we care about from the entries.
     entries = models.Entry.objects.all()
     entry_data = entries.values(
@@ -65,9 +62,18 @@ def build_dump():
         entry["sub_entries"] = list(entry["sub_entries"].values())
         out.append(entry)
 
+    return out
+
+
+# Get the entire DB as JSON, to be stored in a bucket to then be served to clients.
+def build_dump():
+    LOG.info("Building data dump")
+
+    out = build_dump_models()
+
     # Throw out the Entry IDs and just take the values.
     out = {"data": out}
 
-    LOG.info(f"Returning data dump containing {len(id_to_entry)} entries")
+    LOG.info(f"Returning data dump containing {len(out)} entries")
 
     return out

@@ -57,6 +57,5 @@ if not ("sql_unix_socket" in secrets or "sql_host" in secrets):
         "You must set a unix socket or a host/port for the DB connection"
     )
 
-
 if invalid:
     raise RuntimeError(f"These secrets were not set: {invalid}")

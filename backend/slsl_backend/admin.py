@@ -1,6 +1,5 @@
 from django.contrib import admin
-from nested_admin import (NestedModelAdmin, NestedStackedInline,
-                          NestedTabularInline)
+from nested_admin import NestedModelAdmin, NestedStackedInline, NestedTabularInline
 
 from . import models
 from .secrets import secrets

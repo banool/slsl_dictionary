@@ -30,11 +30,11 @@ class TopLevelScaffold extends StatelessWidget {
     var items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(Icons.search),
-        label: "Search",
+        label: AppLocalizations.of(context)!.searchTitle,
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.view_list),
-        label: "Lists",
+        label: AppLocalizations.of(context)!.listsTitle,
       ),
     ];
 
@@ -42,14 +42,14 @@ class TopLevelScaffold extends StatelessWidget {
       items.add(
         BottomNavigationBarItem(
           icon: Icon(Icons.style),
-          label: "Revision",
+          label: AppLocalizations.of(context)!.revisionTitle,
         ),
       );
     }
 
     items.add(BottomNavigationBarItem(
       icon: Icon(Icons.settings),
-      label: "Settings",
+      label: AppLocalizations.of(context)!.settingsTitle,
     ));
 
     return Scaffold(

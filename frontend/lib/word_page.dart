@@ -1,28 +1,11 @@
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 import 'common.dart';
 import 'globals.dart';
 import 'types.dart';
 import 'video_player_screen.dart';
-
-Widget getAuslanSignbankLaunchAppBarActionWidget(
-    BuildContext context, String word, int currentPage,
-    {bool enabled = true}) {
-  return buildActionButton(
-    context,
-    Icon(Icons.public, semanticLabel: "Link to sign in Auslan Signbank"),
-    () async {
-      print('sdfdsf');
-      var url =
-          'http://www.auslan.org.au/dictionary/words/$word-${currentPage + 1}.html';
-      await launch(url, forceSafariVC: false);
-    },
-    enabled: enabled,
-  );
-}
 
 class WordPage extends StatefulWidget {
   WordPage({Key? key, required this.word, required this.showFavouritesButton})
@@ -92,9 +75,9 @@ class _WordPageState extends State<WordPage> {
 
     Icon starIcon;
     if (isFavourited) {
-      starIcon = Icon(Icons.star, semanticLabel: "Already favourited!");
+      starIcon = Icon(Icons.star, semanticLabel: blehwordAlreadyFavourited);
     } else {
-      starIcon = Icon(Icons.star_outline, semanticLabel: "Favourite this word");
+      starIcon = Icon(Icons.star_outline, semanticLabel: blehFavouriteThisWord);
     }
 
     List<Widget> actions = [];
@@ -116,16 +99,14 @@ class _WordPageState extends State<WordPage> {
     }
 
     actions += [
-      getAuslanSignbankLaunchAppBarActionWidget(
-          context, word.word, currentPage),
       getPlaybackSpeedDropdownWidget(
         (p) {
           setState(() {
             playbackSpeed = p!;
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content:
-                  Text("Set playback speed to ${getPlaybackSpeedString(p!)}"),
+              content: Text(
+                  "${blehsetPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
               backgroundColor: MAIN_COLOR,
               duration: Duration(milliseconds: 1000)));
         },
@@ -202,7 +183,7 @@ Widget? getRelatedWordsWidget(
   }
 
   var initial = TextSpan(
-      text: "Related words: ",
+      text: "${blehrelatedWords}: ",
       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
   textSpans = [initial] + textSpans;
   var richText = RichText(

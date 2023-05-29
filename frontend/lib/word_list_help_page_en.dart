@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'help_page_common.dart';
 
-Widget getWordListHelpPage() {
+Widget getWordListHelpPageEn() {
   return HelpPage(title: "List FAQ", items: {
     "How do I add words to a list?": [
       "In the app bar in the top right corner, there is a pencil icon. "

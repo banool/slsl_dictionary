@@ -3,9 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
-import 'flashcards_help_page.dart';
+import 'flashcards_help_page_en.dart';
 import 'flashcards_logic.dart';
 import 'flashcards_page.dart';
 import 'globals.dart';
@@ -21,9 +22,6 @@ const String KEY_USE_UNKNOWN_REGION_SIGNS = "use_unknown_region_signs";
 const String KEY_ONE_CARD_PER_WORD = "one_card_per_word";
 
 const String KEY_LISTS_TO_REVIEW = "lists_chosen_to_review";
-
-const String ONLY_ONE_CARD_TEXT = "Show only one set of cards per word";
-const String UNKNOWN_REGIONS_TEXT = "Signs with unknown region";
 
 class FlashcardsLandingPage extends StatefulWidget {
   @override
@@ -179,7 +177,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             .map((e) => int.parse(e))
             .toList();
 
-    String regionsString = "All of Australia";
+    String regionsString =
+        AppLocalizations.of(context)!.flashcardsAllOfSriLanka;
 
     String additionalRegionsValuesString = additionalRegionsValues
         .map((i) => Region.values[i].pretty)
@@ -190,13 +189,6 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
       regionsString += " + " + additionalRegionsValuesString;
     }
 
-    bool useUnknownRegionSigns =
-        sharedPreferences.getBool(KEY_USE_UNKNOWN_REGION_SIGNS) ?? true;
-
-    if (useUnknownRegionSigns) {
-      regionsString += " + signs with unknown region";
-    }
-
     var revisionStrategy = loadRevisionStrategy();
 
     int cardsToDo =
@@ -204,10 +196,12 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     String cardNumberString;
     switch (revisionStrategy) {
       case RevisionStrategy.Random:
-        cardNumberString = "$cardsToDo cards selected";
+        cardNumberString =
+            AppLocalizations.of(context)!.nFlashcardsSelected(cardsToDo);
         break;
       case RevisionStrategy.SpacedRepetition:
-        cardNumberString = "$cardsToDo cards due";
+        cardNumberString =
+            AppLocalizations.of(context)!.nFlashcardsDue(cardsToDo);
         break;
     }
 
@@ -216,12 +210,13 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         title: Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Text(
-              'Revision Sources',
+              AppLocalizations.of(context)!.flashcardsRevisionSources,
               style: TextStyle(fontSize: 16),
             )),
         tiles: [
           SettingsTile.navigation(
-            title: getText("Select lists to revise"),
+            title: getText(
+                AppLocalizations.of(context)!.flashcardsSelectListsToRevise),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
@@ -234,7 +229,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                   }
                   return MultiSelectDialog<String>(
                     listType: MultiSelectListType.CHIP,
-                    title: Text("Select Lists"),
+                    title: Text(
+                        AppLocalizations.of(context)!.flashcardsSelectLists),
                     items: items,
                     initialValue: listsToReview,
                     onConfirm: (List<String> values) async {
@@ -264,13 +260,13 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           title: Padding(
               padding: EdgeInsets.only(bottom: 5),
               child: Text(
-                'Flashcard Types',
+                AppLocalizations.of(context)!.flashcardsTypes,
                 style: TextStyle(fontSize: 16),
               )),
           tiles: [
             SettingsTile.switchTile(
                 title: Text(
-                  'Sign -> Word',
+                  AppLocalizations.of(context)!.flashcardsSignToWord,
                   style: TextStyle(fontSize: 15),
                 ),
                 initialValue:
@@ -281,7 +277,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 }),
             SettingsTile.switchTile(
                 title: Text(
-                  'Word -> Sign',
+                  AppLocalizations.of(context)!.flashcardsWordToSign,
                   style: TextStyle(fontSize: 15),
                 ),
                 initialValue:
@@ -295,19 +291,21 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         title: Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Text(
-              'Revision Settings',
+              AppLocalizations.of(context)!.flashcardsRevisionSettings,
               style: TextStyle(fontSize: 16),
             )),
         tiles: [
           SettingsTile.navigation(
-            title: getText('Select revision strategy'),
+            title: getText(
+                AppLocalizations.of(context)!.flashcardsSelectRevisionStrategy),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     SimpleDialog dialog = SimpleDialog(
-                      title: const Text('Strategy'),
+                      title: const Text(
+                          AppLocalizations.of(context)!.flashcardsStrategy),
                       children: RevisionStrategy.values
                           .map((e) => SimpleDialogOption(
                                 child: Container(
@@ -350,7 +348,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 builder: (ctx) {
                   return MultiSelectDialog(
                     listType: MultiSelectListType.CHIP,
-                    title: Text("Regions"),
+                    title:
+                        Text(AppLocalizations.of(context)!.flashcardsRegions),
                     items: regionsWithoutEverywhere
                         .map((e) => MultiSelectItem(e.index, e.pretty))
                         .toList(),
@@ -369,23 +368,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           ),
           SettingsTile.switchTile(
             title: Text(
-              UNKNOWN_REGIONS_TEXT,
-              style: TextStyle(fontSize: 15),
-            ),
-            initialValue: useUnknownRegionSigns,
-            onToggle: (newValue) {
-              onPrefSwitch(KEY_USE_UNKNOWN_REGION_SIGNS, newValue,
-                  influencesStartValidity: false);
-              updateRevisionSettings();
-            },
-            description: Text(
-              regionsString,
-              textAlign: TextAlign.center,
-            ),
-          ),
-          SettingsTile.switchTile(
-            title: Text(
-              ONLY_ONE_CARD_TEXT,
+              AppLocalizations.of(context)!.flashcardsOnlyOneCard,
               style: TextStyle(fontSize: 15),
             ),
             initialValue:
@@ -443,7 +426,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
               child: TextButton(
                 key: ValueKey("startButton"),
                 child: Text(
-                  "Start",
+                  AppLocalizations.of(context)!.flashcardsStart,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20),
                 ),
@@ -490,13 +473,17 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => getFlashcardsHelpPage()),
+            MaterialPageRoute(
+                builder: (context) => getFlashcardsHelpPageEn(context)),
           );
         },
       )
     ];
 
-    return TopLevelScaffold(body: body, title: "Revision", actions: actions);
+    return TopLevelScaffold(
+        body: body,
+        title: AppLocalizations.of(context)!.revisionTitle,
+        actions: actions);
   }
 }
 

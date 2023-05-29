@@ -8,6 +8,8 @@ import 'types.dart';
 const String KEY_WORD_LIST_KEYS = "word_list_keys";
 
 class WordList {
+  // TODO: Might have to update this for Sinhala / Tamil, perhaps by listing out
+  // instead what characters are _not_ valid.
   static final validNameCharacters = RegExp(r'^[a-zA-Z0-9 ]+$');
 
   String key;
@@ -65,7 +67,7 @@ class WordList {
 
   static String getNameFromKey(String key) {
     if (key == KEY_FAVOURITES_WORDS) {
-      return "Favourites";
+      return AppLocalizations.of(context)!.listFavourites;
     }
     return key.substring(0, key.length - 6).replaceAll("_", " ");
   }
@@ -76,10 +78,10 @@ class WordList {
 
   static String getKeyFromName(String name) {
     if (name.length == 0) {
-      throw "List name cannot be empty";
+      throw AppLocalizations.of(context)!.listNameCannotBeEmpty;
     }
     if (!validNameCharacters.hasMatch(name)) {
-      throw "Invalid name, this should have been caught already";
+      throw AppLocalizations.of(context)!.listNameInvalid;
     }
     return "${name}_words".replaceAll(" ", "_");
   }

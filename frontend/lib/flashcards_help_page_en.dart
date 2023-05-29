@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'help_page_common.dart';
-import 'flashcards_landing_page.dart';
 
-Widget getFlashcardsHelpPage() {
+// This would be too much too annoying to localize the normal way so instead
+// I have different files for each of these in each language.
+Widget getFlashcardsHelpPageEn(BuildContext context) {
   return HelpPage(title: "Revision FAQ", items: {
     "What do the flashcard types mean?": [
       "There are two types of flashcards you can choose to revise. You must select at least one.",
@@ -31,12 +32,9 @@ Widget getFlashcardsHelpPage() {
           "By default we automatically opt you in to signs that are known to be "
           "used throughout the whole country, but you may also opt in to seeing "
           "signs from specific regions (e.g. Northern, VIC, WA, etc). ",
-      "Many signs in the signbank don't have regional information attached. "
-          "For those you may enable \"$UNKNOWN_REGIONS_TEXT\". I would "
-          "generally recommend leaving this enabled, but we provide this option "
-          "based on whatever works best for you."
     ],
-    "What does \"$ONLY_ONE_CARD_TEXT\" mean?": [
+    "What does \"${AppLocalizations.of(context)!.flashcardsOnlyOneCard}\" mean?":
+        [
       "Based on the other filtering options you have set, there may be "
           "situations where there are multiple sub-entries for a single entry. "
           "In other words, for a single word you might have a sub-entry from "

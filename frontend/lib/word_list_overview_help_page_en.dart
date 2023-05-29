@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'help_page_common.dart';
 
-Widget getWordListOverviewHelpPage() {
+Widget getWordListOverviewHelpPageEn() {
   return HelpPage(title: "Lists FAQ", items: {
     "How do I make a new list?": [
       "In the app bar in the top right corner, there is a pencil icon. Tap this to enter edit mode. "

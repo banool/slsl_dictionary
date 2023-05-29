@@ -149,12 +149,19 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
         String days = longestStreakDays == 1 ? "day" : "days";
 
         leftColumn = [
-          getText("Total Reviews:", bold: true),
-          getText("Success Rate:", bold: true),
-          getText("Successful Cards:", bold: true),
-          getText("Unsuccessful Cards:", bold: true),
-          getText("Unique Words:", bold: true),
-          getText("Longest Streak:", bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsTotalReviews}:",
+              bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsSuccessRate}:",
+              bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsSuccessfulCards}:",
+              bold: true),
+          getText(
+              "${AppLocalizations.of(context)!.flashcardsUnsuccessfulCards}:",
+              bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsUniqueWords}:",
+              bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsLongestStreak}:",
+              bold: true),
         ];
         rightColumn = [
           getText("$totalAnswers"),
@@ -169,7 +176,8 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
         int totalRandomReviews =
             sharedPreferences.getInt(KEY_RANDOM_REVIEWS_COUNTER) ?? 0;
         leftColumn = [
-          getText("Total Reviews:", bold: true),
+          getText("${AppLocalizations.of(context)!.flashcardsTotalReviews}:",
+              bold: true),
         ];
         rightColumn = [getText("$totalRandomReviews")];
         int? firstStartedTrackingRandomReviews =
@@ -179,14 +187,17 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
                   firstStartedTrackingRandomReviews * 1000)
               .toLocal();
           String dateString = getDatetimeString(dt);
-          disclaimer = Text("Stats collected since $dateString");
+          // TODO Localize this date string if this isn't happening already.
+          disclaimer = Text(
+              "${AppLocalizations.of(context)!.flashcardsStatsCollectedSince} $dateString");
         }
         break;
     }
 
     return Scaffold(
         appBar: AppBar(
-          title: Text("Revision Progress"),
+          title: Text(
+              AppLocalizations.of(context)!.flashcardsRevisionProgressTitle),
           centerTitle: true,
         ),
         body: CustomScrollView(slivers: [
@@ -197,7 +208,8 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
                   Padding(
                     padding: EdgeInsets.only(top: 50),
                   ),
-                  Text("Revision strategy to show stats for"),
+                  Text(AppLocalizations.of(context)!
+                      .flashcardsRevisionStategyToShow),
                   Padding(
                     padding: EdgeInsets.only(top: 15),
                   ),

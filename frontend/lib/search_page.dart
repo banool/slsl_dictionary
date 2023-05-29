@@ -87,7 +87,7 @@ class _SearchPageState extends State<SearchPage> {
                     TextField(
                       controller: _searchFieldController,
                       decoration: InputDecoration(
-                        hintText: 'Search for a word',
+                        hintText: AppLocalizations.of(context)!.searchHintText,
                         suffixIcon: IconButton(
                           onPressed: () {
                             clearSearch();
@@ -127,14 +127,17 @@ class _SearchPageState extends State<SearchPage> {
       ));
     }
 
-    return TopLevelScaffold(body: body, title: "Search", actions: actions);
+    return TopLevelScaffold(
+        body: body,
+        title: AppLocalizations.of(context)!.searchTitle,
+        actions: actions);
   }
 
   void showAdvisoryDialog() {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text("Announcement"),
+              title: Text(AppLocalizations.of(context)!.newsTitle),
               // TODO Do this properly.
               content: Text(advisoriesResponse!.advisories[0].lines[0]),
             ));

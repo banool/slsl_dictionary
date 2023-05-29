@@ -35,11 +35,13 @@ class SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     String appStoreTileString;
     if (Platform.isAndroid) {
-      appStoreTileString = 'Give feedback on Play Store';
+      appStoreTileString =
+          AppLocalizations.of(context)!.settingsPlayStoreFeedback;
     } else if (Platform.isIOS) {
-      appStoreTileString = 'Give feedback on App Store';
+      appStoreTileString =
+          AppLocalizations.of(context)!.settingsAppStoreFeedback;
     } else {
-      appStoreTileString = "N/A";
+      appStoreTileString = AppLocalizations.of(context)!.na;
     }
 
     EdgeInsetsDirectional margin =
@@ -48,11 +50,11 @@ class SettingsPageState extends State<SettingsPage> {
     SettingsSection? featuresSection;
     if (enableFlashcardsKnob && !getShouldUseHorizontalLayout(context)) {
       featuresSection = SettingsSection(
-        title: Text('Revision'),
+        title: Text(AppLocalizations.of(context)!.settingsRevision),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              'Hide revision feature',
+              AppLocalizations.of(context)!.settingsHideRevision,
               style: TextStyle(fontSize: 15),
             ),
             initialValue:
@@ -61,22 +63,21 @@ class SettingsPageState extends State<SettingsPage> {
           ),
           SettingsTile.navigation(
               title: getText(
-                'Delete all revision progress',
+                AppLocalizations.of(context)!.settingsDeleteRevisionProgress,
               ),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 bool confirmed = await confirmAlert(
                     context,
-                    Text("This will delete all your review progress from all "
-                        "time for both the spaced repetition and random review "
-                        "strategies. Your lists (including favourites) will not "
-                        "be affected. Are you 100% sure you want to do this?"));
+                    Text(AppLocalizations.of(context)!
+                        .settingsDeleteRevisionProgressExplanation));
                 if (confirmed) {
                   await writeReviews([], [], force: true);
                   await sharedPreferences.setInt(KEY_RANDOM_REVIEWS_COUNTER, 0);
                   await sharedPreferences.remove(KEY_FIRST_RANDOM_REVIEW);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text("All review progress deleted"),
+                    content: Text(
+                        AppLocalizations.of(context)!.settingsProgressDeleted),
                     backgroundColor: MAIN_COLOR,
                   ));
                 }
@@ -88,25 +89,24 @@ class SettingsPageState extends State<SettingsPage> {
 
     List<AbstractSettingsSection?> sections = [
       SettingsSection(
-        title: Text('Cache'),
+        title: Text(AppLocalizations.of(context)!.settingsCache),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              'Cache videos',
+              AppLocalizations.of(context)!.settingsCacheVideos,
               style: TextStyle(fontSize: 15),
             ),
             initialValue: sharedPreferences.getBool(KEY_SHOULD_CACHE) ?? true,
             onToggle: onChangeShouldCache,
           ),
           SettingsTile.navigation(
-              title: getText(
-                'Drop cache',
-              ),
+              title: getText(AppLocalizations.of(context)!.settingsDropCache),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 await videoCacheManager.emptyCache();
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                  content: Text("Cache dropped"),
+                  content:
+                      Text(AppLocalizations.of(context)!.settingsCacheDropped),
                   backgroundColor: MAIN_COLOR,
                 ));
               }),
@@ -114,12 +114,10 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-        title: Text('Data'),
+        title: Text(AppLocalizations.of(context)!.settingsData),
         tiles: [
           SettingsTile.navigation(
-            title: getText(
-              'Check for new dictionary data',
-            ),
+            title: getText(AppLocalizations.of(context)!.settingsCheckNewData),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               bool updated = await getNewData(true);
@@ -127,9 +125,9 @@ class SettingsPageState extends State<SettingsPage> {
               if (updated) {
                 wordsGlobal = await loadWords();
                 updateKeyedWordsGlobal();
-                message = "Successfully updated dictionary data";
+                message = AppLocalizations.of(context)!.settingsDataUpdated;
               } else {
-                message = "Data is already up to date";
+                message = AppLocalizations.of(context)!.DataUpToDate;
               }
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(message), backgroundColor: MAIN_COLOR));
@@ -140,12 +138,10 @@ class SettingsPageState extends State<SettingsPage> {
       ),
       featuresSection,
       SettingsSection(
-        title: Text('Legal'),
+        title: Text(AppLocalizations.of(context)!.settingsLegal),
         tiles: [
           SettingsTile.navigation(
-            title: getText(
-              'See legal information',
-            ),
+            title: getText(AppLocalizations.of(context)!.settingsSeeLegal),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               return await Navigator.push(
@@ -159,12 +155,11 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-          title: Text('Help'),
+          title: Text(AppLocalizations.of(context)!.settingsHelp),
           tiles: [
             SettingsTile.navigation(
-              title: getText(
-                'Report issue with dictionary data',
-              ),
+              title: getText(AppLocalizations.of(context)!
+                  .settingsReportDictionaryDataIssue),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var url = 'https://www.auslan.org.au/feedback/';
@@ -173,8 +168,7 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                'Report issue with app (GitHub)',
-              ),
+                  AppLocalizations.of(context)!.settingsReportAppIssueGithub),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var url = 'https://github.com/banool/auslan_dictionary/issues';
@@ -183,13 +177,12 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                'Report issue with app (Email)',
-              ),
+                  AppLocalizations.of(context)!.settingsReportAppIssueEmail),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var mailto = Mailto(
                     to: ['danielporteous1@gmail.com'],
-                    subject: 'Issue with Auslan Dictionary',
+                    subject: 'Issue with SLSL Dictionary',
                     body:
                         'Please tell me what device you are using and describe the issue in detail. Thanks!');
                 String url = "$mailto";
@@ -204,8 +197,7 @@ class SettingsPageState extends State<SettingsPage> {
               title: getText(appStoreTileString),
               trailing: Container(),
               onPressed: (BuildContext context) async {
-                await LaunchReview.launch(
-                    iOSAppId: "1531368368", writeReview: true);
+                await LaunchReview.launch(iOSAppId: "todo", writeReview: true);
               },
             ),
           ],
@@ -234,7 +226,10 @@ class SettingsPageState extends State<SettingsPage> {
       )
     ];
 
-    return TopLevelScaffold(body: body, title: "Search", actions: actions);
+    return TopLevelScaffold(
+        body: body,
+        title: AppLocalizations.of(context)!.SettingsTitle,
+        actions: actions);
   }
 }
 
@@ -250,6 +245,7 @@ Text getText(String s, {bool larger = false, Color? color}) {
   );
 }
 
+// TODO Translate this once we have legal information sorted out.
 class LegalInformationPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

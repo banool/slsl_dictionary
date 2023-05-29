@@ -5,7 +5,7 @@ import 'common.dart';
 import 'globals.dart';
 import 'top_level_scaffold.dart';
 import 'word_list_logic.dart';
-import 'word_list_overview_help_page.dart';
+import 'word_list_overview_help_page_en.dart';
 import 'word_list_page.dart';
 
 class WordListsOverviewPage extends StatefulWidget {
@@ -125,7 +125,7 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
           await Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => getWordListOverviewHelpPage()),
+                builder: (context) => getWordListOverviewHelpPageEn()),
           );
         },
       )
@@ -133,7 +133,7 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: "Lists",
+        title: AppLocalizations.of(context)!.listsTitle,
         actions: actions,
         floatingActionButton: floatingActionButton);
   }
@@ -144,6 +144,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
   TextEditingController controller = TextEditingController();
 
   List<Widget> children = [
+    // TODO update this with a real regex
     Text(
       "Only letters, numbers, and spaces are allowed.",
     ),
@@ -151,7 +152,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: 'Enter new list name',
+        hintText: AppLocalizations.of(context)!.listEnterNewName,
       ),
       autofocus: true,
       inputFormatters: [
@@ -175,7 +176,8 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
       await wordListManager.createWordList(key);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Failed to make new list: $e."),
+          content:
+              Text("${AppLocalizations.of(context)!.listFailedToMake}: $e."),
           backgroundColor: Colors.red));
       confirmed = false;
     }

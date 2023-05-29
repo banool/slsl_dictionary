@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'common.dart';
 import 'globals.dart';
 import 'types.dart';
-import 'word_list_help_page.dart';
+import 'word_list_help_page_en.dart';
 import 'word_list_logic.dart';
 
 class WordListPage extends StatefulWidget {
@@ -128,7 +128,7 @@ class _WordListPageState extends State<WordListPage> {
         () async {
           await Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => getWordListHelpPage()),
+            MaterialPageRoute(builder: (context) => getWordListHelpPageEn()),
           );
         },
       ),
@@ -148,7 +148,7 @@ class _WordListPageState extends State<WordListPage> {
 
     String hintText;
     if (inEditMode) {
-      hintText = "Search for words to add";
+      hintText = AppLocalizations.of(context)!.listSearchAdd;
       bool keyboardIsShowing = MediaQuery.of(context).viewInsets.bottom > 0;
       if (currentSearchTerm.length > 0 || keyboardIsShowing) {
         floatingActionButton = null;
@@ -161,7 +161,7 @@ class _WordListPageState extends State<WordListPage> {
             child: Icon(Icons.add));
       }
     } else {
-      hintText = "Search $listName";
+      hintText = "${AppLocalizations.of(context)!.listSearchPrefix} $listName";
     }
 
     return Scaffold(

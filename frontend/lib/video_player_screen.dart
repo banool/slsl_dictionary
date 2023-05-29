@@ -225,7 +225,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       } else {
         errorWidgets[idx] = Column(children: [
           Text(
-            "Unexpected error loading $videoLink: $e",
+            "${AppLocalizations.of(context)!.unexpectedErrorLoadingVideo} $videoLink: $e",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 11),
           )

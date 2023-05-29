@@ -16,3 +16,23 @@ class SubEntry {
   // Probably should for the sake of future proofing.
   getRegions()
 }
+
+enum Language {
+  EN_US,
+  // Use proper codes for other languages.
+  SINHALA,
+  TAMIL,
+}
+
+String getLanguageString(Language language) {
+  switch (language) {
+    case Language.EN_US:
+      return "English";
+    case Language.SINHALA:
+      // Use word for Sinhala in Sinhala
+      return "Sinhala";
+    case Language.TAMIL:
+      // Use word for Tamil in Tamil
+      return "Tamil";
+  }
+}

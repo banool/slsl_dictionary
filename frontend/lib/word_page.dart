@@ -3,9 +3,37 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
+import 'entries_logic.dart';
 import 'globals.dart';
 import 'types.dart';
 import 'video_player_screen.dart';
+
+Widget getSwitchLanguageAppBarActionWidget(void Function(Language?) onChanged,
+    {bool enabled = true}) {
+  Color? color;
+  if (!enabled) {
+    color = APP_BAR_DISABLED_COLOR;
+  }
+  return Container(
+      child: Align(
+          alignment: Alignment.center,
+          child: PopupMenuButton<Language>(
+            icon: Icon(
+              Icons.language,
+              color: color,
+            ),
+            enabled: enabled,
+            itemBuilder: (BuildContext context) {
+              return Language.values.map((Language value) {
+                return PopupMenuItem<Language>(
+                  value: value,
+                  child: Text(getLanguageString(value)),
+                );
+              }).toList();
+            },
+            onSelected: enabled ? onChanged : null,
+          )));
+}
 
 class WordPage extends StatefulWidget {
   WordPage({Key? key, required this.word, required this.showFavouritesButton})
@@ -75,9 +103,11 @@ class _WordPageState extends State<WordPage> {
 
     Icon starIcon;
     if (isFavourited) {
-      starIcon = Icon(Icons.star, semanticLabel: blehwordAlreadyFavourited);
+      starIcon = Icon(Icons.star,
+          semanticLabel: AppLocalizations.of(context)!.wordAlreadyFavourited);
     } else {
-      starIcon = Icon(Icons.star_outline, semanticLabel: blehFavouriteThisWord);
+      starIcon = Icon(Icons.star_outline,
+          semanticLabel: AppLocalizations.of(context)!.FavouriteThisWord);
     }
 
     List<Widget> actions = [];
@@ -99,6 +129,10 @@ class _WordPageState extends State<WordPage> {
     }
 
     actions += [
+      getSwitchLanguageAppBarActionWidget((p0) {
+        // todo, switch the stuff we're showing in the entry
+        // don't change the app language though
+      }),
       getPlaybackSpeedDropdownWidget(
         (p) {
           setState(() {
@@ -106,7 +140,7 @@ class _WordPageState extends State<WordPage> {
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
-                  "${blehsetPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
+                  "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
               backgroundColor: MAIN_COLOR,
               duration: Duration(milliseconds: 1000)));
         },
@@ -183,7 +217,7 @@ Widget? getRelatedWordsWidget(
   }
 
   var initial = TextSpan(
-      text: "${blehrelatedWords}: ",
+      text: "${AppLocalizations.of(context)!.relatedWords}: ",
       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
   textSpans = [initial] + textSpans;
   var richText = RichText(

@@ -164,10 +164,7 @@ STORAGES: typing.Dict[str, typing.Dict[str, typing.Any]] = {
 if secrets.get("admin_bucket_name"):
     STORAGES["staticfiles"] = {
         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {
-            "bucket_name": secrets["admin_bucket_name"],
-            "location": "static"
-        }
+        "OPTIONS": {"bucket_name": secrets["admin_bucket_name"], "location": "static"},
     }
 else:
     STATIC_ROOT = "static"
@@ -175,12 +172,8 @@ else:
 if secrets.get("media_bucket_name"):
     STORAGES["default"] = {
         "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {
-            "bucket_name": secrets["media_bucket_name"],
-            "location": "media"
-        }
+        "OPTIONS": {"bucket_name": secrets["media_bucket_name"], "location": "media"},
     }
-
 
 
 # Password validation

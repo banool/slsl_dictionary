@@ -32,23 +32,31 @@ def build_dump_models():
         k: v for (k, v) in sub_entries.values_list("id", "entry")
     }
 
+    # Add base information for each sub-entry.
+    for sub_entry in sub_entries:
+        entry_id = sub_entry_id_to_entry_id[sub_entry.id]
+        entry = id_to_entry[entry_id]
+        sub_entries = entry.setdefault("sub_entries", {})
+        sub_entry_dict = model_to_dict(sub_entry)
+        del sub_entry_dict["id"]
+        del sub_entry_dict["entry"]
+        sub_entry = sub_entries.setdefault(sub_entry.id, sub_entry_dict)
+
     # Attach video information to the sub-entry data.
     videos = models.Video.objects.all()
-    print(videos[:1])
     for video in videos:
         entry_id = sub_entry_id_to_entry_id[video.sub_entry_id]
         entry = id_to_entry[entry_id]
-        sub_entries = entry.setdefault("sub_entries", {})
+        sub_entries = entry["sub_entries"]
         sub_entry = sub_entries.setdefault(video.sub_entry_id, {})
         sub_entry.setdefault("videos", []).append(video.media.url)
 
     # Attach definitions information to the sub-entry data.
     definitions = models.Definition.objects.all()
-    print(definitions[:1])
     for definition in definitions:
         entry_id = sub_entry_id_to_entry_id[definition.sub_entry_id]
         entry = id_to_entry[entry_id]
-        sub_entries = entry.setdefault("sub_entries", {})
+        sub_entries = entry["sub_entries"]
         sub_entry = sub_entries.setdefault(definition.sub_entry_id, {})
         definition = model_to_dict(definition)
         del definition["id"]

@@ -8,6 +8,3 @@ StaticStorage = lambda: GoogleCloudStorage(
 MediaStorage = lambda: GoogleCloudStorage(
     bucket=secrets["media_bucket_name"], location="media"
 )
-DumpStorage = lambda: GoogleCloudStorage(
-    bucket=secrets["media_bucket_name"], location="dump"
-)

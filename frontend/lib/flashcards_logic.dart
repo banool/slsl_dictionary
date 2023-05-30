@@ -1,5 +1,6 @@
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 
+import 'entries_types.dart';
 import 'globals.dart';
 import 'types.dart';
 
@@ -10,110 +11,111 @@ const String KEY_FIRST_RANDOM_REVIEW = "mykey_first_random_review";
 class DolphinInformation {
   DolphinInformation({
     required this.dolphin,
-    required this.keyToSubWordMap,
+    required this.keyToSubEntryMap,
   });
 
   DolphinSR dolphin;
-  Map<String, SubWordWrapper> keyToSubWordMap;
+  Map<String, SubEntryWrapper> keyToSubEntryMap;
 }
 
-class SubWordWrapper {
-  SubWord subWord;
+class SubEntryWrapper {
+  SubEntry subEntry;
   // We need this to know how to build the link to Auslan Signbank.
   int index;
 
-  SubWordWrapper({
-    required this.subWord,
+  SubEntryWrapper({
+    required this.subEntry,
     required this.index,
   });
 }
 
-Set<Word> getWordsFromLists(List<String> listsToUse) {
-  Set<Word> out = {};
+Set<Entry> getEntriesFromLists(List<String> listsToUse) {
+  Set<Entry> out = {};
   for (String key in listsToUse) {
-    out.addAll(wordListManager.wordLists[key]!.words);
+    out.addAll(entryListManager.entryLists[key]!.entries);
   }
   return out;
 }
 
-Map<String, List<SubWordWrapper>> getSubWordsFromWords(Set<Word> favourites) {
-  Map<String, List<SubWordWrapper>> subWords = Map();
-  for (Word w in favourites) {
+Map<String, List<SubEntryWrapper>> getSubEntriesFromEntries(
+    Set<Entry> favourites) {
+  Map<String, List<SubEntryWrapper>> subEntrys = Map();
+  for (Entry e in favourites) {
     int i = 0;
-    subWords[w.word] = [];
-    for (SubWord sw in w.subWords) {
-      subWords[w.word]!.add(SubWordWrapper(subWord: sw, index: i));
+    subEntrys[e.getKey()] = [];
+    for (SubEntry sw in e.getSubEntries()) {
+      subEntrys[e.getKey()]!.add(SubEntryWrapper(subEntry: sw, index: i));
       i += 1;
     }
   }
-  return subWords;
+  return subEntrys;
 }
 
-int getNumSubWords(Map<String, List<SubWord>> subWords) {
-  if (subWords.values.length == 0) {
+int getNumSubEntries(Map<String, List<SubEntry>> subEntrys) {
+  if (subEntrys.values.length == 0) {
     return 0;
   }
-  if (subWords.values.length == 1) {
-    return subWords.values.toList()[0].length;
+  if (subEntrys.values.length == 1) {
+    return subEntrys.values.toList()[0].length;
   }
-  return subWords.values.map((v) => v.length).reduce((a, b) => a + b);
+  return subEntrys.values.map((v) => v.length).reduce((a, b) => a + b);
 }
 
-Map<String, List<SubWordWrapper>> filterSubWords(
-    Map<String, List<SubWordWrapper>> subWords,
+Map<String, List<SubEntryWrapper>> filterSubEntries(
+    Map<String, List<SubEntryWrapper>> subEntrys,
     List<Region> allowedRegions,
     bool useUnknownRegionSigns,
-    bool oneCardPerWord) {
-  Map<String, List<SubWordWrapper>> out = Map();
+    bool oneCardPerEntry) {
+  Map<String, List<SubEntryWrapper>> out = Map();
 
-  for (MapEntry<String, List<SubWordWrapper>> e in subWords.entries) {
-    List<SubWordWrapper> validSubWords = [];
-    for (SubWordWrapper sww in e.value) {
-      if (validSubWords.length > 0 && oneCardPerWord) {
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+    List<SubEntryWrapper> validSubEntries = [];
+    for (SubEntryWrapper sww in e.value) {
+      if (validSubEntries.length > 0 && oneCardPerEntry) {
         break;
       }
-      if (sww.subWord.regions.contains(Region.EVERYWHERE)) {
-        validSubWords.add(sww);
+      if (sww.subEntry.getRegions().contains(Region.ALL.pretty)) {
+        validSubEntries.add(sww);
         continue;
       }
-      if (sww.subWord.regions.length == 0 && useUnknownRegionSigns) {
-        validSubWords.add(sww);
+      if (sww.subEntry.getRegions().length == 0 && useUnknownRegionSigns) {
+        validSubEntries.add(sww);
         continue;
       }
-      for (Region r in sww.subWord.regions) {
+      for (Region r in sww.subEntry.getRegions()) {
         if (allowedRegions.contains(r)) {
-          validSubWords.add(sww);
+          validSubEntries.add(sww);
           break;
         }
       }
     }
-    if (validSubWords.length > 0) {
-      out[e.key] = validSubWords;
+    if (validSubEntries.length > 0) {
+      out[e.key] = validSubEntries;
     }
   }
   return out;
 }
 
-// You should provide this function the filtered list of SubWords.
-List<Master> getMasters(Map<String, List<SubWordWrapper>> subWords,
-    bool wordToSign, bool signToWord) {
-  print("Making masters from ${subWords.length} words");
+// You should provide this function the filtered list of SubEntries.
+List<Master> getMasters(Map<String, List<SubEntryWrapper>> subEntrys,
+    bool entryToSign, bool signToEntry) {
+  print("Making masters from ${subEntrys.length} entries");
   List<Master> masters = [];
   Set<String> keys = {};
-  for (MapEntry<String, List<SubWordWrapper>> e in subWords.entries) {
-    String word = e.key;
-    for (SubWordWrapper sww in e.value) {
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+    String entry = e.key;
+    for (SubEntryWrapper sww in e.value) {
       List<Combination> combinations = [];
-      if (wordToSign) {
+      if (entryToSign) {
         combinations.add(Combination(front: [0], back: [1]));
       }
-      if (signToWord) {
+      if (signToEntry) {
         combinations.add(Combination(front: [1], back: [0]));
       }
-      var key = sww.subWord.getKey(word);
+      var key = sww.subEntry.getKey();
       var m = Master(
         id: key,
-        fields: [word, VIDEO_LINKS_MARKER],
+        fields: [entry, VIDEO_LINKS_MARKER],
         combinations: combinations,
       );
       if (!keys.contains(key)) {
@@ -134,14 +136,14 @@ int getNumCards(DolphinSR dolphin) {
 }
 
 DolphinInformation getDolphinInformation(
-    Map<String, List<SubWordWrapper>> subWords, List<Master> masters,
+    Map<String, List<SubEntryWrapper>> subEntrys, List<Master> masters,
     {List<Review>? reviews}) {
   reviews = reviews ?? [];
-  Map<String, SubWordWrapper> keyToSubWordMap = Map();
-  for (MapEntry<String, List<SubWordWrapper>> e in subWords.entries) {
-    String word = e.key;
-    for (SubWordWrapper sww in e.value) {
-      keyToSubWordMap[sww.subWord.getKey(word)] = sww;
+  Map<String, SubEntryWrapper> keyToSubEntryMap = Map();
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+    for (SubEntryWrapper sww in e.value) {
+      // TODO: Make sure this is okay vs the key needing to have entry.key in it.
+      keyToSubEntryMap[sww.subEntry.getKey()] = sww;
     }
   }
   DolphinSR dolphin = DolphinSR();
@@ -198,7 +200,8 @@ DolphinInformation getDolphinInformation(
   print(
       "Added ${filteredReviews.length} total reviews to Dolphin (excluding seed reviews)");
   dolphin.addReviews(filteredReviews);
-  return DolphinInformation(dolphin: dolphin, keyToSubWordMap: keyToSubWordMap);
+  return DolphinInformation(
+      dolphin: dolphin, keyToSubEntryMap: keyToSubEntryMap);
 }
 
 const String KEY_STORED_REVIEWS = "stored_reviews";

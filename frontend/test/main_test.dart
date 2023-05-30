@@ -1,26 +1,27 @@
 import 'package:flutter/material.dart';
+import 'package:slsl_dictionary/entries_loader.dart';
+import 'package:slsl_dictionary/entries_types.dart';
 import 'package:slsl_dictionary/root.dart';
-import 'package:slsl_dictionary/types.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:slsl_dictionary/common.dart';
 import 'package:slsl_dictionary/globals.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  wordsGlobal = {
-    Word(word: "friend", subWords: [
-      SubWord(definitions: [
-        Definition(
-            heading: "As a Noun", subdefinitions: ["Someone you love :)"])
-      ], videoLinksInner: [
-        "auslan/46/46930.mp4"
-      ], regions: [
-        Region.EVERYWHERE
-      ], keywords: [])
+  entriesGlobal = {
+    MyEntry(word_in_english: "friend", sub_entries: [
+      MySubEntry(
+          videos: ["http://mysite.com/video.mp4"],
+          region: "ALL",
+          definitions: [
+            Definition(
+                language: "en",
+                category: "Relationships",
+                definition: "Someone you love :)")
+          ])
     ])
   };
 
@@ -44,11 +45,11 @@ void main() async {
     DolphinSR dolphin = DolphinSR();
 
     List<Master> masters = [];
-    for (Word w in wordsGlobal) {
-      for (SubWord sw in w.subWords) {
-        var m = Master(id: sw.getKey(w.word), fields: [
-          w.word,
-          sw.videoLinks.join("=====")
+    for (Entry e in entriesGlobal) {
+      for (SubEntry se in e.getSubEntries()) {
+        var m = Master(id: se.getKey(), fields: [
+          e.getKey(),
+          se.getVideos().join("=====")
         ], combinations: [
           Combination(front: [0], back: [1]),
           Combination(front: [1], back: [0]),
@@ -65,6 +66,6 @@ void main() async {
   });
 
   test('json data valid', () async {
-    await loadWords();
+    await loadEntries();
   });
 }

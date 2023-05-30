@@ -27,7 +27,9 @@ dependencies:
   flutter_native_splash:
   go_router: 6.5.9
   http:
-  intl: any
+  intl:
+  json_annotation: ^4.8.1
+  json_serializable: ^6.7.0
   launch_review:
   mailto:
   multi_select_flutter:
@@ -39,6 +41,7 @@ dependencies:
   video_player:
 
 dev_dependencies:
+  build_runner: ^2.3.3
   device_info_plus:
   flutter_driver:
     sdk: flutter

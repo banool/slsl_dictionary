@@ -131,21 +131,23 @@ void main() async {
     await setup();
 
     String listName = "Animals";
-    String listKey = WordList.getKeyFromName(listName);
-    await wordListManager.createWordList(listKey);
-    await wordListManager.wordLists[listKey]!
-        .addWord(keyedWordsGlobal["kangaroo"]!);
-    await wordListManager.wordLists[listKey]!
-        .addWord(keyedWordsGlobal["platypus"]!);
-    await wordListManager.wordLists[listKey]!
-        .addWord(keyedWordsGlobal["echidna"]!);
-    await wordListManager.wordLists[listKey]!.addWord(keyedWordsGlobal["dog"]!);
-    await wordListManager.wordLists[listKey]!.addWord(keyedWordsGlobal["cat"]!);
-    await wordListManager.wordLists[listKey]!
-        .addWord(keyedWordsGlobal["bird"]!);
+    String listKey = EntryList.getKeyFromName(listName);
+    await entryListManager.createEntryList(listKey);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["kangaroo"]!);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["platypus"]!);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["echidna"]!);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["dog"]!);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["cat"]!);
+    await entryListManager.entryLists[listKey]!
+        .addEntry(keyedEntriesGlobal["bird"]!);
 
     await sharedPreferences
-        .setStringList(KEY_LISTS_TO_REVIEW, [KEY_FAVOURITES_WORDS, listKey]);
+        .setStringList(KEY_LISTS_TO_REVIEW, [KEY_FAVOURITES_ENTRIES, listKey]);
 
     await sharedPreferences.setInt(
         KEY_REVISION_STRATEGY, RevisionStrategy.SpacedRepetition.index);

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'flashcards_logic.dart';
 import 'globals.dart';
 import 'types.dart';
@@ -227,15 +228,15 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
                 BorderSide(color: borderColor, width: 1.5))));
   }
 
-  Widget buildFlashcardWidget(DRCard card, SubWord subWord, String word,
+  Widget buildFlashcardWidget(DRCard card, SubEntry subEntry, String word,
       bool wordToSign, bool revealed) {
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
     // See here for an explanation of why I pass in a key here:
     // https://stackoverflow.com/questions/55237188/flutter-is-not-rebuilding-same-widget-with-different-parameters
     var videoPlayerScreen = VideoPlayerScreen(
-      videoLinks: subWord.videoLinks,
-      key: Key(subWord.videoLinks[0]),
+      videoLinks: subEntry.getVideos(),
+      key: Key(subEntry.getVideos()[0]),
     );
 
     Widget topWidget;
@@ -272,7 +273,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     }
 
     Widget regionalInformationWidget = getRegionalInformationWidget(
-        subWord, shouldUseHorizontalDisplay,
+        subEntry, shouldUseHorizontalDisplay,
         hide: !revealed);
 
     Widget? ratingButtonsRow;
@@ -327,8 +328,8 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => WordPage(
-                          word: keyedWordsGlobal[word]!,
+                    builder: (context) => EntryPage(
+                          entry: keyedEntriesGlobal[word]!,
                           showFavouritesButton: false,
                         )));
           })
@@ -520,7 +521,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     if (currentCard != null) {
       DRCard card = currentCard!;
 
-      SubWordWrapper subWordWrapper = di.keyToSubWordMap[card.master]!;
+      SubEntryWrapper subEntryWrapper = di.keyToSubEntryMap[card.master]!;
 
       String word;
       bool wordToSign = card.back![0] == VIDEO_LINKS_MARKER;
@@ -536,7 +537,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
       body = Center(
           child: InheritedPlaybackSpeed(
               playbackSpeed: playbackSpeed,
-              child: buildFlashcardWidget(card, subWordWrapper.subWord, word,
+              child: buildFlashcardWidget(card, subEntryWrapper.subEntry, word,
                   wordToSign, currentCardRevealed)));
       int progressString = getCardsReviewed() + 1;
       if (currentCardRevealed) {
@@ -555,8 +556,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
       }, enabled: videoIsShowing));
     } else {
       body = buildSummaryWidget();
-      appBarTitle =
-          AppLocalizations.of(context).flashcardsRevisionSummaryTitle;
+      appBarTitle = AppLocalizations.of(context).flashcardsRevisionSummaryTitle;
     }
 
     // Disable swipe back with WillPopScope.

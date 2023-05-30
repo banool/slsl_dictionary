@@ -2,27 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'globals.dart';
-import 'types.dart';
 import 'word_list_help_page_en.dart';
 import 'word_list_logic.dart';
 
-class WordListPage extends StatefulWidget {
-  final WordList wordList;
+class EntryListPage extends StatefulWidget {
+  final EntryList entryList;
 
-  WordListPage({Key? key, required this.wordList}) : super(key: key);
+  EntryListPage({Key? key, required this.entryList}) : super(key: key);
 
   @override
-  _WordListPageState createState() => _WordListPageState(wordList: wordList);
+  _EntryListPageState createState() =>
+      _EntryListPageState(entryList: entryList);
 }
 
-class _WordListPageState extends State<WordListPage> {
-  _WordListPageState({required this.wordList});
+class _EntryListPageState extends State<EntryListPage> {
+  _EntryListPageState({required this.entryList});
 
-  WordList wordList;
+  EntryList entryList;
 
-  // The words that match the user's search term.
-  late List<Word> wordsSearched;
+  // The entries that match the user's search term.
+  late List<Entry> entriesSearched;
 
   bool viewSortedList = false;
   bool enableSortButton = true;
@@ -35,7 +36,7 @@ class _WordListPageState extends State<WordListPage> {
 
   @override
   void initState() {
-    wordsSearched = List.from(wordList.words);
+    entriesSearched = List.from(entryList.entries);
     super.initState();
   }
 
@@ -61,18 +62,18 @@ class _WordListPageState extends State<WordListPage> {
     setState(() {
       if (currentSearchTerm.length > 0) {
         if (inEditMode) {
-          Set<Word> wordsGlobalWithoutWordsAlreadyInList =
-              wordsGlobal.difference(wordList.words);
-          wordsSearched = searchList(
-              currentSearchTerm, wordsGlobalWithoutWordsAlreadyInList, {});
+          Set<Entry> entriesGlobalWithoutEntrysAlreadyInList =
+              entriesGlobal.difference(entryList.entries);
+          entriesSearched = searchList(context, currentSearchTerm,
+              entriesGlobalWithoutEntrysAlreadyInList, {});
         } else {
-          wordsSearched =
-              searchList(currentSearchTerm, wordList.words, wordList.words);
+          entriesSearched = searchList(
+              context, currentSearchTerm, entryList.entries, entryList.entries);
         }
       } else {
-        wordsSearched = List.from(wordList.words);
+        entriesSearched = List.from(entryList.entries);
         if (viewSortedList) {
-          wordsSearched.sort();
+          entriesSearched.sort();
         }
       }
     });
@@ -80,28 +81,28 @@ class _WordListPageState extends State<WordListPage> {
 
   void clearSearch() {
     setState(() {
-      wordsSearched = [];
+      entriesSearched = [];
       _searchFieldController.clear();
       updateCurrentSearchTerm("");
       search();
     });
   }
 
-  Future<void> addWord(Word word) async {
-    await wordList.addWord(word);
+  Future<void> addEntry(Entry entry) async {
+    await entryList.addEntry(entry);
     setState(() {
       search();
     });
   }
 
-  Future<void> removeWord(Word word) async {
-    await wordList.removeWord(word);
+  Future<void> removeEntry(Entry entry) async {
+    await entryList.removeEntry(entry);
     setState(() {
       search();
     });
   }
 
-  Future<void> refreshWords() async {
+  Future<void> refreshEntrys() async {
     setState(() {
       search();
     });
@@ -135,7 +136,7 @@ class _WordListPageState extends State<WordListPage> {
       ),
     ];
 
-    String listName = wordList.getName();
+    String listName = entryList.getName();
 
     FloatingActionButton? floatingActionButton = FloatingActionButton(
         backgroundColor: getFloatingActionButtonColor(),
@@ -167,7 +168,7 @@ class _WordListPageState extends State<WordListPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(wordList.getName()),
+        title: Text(entryList.getName()),
         centerTitle: true,
         actions: buildActionButtons(actions),
       ),
@@ -210,13 +211,13 @@ class _WordListPageState extends State<WordListPage> {
                 child: Padding(
               padding: EdgeInsets.only(left: 8),
               child: listWidget(
-                  context, wordsSearched, wordsGlobal, refreshWords,
-                  showFavouritesButton: wordList.key == KEY_FAVOURITES_WORDS,
-                  deleteWordFn: inEditMode && currentSearchTerm.length == 0
-                      ? removeWord
+                  context, entriesSearched, entriesGlobal, refreshEntrys,
+                  showFavouritesButton: entryList.key == KEY_FAVOURITES_ENTRIES,
+                  deleteEntryFn: inEditMode && currentSearchTerm.length == 0
+                      ? removeEntry
                       : null,
-                  addWordFn: inEditMode && currentSearchTerm.length > 0
-                      ? addWord
+                  addEntryFn: inEditMode && currentSearchTerm.length > 0
+                      ? addEntry
                       : null),
             )),
           ],
@@ -228,41 +229,41 @@ class _WordListPageState extends State<WordListPage> {
 
 Widget listWidget(
   BuildContext context,
-  List<Word?> wordsSearched,
-  Set<Word> allWords,
-  Function refreshWordsFn, {
+  List<Entry?> entriesSearched,
+  Set<Entry> allEntrys,
+  Function refreshEntrysFn, {
   bool showFavouritesButton = true,
-  Future<void> Function(Word)? deleteWordFn,
-  Future<void> Function(Word)? addWordFn,
+  Future<void> Function(Entry)? deleteEntryFn,
+  Future<void> Function(Entry)? addEntryFn,
 }) {
   return ListView.builder(
-    itemCount: wordsSearched.length,
+    itemCount: entriesSearched.length,
     itemBuilder: (context, index) {
-      Word word = wordsSearched[index]!;
+      Entry entry = entriesSearched[index]!;
       Widget? trailing;
-      if (deleteWordFn != null) {
+      if (deleteEntryFn != null) {
         trailing = IconButton(
           padding: EdgeInsets.only(left: 8, right: 16, top: 8, bottom: 8),
           icon: Icon(
             Icons.remove_circle,
             color: Colors.red,
           ),
-          onPressed: () async => await deleteWordFn(word),
+          onPressed: () async => await deleteEntryFn(entry),
         );
       }
-      if (addWordFn != null) {
+      if (addEntryFn != null) {
         trailing = IconButton(
           padding: EdgeInsets.only(left: 8, right: 16, top: 8, bottom: 8),
           icon: Icon(
             Icons.add_circle,
             color: Colors.green,
           ),
-          onPressed: () async => await addWordFn(word),
+          onPressed: () async => await addEntryFn(entry),
         );
       }
       return ListTile(
-        key: ValueKey(word.word),
-        title: listItem(context, word, refreshWordsFn,
+        key: ValueKey(entry.getKey()),
+        title: listItem(context, entry, refreshEntrysFn,
             showFavouritesButton: showFavouritesButton),
         trailing: trailing,
       );
@@ -274,19 +275,19 @@ Widget listWidget(
 // aren't the the favourites list, since that star icon might be confusing
 // and lead people to beleive they're interacting with the non-favourites
 // list they just came from.
-Widget listItem(BuildContext context, Word word, Function refreshWordsFn,
+Widget listItem(BuildContext context, Entry entry, Function refreshEntrysFn,
     {bool showFavouritesButton = true}) {
   return TextButton(
     child: Align(
         alignment: Alignment.topLeft,
         child: Text(
-          "${word.word}",
+          "${entry.getKey()}",
           style: TextStyle(color: Colors.black),
         )),
     onPressed: () async => {
-      await navigateToWordPage(context, word,
+      await navigateToEntryPage(context, entry,
           showFavouritesButton: showFavouritesButton),
-      await refreshWordsFn(),
+      await refreshEntrysFn(),
     },
   );
 }

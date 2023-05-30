@@ -1,0 +1,112 @@
+{
+    "appTitle": "இலங்கை சான்று மொழி அகராதிி",
+
+    "newsTitle": "செய்திகள்",
+
+    "searchTitle": "தேடு",
+    "listsTitle": "பட்டியல்கள்",
+    "revisionTitle": "மாற்றம்",
+    "settingsTitle": "அமைப்புகள்",
+
+    "searchHintText": "ஒரு சொல்லை தேடு",
+
+    "flashcardsAllOfSriLanka": "இலங்கையின் முழுவதும்",
+    "nFlashcardsSelected": "{count, plural, =0{அட்டைகள்} =1{அட்டைகள்} other{அட்டைகள்}}",
+    "@nFlashcardsSelected": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
+    "nFlashcardsDue": "{count, plural, =0{அட்டைகள்} =1{அட்டைகள்} other{அட்டைகள்}}",
+    "@nFlashcardsDue": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
+    "flashcardsRevisionSources": "மாற்ற மூலங்கள்",
+    "flashcardsSelectListsToRevise": "மாற்ற பட்டியல்களைத் தேர்ந்தெடு",
+    "flashcardsSelectLists": "பட்டியல்களைத் தேர்ந்தெடு",
+    "flashcardsTypes": "அட்டைவகைகள்",
+    "flashcardsSignToWord": "கையாய்வு -> சொல்",
+    "flashcardsWordToSign": "சொல் -> கையாய்வு",
+    "flashcardsRevisionSettings": "மாற்ற அமைப்புகள்",
+    "flashcardsSelectRevisionStrategy": "மாற்ற வழிமுறையைத் தேர்ந்தெடு",
+    "flashcardsStrategy": "வழிமுறை",
+    "flashcardsSelectSignRegions": "குறிக்கோள் வட்டாரங்களை தேர்வு செய்க",
+    "flashcardsRegions": "பிரதேசங்கள்",
+    "flashcardsStart": "தொடங்கு",
+    "flashcardsOnlyOneCard": "ஒரு சொல்லுக்கு ஒரு அட்டை மட்டுமே காட்டு",
+
+    "flashcardsNext": "அடுத்து",
+    "flashcardsForgot": "மறந்துவிட்டேன்",
+    "flashcardsGotIt": "பெற்றேன்!",
+
+    "flashcardsWhatIsSignForWord": "இந்த சொல்லுக்கு என்ன கையாய்வு?",
+    "flashcardsWhatDoesSignMean": "இந்த கையாய்வு என்ன சொல்லுகிறது?",
+    "flashcardsOpenDictionaryEntry": "அகராதி பதிவைத் திறக்க",
+
+    "flashcardsSuccessRate": "வெற்றிக் குறியீடு",
+    "flashcardsTotalCards": "மொத்த அட்டைகள்",
+    "flashcardsSuccessfulCards": "வெற்றிகரமான அட்டைகள்",
+    "flashcardsIncorrectCards": "தவறான அட்டைகள்",
+
+    "flashcardsTotalReviews": "மொத்த மதிப்பீடுகள்",
+    "flashcardsUnsuccessfulCards": "வெற்றியாகாத அட்டைகள்",
+    "flashcardsUniqueWords": "தனிப்பட்ட சொற்கள்",
+    "flashcardsLongestStreak": "நீளமான தொடர்",
+    "flashcardsStatsCollectedSince": "புள்ளியில் சேகரிக்கப்பட்டுள்ளது",
+
+    "flashcardsRevisionSummaryTitle": "மாற்ற சுருக்கம்",
+    "flashcardsRevisionProgressTitle": "மாற்ற முன்னேற்றம்",
+    "flashcardsRevisionStategyToShow": "புள்ளிக்காண மாற்ற வழிமுறை",
+
+    "setPlaybackSpeedTo": "பிளேபேக் வேகத்தை அமை",
+
+    "settingsPlayStoreFeedback": "Play Store மீது கருத்தை அளி",
+    "settingsAppStoreFeedback": "App Store மீது கருத்தை அளி",
+    "na": "பொருள் தெரியவில்லை",
+
+    "settingsRevision": "மாற்றம்",
+    "settingsHideRevision": "மாற்றத்தை மறை",
+    "settingsDeleteRevisionProgress": "அனைத்து மாற்ற முன்னேற்றத்தையும் அழி",
+    "settingsDeleteRevisionProgressExplanation": "இது உங்கள் அனைத்து மதிப்பீட்டு முன்னேற்றத்தையும் அழித்துவிடும், அது வெவ்வேறு தள்ளுபடு மற்றும் சீரான மதிப்பீடு வழிமுறைகளுக்கு. உங்கள் பட்டியல்கள் (முதன்முதன்மான பட்டியல்களையும் அற்ற) பாதிக்கப்படவில்லை. இதை நீங்கள் செய்ய வேண்டியது என்று நீங்கள் 100% உறுதியாக உள்ளீர்களா?",
+    "settingsProgressDeleted": "அனைத்து மதிப்பீடு முன்னேற்றத்தையும் அழிக்கப்பட்டது",
+    "settingsCache": "கேச்",
+    "settingsCacheVideos": "வீடியோக்களை கேச் செய்",
+    "settingsDropCache": "கேச் போடு",
+    "settingsCacheDropped": "கேச் வீழ்ந்தது",
+    "settingsData": "தரவு",
+    "settingsCheckNewData": "புதிய அகராதி தரவுக்கு பார்வையிடு",
+    "settingsDataUpdated": "அகராதி தரவு வெற்றிகரமாக புதுப்பிக்கப்பட்டது",
+    "settingsDataUpToDate": "தரவு ஏற்கனவே புதுப்பிக்கப்பட்டுள்ளது",
+    "settingsLegal": "சட்டம்",
+    "settingsSeeLegal": "சட்ட தகவலை பார்க்கவும்",
+    "settingsHelp": "உதவி",
+    "settingsReportDictionaryDataIssue": "அகராதி தரவுவில் பிரச்சினை அறிக்கை செய்",
+    "settingsReportAppIssueGithub": "ஆப்பில் ஏற்பட்ட பிரச்சினையை GitHubல் அறிக்கை செய்",
+    "settingsReportAppIssueEmail": "ஆப்பில் ஏற்பட்ட பிரச்சினையை மின்னஞ்சல் வழியாக அறிக்கை செய்",
+
+    "listFavourites": "விருப்பங்கள்",
+    "listNameCannotBeEmpty": "பட்டியலின் பெயர் வெறுமையாக இருக்க முடியாது",
+    "listNameInvalid": "தவறான பெயர், இது ஏற்கனவே கண்டுபிடிக்கப்படவேண்டும்",
+    "listEnterNewName": "புதிய பட்டியலின் பெயரை உள்ளிடு",
+    "listFailedToMake": "புதிய பட்டியலை உருவாக்க முடியவில்லை",
+
+    "listSearchAdd": "சேர்க்க சொற்களைத் தேடு",
+    "listSearchPrefix": "தேடல்",
+
+    "wordAlreadyFavourited": "ஏற்கனவே விருப்பப்பட்டது!",
+    "wordFavouriteThisWord": "இந்த சொல்லை விருப்பப்படுத்து",
+
+    "relatedWords": "தொடர்புடைய சொற்கள்",
+
+    "startupFailureMessage": "ஆப்பை சரியாக துவக்க முடியவில்லை. முதலில், நீங்கள் ஆப்பின் சமீபத்திய பதிப்பைப் பயன்படுத்துகிறீர்கள் என்பதை உறுதிசெய்க. நீங்கள் பயன்படுத்துகிறீர்கள் என்றால், தயவுசெய்து இந்த பிழையைக் காட்டும் ஸ்கிரீன்ஷாட் ஒன்றுடன் daniel@dport.me என்ற முகவரிக்கு மின்னஞ்சல் அனுப்பவும்.",
+    "unexpectedErrorLoadingVideo": "எதிர்கால பிழை ஏற்படுத்தியுள்ளது",
+    "deviceDefault": "சாதாரண சாதனம்"
+}

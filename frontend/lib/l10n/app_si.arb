@@ -1,0 +1,112 @@
+{
+    "appTitle": "ශ්‍රී ලංකා සංකේත භාෂා වචන මාලාව",
+
+    "newsTitle": "පුවත්",
+
+    "searchTitle": "සොයන්න",
+    "listsTitle": "ලැයිස්තු",
+    "revisionTitle": "සංශෝධනය",
+    "settingsTitle": "සැකසුම්",
+
+    "searchHintText": "වචනයක් සොයන්න",
+
+    "flashcardsAllOfSriLanka": "ශ්‍රී ලංකාවේ සියලුම",
+    "nFlashcardsSelected": "{count, plural, =0{cards} =1{cards} other{cards}}",
+    "@nFlashcardsSelected": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
+    "nFlashcardsDue": "{count, plural, =0{cards} =1{cards} other{cards}}",
+    "@nFlashcardsDue": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
+    "flashcardsRevisionSources": "සංශෝධන මූලාශ්‍ර",
+    "flashcardsSelectListsToRevise": "සංශෝධනය කිරීමට ලැයිස්තු තෝරන්න",
+    "flashcardsSelectLists": "ලැයිස්තු තෝරන්න",
+    "flashcardsTypes": "ෆ්ලෑෂ්කාඩ් වර්ග",
+    "flashcardsSignToWord": "සංකේතය -> වචනය",
+    "flashcardsWordToSign": "වචනය -> සංකේතය",
+    "flashcardsRevisionSettings": "සංශෝධන සැකසුම්",
+    "flashcardsSelectRevisionStrategy": "සංශෝධන ක්‍රමය තෝරන්න",
+    "flashcardsStrategy": "ක්‍රමය",
+    "flashcardsSelectSignRegions": "සංකේත කලාප තෝරන්න",
+    "flashcardsRegions": "කළාප",
+    "flashcardsStart": "ආරම්භ කරන්න",
+    "flashcardsOnlyOneCard": "වචනයකට කාඩ් කට්ටලයක් පමණින් පෙන්වන්න",
+
+    "flashcardsNext": "මීළඟ",
+    "flashcardsForgot": "අමතක වුනා",
+    "flashcardsGotIt": "ගත්තා!",
+
+    "flashcardsWhatIsSignForWord": "මෙම වචනය සඳහා සංකේතය කුමක්ද?",
+    "flashcardsWhatDoesSignMean": "මෙම සංකේතය අර්ථයකුමද?",
+    "flashcardsOpenDictionaryEntry": "වචන මාලාව විවෘත කරන්න",
+
+    "flashcardsSuccessRate": "සාර්ථකතා අනුපාතය",
+    "flashcardsTotalCards": "මුළු කාඩ්",
+    "flashcardsSuccessfulCards": "සාර්ථක කාඩ්",
+    "flashcardsIncorrectCards": "නොනිවැරදි කාඩ්",
+
+    "flashcardsTotalReviews": "මුළු සමාලෝචන",
+    "flashcardsUnsuccessfulCards": "අසාර්ථක කාඩ්",
+    "flashcardsUniqueWords": "අනන්‍ය වචන",
+    "flashcardsLongestStreak": "හොඳම ක්‍රියාවලිය",
+    "flashcardsStatsCollectedSince": "සංඛ්‍යාන දැනට ඇතුලත් කර ඇත",
+
+    "flashcardsRevisionSummaryTitle": "සංශෝධන සාරාංශය",
+    "flashcardsRevisionProgressTitle": "සංශෝධන ප්‍රගතිය",
+    "flashcardsRevisionStategyToShow": "සංඛ්‍යාන සඳහා සංශෝධන ක්‍රමය පෙන්වන්න",
+
+    "setPlaybackSpeedTo": "ප්‍රතිවාදන වේගය සකසන්න",
+
+    "settingsPlayStoreFeedback": "Play Store පිළිච්ච දෙන්න",
+    "settingsAppStoreFeedback": "App Store පිළිච්ච දෙන්න",
+    "na": "නොදනී",
+
+    "settingsRevision": "සංශෝධන",
+    "settingsHideRevision": "සංශෝධන විශේෂාංග සඟවන්න",
+    "settingsDeleteRevisionProgress": "සියලුම සංශෝධන ප්‍රගතිය මකන්න",
+    "settingsDeleteRevisionProgressExplanation": "මෙය ඔබේ සියලුම සමාලෝචන ප්‍රගතිය මුළු කාලය සඳහා අවකාශ පුනරාවර්තනය හා අහඹු සමාලෝචන ක්‍රමයන් මකා දමයි. ඔබේ ලැයිස්තු (සුදුසුකම් ඇතුළුව) බලපාන්නේ නැත. ඔබට මෙය කිරීමට 100% සුන්දර වුනාද?",
+    "settingsProgressDeleted": "සියලුම සමාලෝචන ප්‍රගතිය මකාදමා ඇත",
+    "settingsCache": "කැෂේ",
+    "settingsCacheVideos": "වීඩියෝ කැෂේ කරන්න",
+    "settingsDropCache": "කැෂේ ඉවත් කරන්න",
+    "settingsCacheDropped": "කැෂේ ඉවත් කළ ඇත",
+    "settingsData": "දත්ත",
+    "settingsCheckNewData": "නව ශබ්දකෝෂ දත්ත සඳහා පරීක්ෂා කරන්න",
+    "settingsDataUpdated": "ශබ්දකෝෂ දත්ත සාර්ථකව යාවත්කාලීන කළ ඇත",
+    "settingsDataUpToDate": "දත්ත දැනටමත් යාවත්කාලීන වී ඇත",
+    "settingsLegal": "නීතිය",
+    "settingsSeeLegal": "නීතික තොරතුරු බලන්න",
+    "settingsHelp": "උපකාරය",
+    "settingsReportDictionaryDataIssue": "ශබ්දකෝෂ දත්ත ගැටළුව වාර්තා කරන්න",
+    "settingsReportAppIssueGithub": "යෙදුමේ ගැටළුව (Github) වාර්තා කරන්න",
+    "settingsReportAppIssueEmail": "යෙදුමේ ගැටළුව (Email) වාර්තා කරන්න",
+
+    "listFavourites": "ප්‍රියතම",
+    "listNameCannotBeEmpty": "ලැයිස්තු නම හිස් විය නොහැක",
+    "listNameInvalid": "අවලංගු නම, මෙය දැනටමත් අසාර්ථක විය යුතුය",
+    "listEnterNewName": "නව ලැයිස්තු නම ඇතුළත් කරන්න",
+    "listFailedToMake": "නව ලැයිස්තුව සාදා ගැනීමට අසාර්ථක විය",
+
+    "listSearchAdd": "එක් කිරීම සඳහා වචන සොයන්න",
+    "listSearchPrefix": "සොයන්න",
+
+    "wordAlreadyFavourited": "දැනටමත් ප්‍රියතම!",
+    "wordFavouriteThisWord": "මෙම වචනය ප්‍රියතම කරන්න",
+
+    "relatedWords": "සම්බන්ධ වචන",
+
+    "startupFailureMessage": "යෙදුම නිශ්චිත ලෙස ආරම්භ කිරීම වැරදි විය. පළමුව, කරුණාකර ඔබ යෙදුමේ නවතම අනුවාදය භාවිතා කරන බව සහතික කරන්න. ඔබ එසේ නම්, කරුණාකර මෙම දෝෂය පෙන්වන පුනරුපුවරුවක් සමග daniel@dport.me වෙත ඊමේල් කරන්න.",
+    "unexpectedErrorLoadingVideo": "අනපේක්ෂිත දෝෂය පූරණය කරමින්",
+    "deviceDefault": "උපාංග පෙරනිමි"
+}

@@ -9,24 +9,24 @@ import 'word_list_logic.dart';
 import 'word_list_overview_help_page_en.dart';
 import 'word_list_page.dart';
 
-class WordListsOverviewPage extends StatefulWidget {
+class EntryListsOverviewPage extends StatefulWidget {
   @override
-  _WordListsOverviewPageState createState() => _WordListsOverviewPageState();
+  _EntryListsOverviewPageState createState() => _EntryListsOverviewPageState();
 }
 
-class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
+class _EntryListsOverviewPageState extends State<EntryListsOverviewPage> {
   bool inEditMode = false;
 
   @override
   Widget build(BuildContext context) {
     List<Widget> tiles = [];
     int i = 0;
-    for (MapEntry<String, WordList> e in wordListManager.wordLists.entries) {
+    for (MapEntry<String, EntryList> e in entryListManager.entryLists.entries) {
       String key = e.key;
-      WordList wl = e.value;
-      String name = wl.getName();
+      EntryList el = e.value;
+      String name = el.getName();
       Widget? trailing;
-      if (inEditMode && wl.canBeDeleted()) {
+      if (inEditMode && el.canBeDeleted()) {
         trailing = IconButton(
             icon: Icon(
               Icons.remove_circle,
@@ -36,7 +36,7 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
               bool confirmed = await confirmAlert(
                   context, Text("Are you sure you want to delete this list?"));
               if (confirmed) {
-                await wordListManager.deleteWordList(key);
+                await entryListManager.deleteEntryList(key);
                 setState(() {
                   inEditMode = false;
                 });
@@ -46,7 +46,7 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
       Card card = Card(
         key: ValueKey(name),
         child: ListTile(
-          leading: wl.getLeadingIcon(inEditMode: inEditMode),
+          leading: el.getLeadingIcon(inEditMode: inEditMode),
           trailing: trailing,
           minLeadingWidth: 10,
           title: Text(
@@ -58,14 +58,14 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
             await Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => WordListPage(
-                          wordList: wl,
+                    builder: (context) => EntryListPage(
+                          entryList: el,
                         )));
           },
         ),
       );
       Widget toAdd = card;
-      if (wl.key == KEY_FAVOURITES_WORDS && inEditMode) {
+      if (el.key == KEY_FAVOURITES_ENTRIES && inEditMode) {
         toAdd = IgnorePointer(
           key: ValueKey(name),
           child: toAdd,
@@ -84,9 +84,9 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
           children: tiles,
           onReorder: (prev, updated) async {
             setState(() {
-              wordListManager.reorder(prev, updated);
+              entryListManager.reorder(prev, updated);
             });
-            await wordListManager.writeWordListKeys();
+            await entryListManager.writeEntryListKeys();
           });
     } else {
       body = ListView(
@@ -145,9 +145,8 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
   TextEditingController controller = TextEditingController();
 
   List<Widget> children = [
-    // TODO update this with a real regex
     Text(
-      "Only letters, numbers, and spaces are allowed.",
+      "No special characters besides these are allowed: , . - _ !",
     ),
     Padding(padding: EdgeInsets.only(top: 10)),
     TextField(
@@ -157,7 +156,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
       ),
       autofocus: true,
       inputFormatters: [
-        FilteringTextInputFormatter.allow(WordList.validNameCharacters),
+        FilteringTextInputFormatter.allow(EntryList.validNameCharacters),
       ],
       textInputAction: TextInputAction.send,
       keyboardType: TextInputType.visiblePassword,
@@ -173,8 +172,8 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
   if (confirmed) {
     String name = controller.text;
     try {
-      String key = WordList.getKeyFromName(name);
-      await wordListManager.createWordList(key);
+      String key = EntryList.getKeyFromName(name);
+      await entryListManager.createEntryList(key);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:

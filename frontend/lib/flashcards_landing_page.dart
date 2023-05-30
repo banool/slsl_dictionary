@@ -6,6 +6,7 @@ import 'package:settings_ui/settings_ui.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'flashcards_help_page_en.dart';
 import 'flashcards_logic.dart';
 import 'flashcards_page.dart';
@@ -31,13 +32,13 @@ class FlashcardsLandingPage extends StatefulWidget {
 class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
   late int numEnabledFlashcardTypes;
 
-  late final bool initialValueSignToWord;
-  late final bool initialValueWordToSign;
+  late final bool initialValueSignToEntry;
+  late final bool initialValueEntryToSign;
 
   late List<String> listsToReview;
-  late Set<Word> wordsFromLists;
+  late Set<Entry> entriesFromLists;
 
-  Map<String, List<SubWordWrapper>> filteredSubWords = Map();
+  Map<String, List<SubEntryWrapper>> filteredSubEntries = Map();
 
   late DolphinInformation dolphinInformation;
   List<Review>? existingReviews;
@@ -51,49 +52,55 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
       print("Updated revision settings on foregrounding");
     }));
     updateRevisionSettings();
-    initialValueSignToWord =
+    initialValueSignToEntry =
         sharedPreferences.getBool(KEY_SIGN_TO_WORD) ?? true;
-    initialValueWordToSign =
+    initialValueEntryToSign =
         sharedPreferences.getBool(KEY_WORD_TO_SIGN) ?? true;
     numEnabledFlashcardTypes = 0;
-    if (initialValueSignToWord) {
+    if (initialValueSignToEntry) {
       numEnabledFlashcardTypes += 1;
     }
-    if (initialValueWordToSign) {
+    if (initialValueEntryToSign) {
       numEnabledFlashcardTypes += 1;
     }
   }
 
-  void updateFilteredSubwords() {
+  void updateFilteredSubentries() {
     // Get lists we intend to review.
     listsToReview = sharedPreferences.getStringList(KEY_LISTS_TO_REVIEW) ??
-        [KEY_FAVOURITES_WORDS];
+        [KEY_FAVOURITES_ENTRIES];
 
     // Filter out lists that no longer exist.
     listsToReview.removeWhere(
-        (element) => !wordListManager.wordLists.containsKey(element));
+        (element) => !entryListManager.entryLists.containsKey(element));
 
-    // Get the words from all these lists.
-    wordsFromLists = getWordsFromLists(listsToReview);
+    // Get the entries from all these lists.
+    entriesFromLists = getEntriesFromLists(listsToReview);
 
-    // Get the subwords from all these words.
-    Map<String, List<SubWordWrapper>> subWordsToReview =
-        getSubWordsFromWords(wordsFromLists);
+    print("liststoreview ${listsToReview}");
+    print("entriesfromlists ${entriesFromLists}");
 
-    // Load up all the data needed to filter the subwords.
+    // Get the subentries from all these entries.
+    Map<String, List<SubEntryWrapper>> subEntriesToReview =
+        getSubEntriesFromEntries(entriesFromLists);
+
+    // Load up all the data needed to filter the subentries.
+    // TODO
     List<Region> allowedRegions =
         (sharedPreferences.getStringList(KEY_FLASHCARD_REGIONS) ?? [])
             .map((i) => Region.values[int.parse(i)])
             .toList();
+
+    print("allowedRegions ${allowedRegions}");
     bool useUnknownRegionSigns =
         sharedPreferences.getBool(KEY_USE_UNKNOWN_REGION_SIGNS) ?? true;
-    bool oneCardPerWord =
+    bool oneCardPerEntry =
         sharedPreferences.getBool(KEY_ONE_CARD_PER_WORD) ?? false;
 
-    // Finally get the final list of filtered subwords.
+    // Finally get the final list of filtered subentries.
     setState(() {
-      filteredSubWords = filterSubWords(subWordsToReview, allowedRegions,
-          useUnknownRegionSigns, oneCardPerWord);
+      filteredSubEntries = filterSubEntries(subEntriesToReview, allowedRegions,
+          useUnknownRegionSigns, oneCardPerEntry);
     });
   }
 
@@ -111,25 +118,27 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     });
   }
 
-  int getNumValidSubWords() {
-    if (filteredSubWords.values.length == 0) {
+  int getNumValidSubEntrys() {
+    if (filteredSubEntries.values.length == 0) {
       return 0;
     }
-    if (filteredSubWords.values.length == 1) {
-      return filteredSubWords.values.toList()[0].length;
+    if (filteredSubEntries.values.length == 1) {
+      return filteredSubEntries.values.toList()[0].length;
     }
-    return filteredSubWords.values.map((v) => v.length).reduce((a, b) => a + b);
+    return filteredSubEntries.values
+        .map((v) => v.length)
+        .reduce((a, b) => a + b);
   }
 
   bool startValid() {
     var revisionStrategy = loadRevisionStrategy();
     bool flashcardTypesValid = numEnabledFlashcardTypes > 0;
-    bool numFilteredSubWordsValid = getNumValidSubWords() > 0;
+    bool numfilteredSubEntriesValid = getNumValidSubEntrys() > 0;
     bool numCardsValid =
         getNumDueCards(dolphinInformation.dolphin, revisionStrategy) > 0;
     bool validBasedOnRevisionStrategy = true;
     return flashcardTypesValid &&
-        numFilteredSubWordsValid &&
+        numfilteredSubEntriesValid &&
         numCardsValid &&
         validBasedOnRevisionStrategy;
   }
@@ -137,11 +146,11 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
   DolphinInformation getDolphin({RevisionStrategy? revisionStrategy}) {
     revisionStrategy = revisionStrategy ?? loadRevisionStrategy();
     var wordToSign = sharedPreferences.getBool(KEY_WORD_TO_SIGN) ?? true;
-    var signToWord = sharedPreferences.getBool(KEY_SIGN_TO_WORD) ?? true;
-    var masters = getMasters(filteredSubWords, wordToSign, signToWord);
+    var signToEntry = sharedPreferences.getBool(KEY_SIGN_TO_WORD) ?? true;
+    var masters = getMasters(filteredSubEntries, wordToSign, signToEntry);
     switch (revisionStrategy) {
       case RevisionStrategy.Random:
-        return getDolphinInformation(filteredSubWords, masters);
+        return getDolphinInformation(filteredSubEntries, masters);
       case RevisionStrategy.SpacedRepetition:
         if (existingReviews == null) {
           setState(() {
@@ -149,7 +158,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           });
           print("Start: Read ${existingReviews!.length} reviews from storage");
         }
-        return getDolphinInformation(filteredSubWords, masters,
+        return getDolphinInformation(filteredSubEntries, masters,
             reviews: existingReviews);
     }
   }
@@ -162,7 +171,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
 
   void updateRevisionSettings() {
     setState(() {
-      updateFilteredSubwords();
+      updateFilteredSubentries();
       updateDolphin();
     });
   }
@@ -177,8 +186,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             .map((e) => int.parse(e))
             .toList();
 
-    String regionsString =
-        AppLocalizations.of(context).flashcardsAllOfSriLanka;
+    String regionsString = AppLocalizations.of(context).flashcardsAllOfSriLanka;
 
     String additionalRegionsValuesString = additionalRegionsValues
         .map((i) => Region.values[i].pretty)
@@ -204,6 +212,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             AppLocalizations.of(context).nFlashcardsDue(cardsToDo);
         break;
     }
+    cardNumberString = "${cardsToDo} " + cardNumberString;
 
     SettingsSection? sourceListSection;
     sourceListSection = SettingsSection(
@@ -223,8 +232,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 context: context,
                 builder: (ctx) {
                   List<MultiSelectItem<String>> items = [];
-                  for (MapEntry<String, WordList> e
-                      in wordListManager.wordLists.entries) {
+                  for (MapEntry<String, EntryList> e
+                      in entryListManager.entryLists.entries) {
                     items.add(MultiSelectItem(e.key, e.value.getName()));
                   }
                   return MultiSelectDialog<String>(
@@ -246,7 +255,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             },
             description: Text(
               listsToReview
-                  .map((key) => WordList.getNameFromKey(key))
+                  .map((key) => EntryList.getNameFromKey(key))
                   .toList()
                   .join(", "),
               textAlign: TextAlign.center,
@@ -304,8 +313,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                   context: context,
                   builder: (BuildContext context) {
                     SimpleDialog dialog = SimpleDialog(
-                      title: Text(
-                          AppLocalizations.of(context).flashcardsStrategy),
+                      title:
+                          Text(AppLocalizations.of(context).flashcardsStrategy),
                       children: RevisionStrategy.values
                           .map((e) => SimpleDialogOption(
                                 child: Container(
@@ -340,7 +349,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             ),
           ),
           SettingsTile.navigation(
-            title: getText("Select additional sign regions"),
+            title: getText(
+                AppLocalizations.of(context).flashcardsSelectSignRegions),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
@@ -348,9 +358,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 builder: (ctx) {
                   return MultiSelectDialog(
                     listType: MultiSelectListType.CHIP,
-                    title:
-                        Text(AppLocalizations.of(context).flashcardsRegions),
-                    items: regionsWithoutEverywhere
+                    title: Text(AppLocalizations.of(context).flashcardsRegions),
+                    items: Region.values
                         .map((e) => MultiSelectItem(e.index, e.pretty))
                         .toList(),
                     initialValue: additionalRegionsValues,

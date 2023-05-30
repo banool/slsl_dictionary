@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'globals.dart';
 import 'top_level_scaffold.dart';
-import 'types.dart';
 
 class SearchPage extends StatefulWidget {
   final String? initialQuery;
@@ -27,7 +27,7 @@ class _SearchPageState extends State<SearchPage> {
 
   _SearchPageState({this.initialQuery, this.navigateToFirstMatch});
 
-  List<Word?> wordsSearched = [];
+  List<Entry?> entriesSearched = [];
   int currentNavBarIndex = 0;
 
   final _searchFieldController = TextEditingController();
@@ -43,13 +43,13 @@ class _SearchPageState extends State<SearchPage> {
 
   void search(String searchTerm) {
     setState(() {
-      wordsSearched = searchList(searchTerm, wordsGlobal, {});
+      entriesSearched = searchList(context, searchTerm, entriesGlobal, {});
     });
   }
 
   void clearSearch() {
     setState(() {
-      wordsSearched = [];
+      entriesSearched = [];
       _searchFieldController.clear();
     });
   }
@@ -66,11 +66,11 @@ class _SearchPageState extends State<SearchPage> {
     // Navigate to the first match if words have been searched and the page
     // was built with that setting enabled.
     if (navigateToFirstMatch ?? false) {
-      if (wordsSearched.length > 0) {
+      if (entriesSearched.length > 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           print(
               "Navigating to first match because navigateToFirstMatch was set");
-          navigateToWordPage(context, wordsSearched[0]!);
+          navigateToEntryPage(context, entriesSearched[0]!);
         });
       }
     }
@@ -112,7 +112,7 @@ class _SearchPageState extends State<SearchPage> {
             new Expanded(
               child: Padding(
                   padding: EdgeInsets.only(left: 8),
-                  child: listWidget(context, wordsSearched)),
+                  child: listWidget(context, entriesSearched)),
             ),
           ],
         ),
@@ -123,7 +123,7 @@ class _SearchPageState extends State<SearchPage> {
     if (advisoriesResponse != null) {
       actions.add(buildActionButton(
         context,
-        Icon(Icons.new_releases),
+        Icon(Icons.article),
         () async {
           showAdvisoryDialog();
         },
@@ -158,20 +158,22 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-Widget listWidget(BuildContext context, List<Word?> wordsSearched) {
+Widget listWidget(BuildContext context, List<Entry?> entriesSearched) {
   return ListView.builder(
-    itemCount: wordsSearched.length,
+    itemCount: entriesSearched.length,
     itemBuilder: (context, index) {
-      return ListTile(title: listItem(context, wordsSearched[index]!));
+      return ListTile(title: listItem(context, entriesSearched[index]!));
     },
   );
 }
 
-Widget listItem(BuildContext context, Word word) {
+Widget listItem(BuildContext context, Entry entry) {
+  Locale currentLocale = Localizations.localeOf(context);
   return TextButton(
     child: Align(
         alignment: Alignment.topLeft,
-        child: Text("${word.word}", style: TextStyle(color: Colors.black))),
-    onPressed: () => navigateToWordPage(context, word),
+        child: Text("${entry.getPhrase(currentLocale)}",
+            style: TextStyle(color: Colors.black))),
+    onPressed: () => navigateToEntryPage(context, entry),
   );
 }

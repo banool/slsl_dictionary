@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
-import 'package:slsl_dictionary/entries_logic.dart';
+import 'package:slsl_dictionary/entries_types.dart';
 
 import 'common.dart';
 import 'flashcards_landing_page.dart';
@@ -75,7 +74,7 @@ class _RootAppState extends State<RootApp> {
         GoRoute(
             path: LISTS_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              return NoTransitionPage(child: WordListsOverviewPage());
+              return NoTransitionPage(child: EntryListsOverviewPage());
             }),
         GoRoute(
             path: REVISION_ROUTE,
@@ -104,6 +103,7 @@ class _RootAppState extends State<RootApp> {
           onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: LANGUAGE_TO_LOCALE.values,
+          locale: locale,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
               primarySwatch: MAIN_COLOR,

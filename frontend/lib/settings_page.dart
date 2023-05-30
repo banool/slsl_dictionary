@@ -9,7 +9,8 @@ import 'package:slsl_dictionary/root.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common.dart';
-import 'entries_logic.dart';
+import 'entries_loader.dart';
+import 'entries_types.dart';
 import 'flashcards_logic.dart';
 import 'globals.dart';
 import 'settings_help_page.dart';
@@ -126,8 +127,8 @@ class SettingsPageState extends State<SettingsPage> {
               bool updated = await getNewData(true);
               String message;
               if (updated) {
-                wordsGlobal = await loadWords();
-                updateKeyedWordsGlobal();
+                entriesGlobal = await loadEntries();
+                updateKeyedEntriesGlobal();
                 message = AppLocalizations.of(context).settingsDataUpdated;
               } else {
                 message = AppLocalizations.of(context).settingsDataUpToDate;
@@ -214,7 +215,22 @@ class SettingsPageState extends State<SettingsPage> {
       }
     }
 
-    Widget body = SettingsList(sections: nonNullSections);
+    Widget body =
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: EdgeInsets.only(left: 35, top: 10),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+            "Language",
+            style: TextStyle(
+                fontSize: 13, color: Color.fromARGB(255, 100, 100, 100)),
+            textAlign: TextAlign.start,
+          ),
+          Center(child: LanguageDropdown()),
+        ]),
+      ),
+      Expanded(child: SettingsList(sections: nonNullSections))
+    ]);
 
     List<Widget> actions = [
       buildActionButton(
@@ -365,7 +381,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
           if (localeOverride != null) {
             selectedLanguageOption = LOCALE_TO_LANGUAGE[localeOverride]!;
           } else {
-            selectedLanguageOption = noOverride;
+            selectedLanguageOption = NO_OVERRIDE_KEY;
           }
           return DropdownButton<String>(
             value: selectedLanguageOption,

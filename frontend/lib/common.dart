@@ -1,11 +1,10 @@
 import 'dart:collection';
-import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:edit_distance/edit_distance.dart';
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 
+import 'entries_types.dart';
 import 'globals.dart';
 import 'types.dart';
 import 'word_page.dart';
@@ -35,7 +34,7 @@ const String KEY_SHOULD_CACHE = "should_cache";
 
 const String KEY_ADVISORY_VERSION = "advisory_version";
 
-const String KEY_FAVOURITES_WORDS = "favourites_words";
+const String KEY_FAVOURITES_ENTRIES = "favourites_entries";
 const String KEY_LAST_DICTIONARY_DATA_CHECK_TIME = "last_data_check_time";
 const String KEY_DICTIONARY_DATA_CURRENT_VERSION = "current_data_version";
 const String KEY_HIDE_FLASHCARDS_FEATURE = "hide_flashcards_feature";
@@ -46,44 +45,21 @@ const int DATA_CHECK_INTERVAL = 60 * 60 * 1; // 1 hour.
 
 const int NUM_DAYS_TO_CACHE = 14;
 
-const String DATA_URL =
-    "https://storage.googleapis.com/slsl-main-bucket-f32e475/dump/dump.json";
-
-Future<Set<Word>> loadWords() async {
-  String data;
-  try {
-    // First try to read the data from local storage.
-    final path = await _dictionaryDataFilePath;
-    data = await path.readAsString();
-    print("Loaded data from local storage downloaded from the internet");
-    return loadWordsInner(data);
-  } catch (e) {
-    // Return nothing if there was no data in local storage.
-    print("Failed to load data from local storage: $e");
-    return {};
-  }
-}
-
-void updateKeyedWordsGlobal() {
-  for (Word w in wordsGlobal) {
-    keyedWordsGlobal[w.word] = w;
-  }
-}
-
-Future<void> navigateToWordPage(BuildContext context, Word word,
+Future<void> navigateToEntryPage(BuildContext context, Entry entry,
     {bool showFavouritesButton = true}) {
   return Navigator.push(
     context,
     MaterialPageRoute(
-        builder: (context) =>
-            WordPage(word: word, showFavouritesButton: showFavouritesButton)),
+        builder: (context) => EntryPage(
+            entry: entry, showFavouritesButton: showFavouritesButton)),
   );
 }
 
-// Search a list of words and return top matching items.
-List<Word> searchList(String searchTerm, Set<Word> words, Set<Word> fallback) {
-  final SplayTreeMap<double, List<Word>> st =
-      SplayTreeMap<double, List<Word>>();
+// Search a list of entries and return top matching items.
+List<Entry> searchList(BuildContext context, String searchTerm,
+    Set<Entry> entries, Set<Entry> fallback) {
+  final SplayTreeMap<double, List<Entry>> st =
+      SplayTreeMap<double, List<Entry>>();
   if (searchTerm == "") {
     return List.from(fallback);
   }
@@ -94,86 +70,30 @@ List<Word> searchList(String searchTerm, Set<Word> words, Set<Word> fallback) {
     caseSensitive: false,
     multiLine: false,
   );
-  for (Word w in words) {
-    String noPunctuation = w.word.replaceAll(" ", "").replaceAll(",", "");
+  Locale currentLocale = Localizations.localeOf(context);
+  for (Entry e in entries) {
+    String? phrase = e.getPhrase(currentLocale);
+    if (phrase == null) {
+      continue;
+    }
+    String noPunctuation = phrase.replaceAll(" ", "").replaceAll(",", "");
     String lowerCase = noPunctuation.toLowerCase();
     String noParenthesesContent = noParenthesesRegExp.stringMatch(lowerCase)!;
-    String normalisedWord = noParenthesesContent;
-    double difference = d.normalizedDistance(normalisedWord, searchTerm);
+    String normalisedEntry = noParenthesesContent;
+    double difference = d.normalizedDistance(normalisedEntry, searchTerm);
     if (difference == 1.0) {
       continue;
     }
-    st.putIfAbsent(difference, () => []).add(w);
+    st.putIfAbsent(difference, () => []).add(e);
   }
-  List<Word> out = [];
-  for (List<Word> words in st.values) {
-    out.addAll(words);
+  List<Entry> out = [];
+  for (List<Entry> entries in st.values) {
+    out.addAll(entries);
     if (out.length > 10) {
       break;
     }
   }
   return out;
-}
-
-// Run this at startup.
-// Downloads new dictionary data if available.
-// First it checks how recently it attempted to do this, so we don't spam
-// the dictionary data server.
-// Returns true if new data was downloaded.
-Future<bool> getNewData(bool forceCheck) async {
-  // Determine whether it is time to check for new dictionary data.
-  int? lastCheckTime =
-      sharedPreferences.getInt(KEY_LAST_DICTIONARY_DATA_CHECK_TIME);
-  int now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
-  if (!(lastCheckTime == null ||
-      now - DATA_CHECK_INTERVAL > lastCheckTime ||
-      forceCheck)) {
-    // No need to check again so soon.
-    print("Not checking for new dictionary data, it hasn't been long enough");
-    // todo undo this TODO
-    //return false;
-  }
-
-  // Check for new dictionary data. The versions here are just unixtimes.
-  int currentVersion =
-      sharedPreferences.getInt(KEY_DICTIONARY_DATA_CURRENT_VERSION) ?? 0;
-  var head = await http.head(Uri.parse(DATA_URL));
-  var latestVersion =
-      HttpDate.parse(head.headers['last-modified']!).millisecondsSinceEpoch ~/
-          1000;
-
-  // Exit out if the latest version is not newer than the current version.
-  if (latestVersion <= currentVersion) {
-    print(
-        "Current version ($currentVersion) is >= latest version ($latestVersion), not downloading new data");
-    // Record that we made this check so we don't check again too soon.
-    await sharedPreferences.setInt(KEY_LAST_DICTIONARY_DATA_CHECK_TIME, now);
-    return false;
-  }
-
-  // At this point, we know we need to download the new data. Let's do that.
-  String newData = (await http.get(Uri.parse(DATA_URL))).body;
-
-  // Assert that the data is valid. This will throw if it's not.
-  loadWordsInner(newData);
-
-  // Write the data to file.
-  final path = await _dictionaryDataFilePath;
-  await path.writeAsString(newData);
-
-  // Now, record the new version that we downloaded.
-  await sharedPreferences.setInt(
-      KEY_DICTIONARY_DATA_CURRENT_VERSION, latestVersion);
-  print(
-      "Set KEY_LAST_DICTIONARY_DATA_CHECK_TIME to $now and KEY_DICTIONARY_DATA_CURRENT_VERSION to $latestVersion. Done!");
-
-  return true;
-}
-
-// Returns the local path where we store the dictionary data we download.
-Future<File> get _dictionaryDataFilePath async {
-  final path = (await getApplicationDocumentsDirectory()).path;
-  return File('$path/word_dictionary.json');
 }
 
 bool getShouldUseHorizontalLayout(BuildContext context) {
@@ -190,7 +110,7 @@ Future<bool> readKnob(String key, bool fallback) async {
   String sharedPrefsKey = "knob_$key";
   try {
     String url =
-        'https://raw.githubusercontent.com/banool/slsl_dictionary/main/assets/knobs/$key';
+        'https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/$key';
     var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 4));
     String raw = result.body.replaceAll("\n", "");
     bool out;
@@ -296,4 +216,14 @@ RevisionStrategy loadRevisionStrategy() {
   RevisionStrategy revisionStrategy =
       RevisionStrategy.values[revisionStrategyIndex];
   return revisionStrategy;
+}
+
+extension StripString on String {
+  String lstrip(String pattern) {
+    return this.replaceFirst(new RegExp('^' + pattern + '*'), '');
+  }
+
+  String rstrip(String pattern) {
+    return this.replaceFirst(new RegExp(pattern + r'*$'), '');
+  }
 }

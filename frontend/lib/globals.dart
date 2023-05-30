@@ -4,14 +4,14 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'advisories.dart';
-import 'types.dart';
+import 'entries_types.dart';
 import 'word_list_logic.dart';
 
-late Set<Word> wordsGlobal;
-late Map<String, Word> keyedWordsGlobal = {};
-late Set<Word> favouritesGlobal;
+late Set<Entry> entriesGlobal;
+late Map<String, Entry> keyedEntriesGlobal = {};
+late Set<Entry> favouritesGlobal;
 
-late WordListManager wordListManager;
+late EntryListManager entryListManager;
 
 late SharedPreferences sharedPreferences;
 late CacheManager videoCacheManager;

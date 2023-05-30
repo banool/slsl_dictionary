@@ -91,6 +91,9 @@ Future<AdvisoriesResponse?> getAdvisories() async {
 
   bool newAdvisories = numKnownAdvisories < advisories.length;
 
+  // Write back the new latest advisories version we'v seen.
+  await sharedPreferences.setInt(KEY_ADVISORY_VERSION, advisories.length);
+
   return new AdvisoriesResponse(
       advisories: advisories, newAdvisories: newAdvisories);
 }

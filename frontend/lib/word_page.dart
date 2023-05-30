@@ -4,26 +4,26 @@ import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'globals.dart';
-import 'types.dart';
 import 'video_player_screen.dart';
 
-class WordPage extends StatefulWidget {
-  WordPage({Key? key, required this.word, required this.showFavouritesButton})
+class EntryPage extends StatefulWidget {
+  EntryPage({Key? key, required this.entry, required this.showFavouritesButton})
       : super(key: key);
 
-  final Word word;
+  final Entry entry;
   final bool showFavouritesButton;
 
   @override
-  _WordPageState createState() =>
-      _WordPageState(word: word, showFavouritesButton: showFavouritesButton);
+  _EntryPageState createState() =>
+      _EntryPageState(entry: entry, showFavouritesButton: showFavouritesButton);
 }
 
-class _WordPageState extends State<WordPage> {
-  _WordPageState({required this.word, required this.showFavouritesButton});
+class _EntryPageState extends State<EntryPage> {
+  _EntryPageState({required this.entry, required this.showFavouritesButton});
 
-  final Word word;
+  final Entry entry;
   final bool showFavouritesButton;
 
   int currentPage = 0;
@@ -34,7 +34,7 @@ class _WordPageState extends State<WordPage> {
 
   @override
   void initState() {
-    if (wordIsFavourited(word)) {
+    if (entryIsFavourited(entry)) {
       isFavourited = true;
     } else {
       isFavourited = false;
@@ -42,17 +42,18 @@ class _WordPageState extends State<WordPage> {
     super.initState();
   }
 
-  bool wordIsFavourited(Word word) {
-    return wordListManager.wordLists[KEY_FAVOURITES_WORDS]!.words
-        .contains(word);
+  bool entryIsFavourited(Entry entry) {
+    return entryListManager.entryLists[KEY_FAVOURITES_ENTRIES]!.entries
+        .contains(entry);
   }
 
-  Future<void> addWordToFavourites(Word word) async {
-    await wordListManager.wordLists[KEY_FAVOURITES_WORDS]!.addWord(word);
+  Future<void> addEntryToFavourites(Entry entry) async {
+    await entryListManager.entryLists[KEY_FAVOURITES_ENTRIES]!.addEntry(entry);
   }
 
-  Future<void> removeWordFromFavourites(Word word) async {
-    await wordListManager.wordLists[KEY_FAVOURITES_WORDS]!.removeWord(word);
+  Future<void> removeEntryFromFavourites(Entry entry) async {
+    await entryListManager.entryLists[KEY_FAVOURITES_ENTRIES]!
+        .removeEntry(entry);
   }
 
   void onPageChanged(int index) {
@@ -65,13 +66,13 @@ class _WordPageState extends State<WordPage> {
   @override
   Widget build(BuildContext context) {
     List<Widget> pages = [];
-    for (int i = 0; i < word.subWords.length; i++) {
-      SubWord subWord = word.subWords[i];
-      SubWordPage subWordPage = SubWordPage(
-        word: word,
-        subWord: subWord,
+    for (int i = 0; i < entry.getSubEntries().length; i++) {
+      SubEntry subEntry = entry.getSubEntries()[i];
+      SubEntryPage subEntryPage = SubEntryPage(
+        entry: entry,
+        subEntry: subEntry,
       );
-      pages.add(subWordPage);
+      pages.add(subEntryPage);
     }
 
     Icon starIcon;
@@ -93,9 +94,9 @@ class _WordPageState extends State<WordPage> {
             isFavourited = !isFavourited;
           });
           if (isFavourited) {
-            await addWordToFavourites(word);
+            await addEntryToFavourites(entry);
           } else {
-            await removeWordFromFavourites(word);
+            await removeEntryFromFavourites(entry);
           }
         },
       ));
@@ -122,15 +123,20 @@ class _WordPageState extends State<WordPage> {
       )
     ];
 
+    // TODO: Make this overridable on the page.
+    Locale currentLocale = Localizations.localeOf(context);
+
     return InheritedPlaybackSpeed(
         playbackSpeed: playbackSpeed,
         child: Scaffold(
           appBar: AppBar(
-              title: Text(word.word), actions: buildActionButtons(actions)),
+              // TODO: Handle when this is null.
+              title: Text(entry.getPhrase(currentLocale)!),
+              actions: buildActionButtons(actions)),
           bottomNavigationBar: Padding(
             padding: EdgeInsets.only(top: 5, bottom: 10),
             child: DotsIndicator(
-              dotsCount: word.subWords.length,
+              dotsCount: entry.getSubEntries().length,
               position: currentPage,
               decorator: DotsDecorator(
                 color: Colors.black, // Inactive color
@@ -140,51 +146,47 @@ class _WordPageState extends State<WordPage> {
           ),
           body: Center(
               child: PageView.builder(
-                  itemCount: word.subWords.length,
-                  itemBuilder: (context, index) => SubWordPage(
-                        word: word,
-                        subWord: word.subWords[index],
+                  itemCount: entry.getSubEntries().length,
+                  itemBuilder: (context, index) => SubEntryPage(
+                        entry: entry,
+                        subEntry: entry.getSubEntries()[index],
                       ),
                   onPageChanged: onPageChanged)),
         ));
   }
 }
 
-Widget? getRelatedWordsWidget(
-    BuildContext context, SubWord subWord, bool shouldUseHorizontalDisplay) {
-  int numKeywords = subWord.keywords.length;
-  if (numKeywords == 0) {
+Widget? getRelatedEntrysWidget(
+    BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay) {
+  int numRelatedWords = subEntry.getRelatedWords().length;
+  if (numRelatedWords == 0) {
     return null;
   }
 
-  Map<String?, Word> allWordsMap = {};
-  for (Word word in wordsGlobal) {
-    allWordsMap[word.word] = word;
-  }
   List<TextSpan> textSpans = [];
 
   int idx = 0;
-  for (String keyword in subWord.keywords) {
+  for (String relatedWord in subEntry.getRelatedWords()) {
     Color color;
     void Function()? navFunction;
-    Word? relatedWord;
-    if (allWordsMap.containsKey(keyword)) {
-      relatedWord = allWordsMap[keyword];
+    Entry? relatedEntry;
+    if (keyedEntriesGlobal.containsKey(relatedWord)) {
+      relatedEntry = keyedEntriesGlobal[relatedWord];
       color = MAIN_COLOR;
-      navFunction = () => navigateToWordPage(context, relatedWord!);
+      navFunction = () => navigateToEntryPage(context, relatedEntry!);
     } else {
-      relatedWord = null;
+      relatedEntry = null;
       color = Colors.black;
       navFunction = null;
     }
     String suffix;
-    if (idx < numKeywords - 1) {
+    if (idx < numRelatedWords - 1) {
       suffix = ", ";
     } else {
       suffix = "";
     }
     textSpans.add(TextSpan(
-      text: "$keyword$suffix",
+      text: "$relatedWord$suffix",
       style: TextStyle(color: color),
       recognizer: TapGestureRecognizer()..onTap = navFunction,
     ));
@@ -212,9 +214,9 @@ Widget? getRelatedWordsWidget(
 }
 
 Widget getRegionalInformationWidget(
-    SubWord subWord, bool shouldUseHorizontalDisplay,
+    SubEntry subEntry, bool shouldUseHorizontalDisplay,
     {bool hide = false}) {
-  String regionsStr = subWord.getRegionsString();
+  String regionsStr = subEntry.getRegions().map((r) => r.pretty).join(", ");
   if (hide) {
     regionsStr = "";
   }
@@ -237,49 +239,52 @@ Widget getRegionalInformationWidget(
   }
 }
 
-class SubWordPage extends StatefulWidget {
-  SubWordPage({
+class SubEntryPage extends StatefulWidget {
+  SubEntryPage({
     Key? key,
-    required this.word,
-    required this.subWord,
+    required this.entry,
+    required this.subEntry,
   }) : super(key: key);
 
-  final Word word;
-  final SubWord subWord;
+  final Entry entry;
+  final SubEntry subEntry;
 
   @override
-  _SubWordPageState createState() =>
-      _SubWordPageState(word: word, subWord: subWord);
+  _SubEntryPageState createState() =>
+      _SubEntryPageState(entry: entry, subEntry: subEntry);
 }
 
-class _SubWordPageState extends State<SubWordPage> {
-  _SubWordPageState({required this.word, required this.subWord});
+class _SubEntryPageState extends State<SubEntryPage> {
+  _SubEntryPageState({required this.entry, required this.subEntry});
 
-  final Word word;
-  final SubWord subWord;
+  final Entry entry;
+  final SubEntry subEntry;
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Make this overridable on the page.
+    Locale currentLocale = Localizations.localeOf(context);
+
     var videoPlayerScreen = VideoPlayerScreen(
-      videoLinks: subWord.videoLinks,
+      videoLinks: subEntry.getVideos(),
     );
-    // If the display is wide enough, show the video beside the words instead
-    // of above the words (as well as other layout changes).
+    // If the display is wide enough, show the video beside the entries instead
+    // of above the entries (as well as other layout changes).
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
-    Widget? keywordsWidget =
-        getRelatedWordsWidget(context, subWord, shouldUseHorizontalDisplay);
+    Widget? keyentriesWidget =
+        getRelatedEntrysWidget(context, subEntry, shouldUseHorizontalDisplay);
     Widget regionalInformationWidget =
-        getRegionalInformationWidget(subWord, shouldUseHorizontalDisplay);
+        getRegionalInformationWidget(subEntry, shouldUseHorizontalDisplay);
 
     if (!shouldUseHorizontalDisplay) {
       List<Widget> children = [];
       children.add(videoPlayerScreen);
-      if (keywordsWidget != null) {
-        children.add(keywordsWidget);
+      if (keyentriesWidget != null) {
+        children.add(keyentriesWidget);
       }
       children.add(Expanded(
-        child: definitions(context, subWord.definitions),
+        child: definitions(context, subEntry.getDefinitions(currentLocale)),
       ));
       children.add(regionalInformationWidget);
       return Column(
@@ -305,11 +310,12 @@ class _SubWordPageState extends State<SubWordPage> {
             // The issue is the parent has infinite width and height
             // and Expanded doesn't seem to be working.
             List<Widget> children = [];
-            if (keywordsWidget != null) {
-              children.add(keywordsWidget);
+            if (keyentriesWidget != null) {
+              children.add(keyentriesWidget);
             }
-            children.add(
-                Expanded(child: definitions(context, subWord.definitions)));
+            children.add(Expanded(
+                child: definitions(
+                    context, subEntry.getDefinitions(currentLocale))));
             return ConstrainedBox(
                 constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.4, maxHeight: screenHeight * 0.7),
@@ -337,15 +343,11 @@ Widget definition(BuildContext context, Definition definition) {
       padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
-          definition.heading!,
+          definition.categoryPretty,
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
-        Column(
-          children: definition.subdefinitions!
-              .map((s) => Padding(
-                  padding: EdgeInsets.only(left: 10.0, top: 8.0),
-                  child: Text(s)))
-              .toList(),
-        )
+        Padding(
+            padding: EdgeInsets.only(left: 10.0, top: 8.0),
+            child: Text(definition.definition))
       ]));
 }

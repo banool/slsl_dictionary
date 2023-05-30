@@ -135,7 +135,6 @@ STATIC_URL = "/static/"
 if secrets.get("bucket_name"):
     DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
     STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
-    GS_BUCKET_NAME = secrets["bucket_name"]
     # https://github.com/jschneier/django-storages/issues/941
     GS_QUERYSTRING_AUTH = False
     # Compress uploaded files with gzip.

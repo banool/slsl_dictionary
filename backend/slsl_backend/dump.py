@@ -62,7 +62,13 @@ def build_dump_models():
     for entry in id_to_entry.values():
         if "sub_entries" not in entry:
             continue
-        entry["sub_entries"] = list(entry["sub_entries"].values())
+        # Remove any sub entries without a video.
+        new_sub_entries = []
+        for sub_entry in list(entry["sub_entries"].values()):
+            if not sub_entries.get("videos", []):
+                continue
+            new_sub_entries.append(sub_entry)
+        entry["sub_entries"] = new_sub_entries
         out.append(entry)
 
     return out

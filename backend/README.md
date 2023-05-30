@@ -29,7 +29,7 @@ gcloud config set project slsl-dictionary
 
 Run the Cloud SQL proxy:
 ```
-cloud-sql-proxy slsl-dictionary:asia-south1:slsl-db-instance-04a74a9 --port 5433
+cloud-sql-proxy slsl-dictionary:us-east1:slsl-admin-db-instance-02833a6 --port 5433
 ```
 
 Make a file called `prod_secrets.json` where the following keys are different from `secrets.json`:
@@ -48,7 +48,8 @@ For the secrets:
 - `sql_database`: Find the database name here: https://console.cloud.google.com/sql/instances/slsl-db-instance-04a74a9/databases?project=slsl-dictionary
 - `sql_user`: `pulumi config get sql_user` (from within `deployment/`)
 - `sql_password`, `admin_username`, `admin_password`: Same as with `sql_user`
-- `bucket_name`: Find the bucket name here: https://console.cloud.google.com/storage/browser?project=slsl-dictionary
+- `admin_bucket_name`: Find the bucket name here: https://console.cloud.google.com/storage/browser?project=slsl-dictionary
+- `media_bucket_name`: As above
 
 Finally, run the server locally like this:
 ```

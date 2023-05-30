@@ -1,6 +1,7 @@
 # Secrets
 prod_secrets.json
 blah
+*.sqlite3
 
 # Django
 static/

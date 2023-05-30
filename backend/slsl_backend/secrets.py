@@ -33,11 +33,12 @@ for fname in POSSIBLE_FILENAMES:
             secrets = json.load(f)
         break
 
-if not secrets:
-    for secret in REQUIRED + OTHER:
-        value = os.environ.get(secret)
-        if value is not None:
-            secrets[secret] = value
+for secret in REQUIRED + OTHER:
+    if secret in secrets:
+        continue
+    value = os.environ.get(secret)
+    if value is not None:
+        secrets[secret] = value
 
 invalid = []
 for key in REQUIRED:

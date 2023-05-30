@@ -33,10 +33,8 @@ python manage.py migrate --noinput
 # Create superuser if it hasn't been done already.
 python manage.py initadmin
 
-# Collect static files for admin page.
-if [ "$SKIP_COLLECTSTATIC" = "true" ]; then
-    echo "Skipping collectstatic"
-else
+# Collect static files for admin page. This is only necessary in the dev environment.
+if [ "$ENV" = "dev" ]; then
     echo "Running collectstatic"
     python manage.py collectstatic -c --noinput
 fi

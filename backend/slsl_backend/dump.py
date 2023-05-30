@@ -76,6 +76,9 @@ def build_dump_models():
             if not sub_entry.get("videos", []):
                 continue
             new_sub_entries.append(sub_entry)
+        # Ignore any entries without at least one sub-entry.
+        if len(new_sub_entries) == 0:
+            continue
         entry["sub_entries"] = new_sub_entries
         out.append(entry)
 

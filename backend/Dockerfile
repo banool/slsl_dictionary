@@ -24,6 +24,7 @@ RUN poetry config virtualenvs.in-project true && poetry install --only=main --no
 
 # Build the actual app.
 COPY manage.py ./
+COPY README.md ./
 COPY slsl_backend ./slsl_backend
 RUN poetry build
 
@@ -35,7 +36,7 @@ COPY --from=builder /app/.venv ./.venv
 COPY --from=builder /app/dist .
 COPY --from=builder /app/manage.py .
 
-# Copy in the run script.
+# Copy in the run script and README.
 COPY run.sh .
 
 # Install the wheels we just built.

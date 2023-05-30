@@ -21,3 +21,5 @@ You should see output like this:
 executionId: 1h9fv0mejjid
 result: Uploaded dump containing 1419 entries to slsl-main-bucket-f32e475
 ```
+
+To deploy any changes to the cloud function (e.g. to main.py or requirements.txt) just run the above, it will zip it all up for you.

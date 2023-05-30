@@ -82,7 +82,7 @@ class DefinitionCategory(models.TextChoices):
 class Language(models.TextChoices):
     ENGLISH = "EN", _("English")
     TAMIL = "TA", _("Tamil")
-    SINHALA = "SIN", _("Sinhala")
+    SINHALA = "SI", _("Sinhala")
 
 
 class Region(models.TextChoices):

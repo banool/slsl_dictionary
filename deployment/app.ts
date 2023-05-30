@@ -4,12 +4,12 @@ import { ADMIN_LOCATION, SLSL } from "./common";
 import { envVars } from "./config";
 import { database, databaseInstance, databaseUser } from "./db";
 import { gcpServices } from "./project";
-import { mainBucket } from "./storage";
+import { adminBucket } from "./storage";
 import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "f197b2667bfcfe858a29ae7a3e871538e35d073b";
+const GIT_SHA = "374c8114242e8bf798b85738f4e7775296317b46";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
@@ -87,7 +87,7 @@ export const adminService = new gcp.cloudrun.Service(
       gcpServices.run,
       database,
       databaseUser,
-      mainBucket,
+      adminBucket,
       appServiceAccount,
       role1,
       role2,

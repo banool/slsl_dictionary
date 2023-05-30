@@ -1,5 +1,5 @@
 import * as gcp from "@pulumi/gcp";
-import { ADMIN_LOCATION, MEDIA_LOCATION, OLD_LOCATION } from "./common";
+import { ADMIN_LOCATION, MEDIA_LOCATION } from "./common";
 
 // Create a bucket that we'll use for the admin site (static content and cloud functions).
 export const adminBucket = new gcp.storage.Bucket("slsl-admin-bucket", {
@@ -45,21 +45,4 @@ new gcp.storage.BucketIAMMember(
     bucket: mediaBucket.name,
   },
   { dependsOn: [mediaBucket] }
-);
-
-// The old bucket, we're keeping this around for now until we migrate.
-export const mainBucket = new gcp.storage.Bucket("slsl-main-bucket", {
-  location: OLD_LOCATION,
-  uniformBucketLevelAccess: true,
-});
-
-// Make the bucket accessible to the public internet.
-new gcp.storage.BucketIAMMember(
-  "public-access",
-  {
-    member: "allUsers",
-    role: "roles/storage.objectViewer",
-    bucket: mainBucket.name,
-  },
-  { dependsOn: [mainBucket] }
 );

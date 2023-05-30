@@ -1,7 +1,7 @@
 import * as pulumi from "@pulumi/pulumi";
 import * as gcp from "@pulumi/gcp";
 import { gcpServices } from "./project";
-import { adminBucket, mainBucket, mediaBucket } from "./storage";
+import { adminBucket, mediaBucket } from "./storage";
 import { ADMIN_LOCATION, SLSL } from "./common";
 import * as fs from "fs";
 import * as archiver from "archiver";

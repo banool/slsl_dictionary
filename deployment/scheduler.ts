@@ -1,5 +1,5 @@
 import * as gcp from "@pulumi/gcp";
-import { LOCATION, RUN_EVERY_N_MINUTES } from "./common";
+import { ADMIN_LOCATION, RUN_EVERY_N_MINUTES } from "./common";
 import { func } from "./functions";
 import { appServiceAccount, role4 } from "./iam";
 
@@ -7,7 +7,7 @@ import { appServiceAccount, role4 } from "./iam";
 const job = new gcp.cloudscheduler.Job(
   "job",
   {
-    region: LOCATION,
+    region: ADMIN_LOCATION,
     httpTarget: {
       httpMethod: "GET",
       uri: func.httpsTriggerUrl,

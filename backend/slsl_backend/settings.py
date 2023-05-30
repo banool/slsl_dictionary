@@ -133,8 +133,22 @@ else:
 STATIC_URL = "/static/"
 
 if secrets.get("admin_bucket_name") and secrets.get("media_bucket_name"):
-    DEFAULT_FILE_STORAGE = "slsl_backend.storages.MediaStorage"
-    STATICFILES_STORAGE = "slsl_backend.storages.StaticStorage"
+    STORAGES = {
+        "default": {
+            "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+            "OPTIONS": {
+                "bucket_name": secrets["media_bucket_name"],
+                "location": "media"
+            }
+        },
+        "staticfiles": {
+            "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+            "OPTIONS": {
+                "bucket_name": secrets["admin_bucket_name"],
+                "location": "static"
+            }
+        }
+    }
     # https://github.com/jschneier/django-storages/issues/941
     GS_QUERYSTRING_AUTH = False
     # Compress uploaded files with gzip.

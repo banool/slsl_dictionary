@@ -1,5 +1,7 @@
 import logging
 
+from django.forms.models import model_to_dict
+
 from . import models
 
 LOG = logging.getLogger(__name__)
@@ -30,27 +32,28 @@ def build_dump_models():
         k: v for (k, v) in sub_entries.values_list("id", "entry")
     }
 
-    # Attach video information to the entry data.
+    # Attach video information to the sub-entry data.
     videos = models.Video.objects.all()
+    print(videos[:1])
     for video in videos:
         entry_id = sub_entry_id_to_entry_id[video.sub_entry_id]
         entry = id_to_entry[entry_id]
         sub_entries = entry.setdefault("sub_entries", {})
         sub_entry = sub_entries.setdefault(video.sub_entry_id, {})
-        videos = sub_entry.setdefault("videos", [])
-        videos.append(video.media.url)
+        sub_entry.setdefault("videos", []).append(video.media.url)
 
-    # Attach definitions information to the entry data.
-    definitions = models.Definition.objects.all().values()
+    # Attach definitions information to the sub-entry data.
+    definitions = models.Definition.objects.all()
+    print(definitions[:1])
     for definition in definitions:
-        entry_id = sub_entry_id_to_entry_id[definition["sub_entry_id"]]
+        entry_id = sub_entry_id_to_entry_id[definition.sub_entry_id]
         entry = id_to_entry[entry_id]
         sub_entries = entry.setdefault("sub_entries", {})
-        sub_entry = sub_entries.setdefault(definition["sub_entry_id"], {})
-        definitions = sub_entry.setdefault("definitions", [])
+        sub_entry = sub_entries.setdefault(definition.sub_entry_id, {})
+        definition = model_to_dict(definition)
         del definition["id"]
-        del definition["sub_entry_id"]
-        definitions.append(definition)
+        del definition["sub_entry"]
+        sub_entry.setdefault("definitions", []).append(definition)
 
     # Collapse the sub entries dictionary, since we don't actually care about
     # any kind of numerical index for the sub-entries. Order is preserved since dicts

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 import os
+import typing
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -132,43 +133,54 @@ else:
 
 STATIC_URL = "/static/"
 
-if secrets.get("admin_bucket_name") and secrets.get("media_bucket_name"):
-    STORAGES = {
-        "default": {
-            "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-            "OPTIONS": {
-                "bucket_name": secrets["media_bucket_name"],
-                "location": "media"
-            }
-        },
-        "staticfiles": {
-            "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-            "OPTIONS": {
-                "bucket_name": secrets["admin_bucket_name"],
-                "location": "static"
-            }
+# https://github.com/jschneier/django-storages/issues/941
+GS_QUERYSTRING_AUTH = False
+# Compress uploaded files with gzip.
+GS_IS_GZIPPED = True
+# Content types to compress.
+GZIP_CONTENT_TYPES = [
+    "text/css",
+    "text/javascript",
+    "application/javascript",
+    "application/x-javascript",
+    "image/svg+xml",
+    "video/mp4",
+    "video/quicktime",
+]
+# If this is true, new uploads with the same filename overwrite the previous one.
+# Since the videos we're using share the same filename in some cases, we turn this
+# off, in which case it will instead add additional characters to the filename.
+GS_FILE_OVERWRITE = False
+
+STORAGES: typing.Dict[str, typing.Dict[str, typing.Any]] = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
+
+if secrets.get("admin_bucket_name"):
+    STORAGES["staticfiles"] = {
+        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+        "OPTIONS": {
+            "bucket_name": secrets["admin_bucket_name"],
+            "location": "static"
         }
     }
-    # https://github.com/jschneier/django-storages/issues/941
-    GS_QUERYSTRING_AUTH = False
-    # Compress uploaded files with gzip.
-    GS_IS_GZIPPED = True
-    # Content types to compress.
-    GZIP_CONTENT_TYPES = [
-        "text/css",
-        "text/javascript",
-        "application/javascript",
-        "application/x-javascript",
-        "image/svg+xml",
-        "video/mp4",
-        "video/quicktime",
-    ]
-    # If this is true, new uploads with the same filename overwrite the previous one.
-    # Since the videos we're using share the same filename in some cases, we turn this
-    # off, in which case it will instead add additional characters to the filename.
-    GS_FILE_OVERWRITE = False
 else:
     STATIC_ROOT = "static"
+
+if secrets.get("media_bucket_name"):
+    STORAGES["default"] = {
+        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
+        "OPTIONS": {
+            "bucket_name": secrets["media_bucket_name"],
+            "location": "media"
+        }
+    }
+
 
 
 # Password validation

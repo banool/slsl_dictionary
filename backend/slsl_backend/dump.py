@@ -55,17 +55,17 @@ def build_dump_models():
         del definition["sub_entry"]
         sub_entry.setdefault("definitions", []).append(definition)
 
-    # Collapse the sub entries dictionary, since we don't actually care about
-    # any kind of numerical index for the sub-entries. Order is preserved since dicts
-    # are ordered in Python 3.6+ by insertion order.
+    # Collapse the sub entries dictionary, since we don't actually care about any kind
+    # of numerical index for the sub-entries. Order is preserved since dicts are
+    # ordered in Python 3.6+ by insertion order.
     out = []
     for entry in id_to_entry.values():
         if "sub_entries" not in entry:
             continue
-        # Remove any sub entries without a video.
+        # Remove any sub entries without at least one video.
         new_sub_entries = []
         for sub_entry in list(entry["sub_entries"].values()):
-            if not sub_entries.get("videos", []):
+            if not sub_entry.get("videos", []):
                 continue
             new_sub_entries.append(sub_entry)
         entry["sub_entries"] = new_sub_entries

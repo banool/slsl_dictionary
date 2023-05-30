@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/root.dart';
 import 'package:slsl_dictionary/types.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
@@ -33,7 +34,9 @@ void main() async {
 
   testWidgets('Pump app test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(RootApp());
+    await tester.pumpWidget(RootApp(
+      startingLocale: Locale("en"),
+    ));
     print("Pump successful!");
   });
 

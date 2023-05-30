@@ -1,38 +1,37 @@
+import 'dart:ui';
+
+
 // TODO define an interface like:
 
-class Entry {
+abstract class Entry {
   // This could be a word or phrase.
-  getPhrase(language)
+  String getPhrase(Locale locale);
 
-  getSubEntries(language)
+  // Language is only passed down here to pass it to getDefinitions,
+  // the sub entries available do not depend on language choice.
+  List<SubEntry> getSubEntries(Locale locale);
 }
 
-class SubEntry {
-  getVideos()
+abstract class SubEntry {
+  // Returns the video URLs.
+  List<String> getVideos();
 
-  getDefinitions(language)
+  // Gets definitions.
+  // todo define return type
+  getDefinitions(Locale locale);
 
   // TODO: Decide if a word can have multiple regions?
   // Probably should for the sake of future proofing.
-  getRegions()
+  getRegions();
 }
 
-enum Language {
-  EN_US,
-  // Use proper codes for other languages.
-  SINHALA,
-  TAMIL,
-}
+const Map<String, Locale> LANGUAGE_TO_LOCALE = {
+  "English": Locale('en', ''),
+  // Use word for Sinhala in Sinhala
+  "Sinhala": Locale('si', ''),
+  // Use word for Tamil in Tamil
+  "Tamil": Locale('ta', ''),
+};
 
-String getLanguageString(Language language) {
-  switch (language) {
-    case Language.EN_US:
-      return "English";
-    case Language.SINHALA:
-      // Use word for Sinhala in Sinhala
-      return "Sinhala";
-    case Language.TAMIL:
-      // Use word for Tamil in Tamil
-      return "Tamil";
-  }
-}
+Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
+    LANGUAGE_TO_LOCALE.entries.map((e) => MapEntry(e.value, e.key)));

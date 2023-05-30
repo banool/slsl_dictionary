@@ -5,7 +5,9 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:system_proxy/system_proxy.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'advisories.dart';
 import 'common.dart';
 import 'globals.dart';
 import 'root.dart';
@@ -92,7 +94,7 @@ Future<void> main() async {
   print("Start of main");
   try {
     await setup();
-    runApp(RootApp());
+    runApp(RootApp(startingLocale: Locale("en")));
   } catch (error, stackTrace) {
     runApp(ErrorFallback(
       error: error,
@@ -130,7 +132,7 @@ class ErrorFallback extends StatelessWidget {
     }
     List<Widget> children = [
       Text(
-        AppLocalizations.of(context)!.startupFailureMessage,
+        AppLocalizations.of(context).startupFailureMessage,
         textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),

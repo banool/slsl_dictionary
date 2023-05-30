@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
 import 'globals.dart';
@@ -55,7 +56,9 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    if (advisoriesResponse != null && !advisoryShownOnce) {
+    if (advisoriesResponse != null &&
+        advisoriesResponse!.newAdvisories &&
+        !advisoryShownOnce) {
       Future.delayed(Duration(milliseconds: 500), () => showAdvisoryDialog());
       advisoryShownOnce = true;
     }
@@ -87,7 +90,7 @@ class _SearchPageState extends State<SearchPage> {
                     TextField(
                       controller: _searchFieldController,
                       decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context)!.searchHintText,
+                        hintText: AppLocalizations.of(context).searchHintText,
                         suffixIcon: IconButton(
                           onPressed: () {
                             clearSearch();
@@ -120,7 +123,7 @@ class _SearchPageState extends State<SearchPage> {
     if (advisoriesResponse != null) {
       actions.add(buildActionButton(
         context,
-        Icon(Icons.announcement),
+        Icon(Icons.new_releases),
         () async {
           showAdvisoryDialog();
         },
@@ -129,7 +132,7 @@ class _SearchPageState extends State<SearchPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context)!.searchTitle,
+        title: AppLocalizations.of(context).searchTitle,
         actions: actions);
   }
 
@@ -137,9 +140,20 @@ class _SearchPageState extends State<SearchPage> {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
-              title: Text(AppLocalizations.of(context)!.newsTitle),
-              // TODO Do this properly.
-              content: Text(advisoriesResponse!.advisories[0].lines[0]),
+              title: Text(AppLocalizations.of(context).newsTitle),
+              content: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: advisoriesResponse!.advisories
+                      .map((e) => Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  e.date,
+                                  textAlign: TextAlign.start,
+                                ),
+                                e.asMarkdown()
+                              ]))
+                      .toList()),
             ));
   }
 }

@@ -2,8 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:slsl_dictionary/common.dart';
 
+import 'advisories.dart';
 import 'types.dart';
 import 'word_list_logic.dart';
 

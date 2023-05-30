@@ -1,12 +1,15 @@
 import 'dart:io' show Platform;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:mailto/mailto.dart';
 import 'package:settings_ui/settings_ui.dart';
+import 'package:slsl_dictionary/root.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common.dart';
+import 'entries_logic.dart';
 import 'flashcards_logic.dart';
 import 'globals.dart';
 import 'settings_help_page.dart';
@@ -36,12 +39,12 @@ class SettingsPageState extends State<SettingsPage> {
     String appStoreTileString;
     if (Platform.isAndroid) {
       appStoreTileString =
-          AppLocalizations.of(context)!.settingsPlayStoreFeedback;
+          AppLocalizations.of(context).settingsPlayStoreFeedback;
     } else if (Platform.isIOS) {
       appStoreTileString =
-          AppLocalizations.of(context)!.settingsAppStoreFeedback;
+          AppLocalizations.of(context).settingsAppStoreFeedback;
     } else {
-      appStoreTileString = AppLocalizations.of(context)!.na;
+      appStoreTileString = AppLocalizations.of(context).na;
     }
 
     EdgeInsetsDirectional margin =
@@ -50,11 +53,11 @@ class SettingsPageState extends State<SettingsPage> {
     SettingsSection? featuresSection;
     if (enableFlashcardsKnob && !getShouldUseHorizontalLayout(context)) {
       featuresSection = SettingsSection(
-        title: Text(AppLocalizations.of(context)!.settingsRevision),
+        title: Text(AppLocalizations.of(context).settingsRevision),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              AppLocalizations.of(context)!.settingsHideRevision,
+              AppLocalizations.of(context).settingsHideRevision,
               style: TextStyle(fontSize: 15),
             ),
             initialValue:
@@ -63,13 +66,13 @@ class SettingsPageState extends State<SettingsPage> {
           ),
           SettingsTile.navigation(
               title: getText(
-                AppLocalizations.of(context)!.settingsDeleteRevisionProgress,
+                AppLocalizations.of(context).settingsDeleteRevisionProgress,
               ),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 bool confirmed = await confirmAlert(
                     context,
-                    Text(AppLocalizations.of(context)!
+                    Text(AppLocalizations.of(context)
                         .settingsDeleteRevisionProgressExplanation));
                 if (confirmed) {
                   await writeReviews([], [], force: true);
@@ -77,7 +80,7 @@ class SettingsPageState extends State<SettingsPage> {
                   await sharedPreferences.remove(KEY_FIRST_RANDOM_REVIEW);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(
-                        AppLocalizations.of(context)!.settingsProgressDeleted),
+                        AppLocalizations.of(context).settingsProgressDeleted),
                     backgroundColor: MAIN_COLOR,
                   ));
                 }
@@ -89,24 +92,24 @@ class SettingsPageState extends State<SettingsPage> {
 
     List<AbstractSettingsSection?> sections = [
       SettingsSection(
-        title: Text(AppLocalizations.of(context)!.settingsCache),
+        title: Text(AppLocalizations.of(context).settingsCache),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              AppLocalizations.of(context)!.settingsCacheVideos,
+              AppLocalizations.of(context).settingsCacheVideos,
               style: TextStyle(fontSize: 15),
             ),
             initialValue: sharedPreferences.getBool(KEY_SHOULD_CACHE) ?? true,
             onToggle: onChangeShouldCache,
           ),
           SettingsTile.navigation(
-              title: getText(AppLocalizations.of(context)!.settingsDropCache),
+              title: getText(AppLocalizations.of(context).settingsDropCache),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 await videoCacheManager.emptyCache();
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
-                      Text(AppLocalizations.of(context)!.settingsCacheDropped),
+                      Text(AppLocalizations.of(context).settingsCacheDropped),
                   backgroundColor: MAIN_COLOR,
                 ));
               }),
@@ -114,10 +117,10 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-        title: Text(AppLocalizations.of(context)!.settingsData),
+        title: Text(AppLocalizations.of(context).settingsData),
         tiles: [
           SettingsTile.navigation(
-            title: getText(AppLocalizations.of(context)!.settingsCheckNewData),
+            title: getText(AppLocalizations.of(context).settingsCheckNewData),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               bool updated = await getNewData(true);
@@ -125,9 +128,9 @@ class SettingsPageState extends State<SettingsPage> {
               if (updated) {
                 wordsGlobal = await loadWords();
                 updateKeyedWordsGlobal();
-                message = AppLocalizations.of(context)!.settingsDataUpdated;
+                message = AppLocalizations.of(context).settingsDataUpdated;
               } else {
-                message = AppLocalizations.of(context)!.DataUpToDate;
+                message = AppLocalizations.of(context).settingsDataUpToDate;
               }
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(message), backgroundColor: MAIN_COLOR));
@@ -138,10 +141,10 @@ class SettingsPageState extends State<SettingsPage> {
       ),
       featuresSection,
       SettingsSection(
-        title: Text(AppLocalizations.of(context)!.settingsLegal),
+        title: Text(AppLocalizations.of(context).settingsLegal),
         tiles: [
           SettingsTile.navigation(
-            title: getText(AppLocalizations.of(context)!.settingsSeeLegal),
+            title: getText(AppLocalizations.of(context).settingsSeeLegal),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               return await Navigator.push(
@@ -155,10 +158,10 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-          title: Text(AppLocalizations.of(context)!.settingsHelp),
+          title: Text(AppLocalizations.of(context).settingsHelp),
           tiles: [
             SettingsTile.navigation(
-              title: getText(AppLocalizations.of(context)!
+              title: getText(AppLocalizations.of(context)
                   .settingsReportDictionaryDataIssue),
               trailing: Container(),
               onPressed: (BuildContext context) async {
@@ -168,7 +171,7 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                  AppLocalizations.of(context)!.settingsReportAppIssueGithub),
+                  AppLocalizations.of(context).settingsReportAppIssueGithub),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var url = 'https://github.com/banool/auslan_dictionary/issues';
@@ -177,7 +180,7 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                  AppLocalizations.of(context)!.settingsReportAppIssueEmail),
+                  AppLocalizations.of(context).settingsReportAppIssueEmail),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var mailto = Mailto(
@@ -228,7 +231,7 @@ class SettingsPageState extends State<SettingsPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context)!.SettingsTitle,
+        title: AppLocalizations.of(context).settingsTitle,
         actions: actions);
   }
 }
@@ -280,5 +283,125 @@ class LegalInformationPage extends StatelessWidget {
                     },
                   ),
                 ])));
+  }
+}
+
+// TODO: Use this instead of the other one I created for word page.
+class LanguageDropdown extends StatefulWidget {
+  LanguageDropdown({Key? key}) : super(key: key);
+
+  @override
+  LanguageDropdownState createState() => LanguageDropdownState();
+}
+
+class LanguageDropdownState extends State<LanguageDropdown> {
+  Locale? localeOverride;
+  late Future<void> initStateAsyncFuture;
+
+  static const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
+
+  @override
+  void initState() {
+    initStateAsyncFuture = initStateAsync();
+    super.initState();
+  }
+
+  Future<void> initStateAsync() async {
+    localeOverride = await getLocaleOverride();
+  }
+
+// If there is an override, return the override.
+// Otherwise return the current locale.
+  Future<Locale?> getLocaleOverride() async {
+    return await LocaleOverride.getLocaleOverride();
+  }
+
+// Returns the locale if an override was set, or null if the user just chose
+// to use the system locale (no override).
+  Future<Locale?> setLocale(String language) async {
+    if (language == NO_OVERRIDE_KEY) {
+      // Unset locale override.
+      RootApp.clearLocaleOverride(context);
+      await LocaleOverride.clearLocaleOverride();
+      return null;
+    }
+    // Set locale override, both in the DB and in the app live right now.
+    Locale localeOverride = LANGUAGE_TO_LOCALE[language]!;
+    RootApp.applyLocaleOverride(context, localeOverride);
+    await LocaleOverride.writeLocaleOverride(localeOverride);
+    return localeOverride;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    String noOverride = AppLocalizations.of(context).deviceDefault;
+
+    // Build list of possible language.
+    List<DropdownMenuItem<String>> languageDropdownOptions = [];
+
+    // Add system locale.
+    languageDropdownOptions.add(DropdownMenuItem<String>(
+        value: NO_OVERRIDE_KEY, child: Text(noOverride)));
+
+    // Add the rest of the language options.
+    languageDropdownOptions.addAll(LANGUAGE_TO_LOCALE.keys
+        .map<DropdownMenuItem<String>>((String language) {
+      return DropdownMenuItem<String>(
+        value: language,
+        child: Text(language),
+      );
+    }).toList());
+
+    return FutureBuilder(
+        future: initStateAsyncFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState != ConnectionState.done) {
+            return new Center(
+              child: new CircularProgressIndicator(),
+            );
+          }
+          // Determine which locale option should be selected.
+          String selectedLanguageOption;
+          if (localeOverride != null) {
+            selectedLanguageOption = LOCALE_TO_LANGUAGE[localeOverride]!;
+          } else {
+            selectedLanguageOption = noOverride;
+          }
+          return DropdownButton<String>(
+            value: selectedLanguageOption,
+            items: languageDropdownOptions,
+            onChanged: (String? newValue) async {
+              Locale? newLocale = await setLocale(newValue!);
+              setState(() {
+                if (newLocale != null) {
+                  localeOverride = newLocale;
+                } else {
+                  localeOverride = null;
+                }
+              });
+            },
+          );
+        });
+  }
+}
+
+// Records the locale override, if any.
+// This class stores the locale as a string internally but the interface
+// requires and returns Locale objects.
+class LocaleOverride {
+  static Future<void> writeLocaleOverride(Locale locale) async {
+    sharedPreferences.setString(KEY_LOCALE_OVERRIDE, locale.toString());
+  }
+
+  static Future<void> clearLocaleOverride() async {
+    sharedPreferences.remove(KEY_LOCALE_OVERRIDE);
+  }
+
+  static Future<Locale?> getLocaleOverride() async {
+    var localeRaw = sharedPreferences.getString(KEY_LOCALE_OVERRIDE);
+    if (localeRaw == null) {
+      return null;
+    }
+    return Locale(localeRaw);
   }
 }

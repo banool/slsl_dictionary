@@ -29,7 +29,9 @@ const MaterialColor MAIN_COLOR = const MaterialColor(
 );
 const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 
-const String KEY_SHOULD_CACHE = "shouldCache";
+const String KEY_LOCALE_OVERRIDE = "locale_override";
+
+const String KEY_SHOULD_CACHE = "should_cache";
 
 const String KEY_ADVISORY_VERSION = "advisory_version";
 
@@ -208,97 +210,6 @@ Future<bool> readKnob(String key, bool fallback) async {
     print("Returning fallback value for knob $key: $out");
     return out;
   }
-}
-
-class Advisory {
-  String date;
-  List<String> lines;
-
-  RichText asMarkdown() {
-    return RichText(text: TextSpan(text: "${date}\n${lines.join("\n")}"));
-  }
-
-  Advisory({
-    required this.date,
-    required this.lines,
-  });
-}
-
-class AdvisoriesResponse {
-  List<Advisory> advisories;
-  bool newAdvisories;
-
-  AdvisoriesResponse({
-    required this.advisories,
-    required this.newAdvisories,
-  });
-}
-
-// Returns the advisories and whether there is a new advisory. It returns them
-// in order from old to new. If we failed to lookup the advisories we return
-// null.
-Future<AdvisoriesResponse?> getAdvisories() async {
-  // Pull the number of advisories we've seen in the past from storage.
-  int numKnownAdvisories = sharedPreferences.getInt(KEY_ADVISORY_VERSION) ?? 0;
-
-  // Get the advisories file.
-  String? advisoryRaw;
-  try {
-    String url =
-        'https://raw.githubusercontent.com/banool/slsl_dictiionary/main/assets/advisories.md';
-    var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 4));
-    advisoryRaw = result.body;
-  } catch (e) {
-    print("Failed to get advisory: $e");
-    return null;
-  }
-
-  // Each advisory is a list of strings, the lines from within the section.
-  List<Advisory> advisories = [];
-  var inSection = false;
-  List<String> currentLines = [];
-  String? currentDate;
-  for (var line in advisoryRaw.split("\n")) {
-    // Skip comment lines.
-    if (line.startsWith("////")) {
-      continue;
-    }
-
-    // Skip empty lines if we're not in a action.
-    if (line.length == 1 && line.endsWith("\n") && !inSection) {
-      continue;
-    }
-
-    // Handle the start of a section.
-    if (line.startsWith("START===")) {
-      inSection = true;
-      continue;
-    }
-
-    // Handle the end of a section.
-    if (line.startsWith("END===")) {
-      advisories.add(new Advisory(date: currentDate!, lines: currentLines));
-      currentLines = [];
-      currentDate = null;
-      inSection = false;
-      continue;
-    }
-
-    // Handle the date.
-    if (line.startsWith("DATE===")) {
-      currentDate = line.substring("DATE===".length);
-      continue;
-    }
-
-    if (inSection) {
-      currentLines.add(line);
-    }
-  }
-
-  bool newAdvisories = numKnownAdvisories < advisories.length;
-
-  return new AdvisoriesResponse(
-      advisories: advisories, newAdvisories: newAdvisories);
 }
 
 bool getShowFlashcards() {

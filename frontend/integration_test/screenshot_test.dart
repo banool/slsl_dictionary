@@ -150,7 +150,7 @@ void main() async {
     await sharedPreferences.setInt(
         KEY_REVISION_STRATEGY, RevisionStrategy.SpacedRepetition.index);
 
-    await tester.pumpWidget(RootApp());
+    await tester.pumpWidget(RootApp(startingLocale: Locale("en")));
     await tester.pumpAndSettle(Duration(seconds: 10));
     var screenshotNameInfo = await ScreenshotNameInfo.buildScreenshotNameInfo();
 

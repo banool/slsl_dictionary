@@ -67,7 +67,7 @@ class WordList {
 
   static String getNameFromKey(String key) {
     if (key == KEY_FAVOURITES_WORDS) {
-      return AppLocalizations.of(context)!.listFavourites;
+      return "Favourites";
     }
     return key.substring(0, key.length - 6).replaceAll("_", " ");
   }
@@ -78,10 +78,10 @@ class WordList {
 
   static String getKeyFromName(String name) {
     if (name.length == 0) {
-      throw AppLocalizations.of(context)!.listNameCannotBeEmpty;
+      throw "List name cannot be empty";
     }
     if (!validNameCharacters.hasMatch(name)) {
-      throw AppLocalizations.of(context)!.listNameInvalid;
+      throw "Invalid name, this should have been caught already";
     }
     return "${name}_words".replaceAll(" ", "_");
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
 import 'globals.dart';
@@ -148,7 +149,7 @@ class _WordListPageState extends State<WordListPage> {
 
     String hintText;
     if (inEditMode) {
-      hintText = AppLocalizations.of(context)!.listSearchAdd;
+      hintText = AppLocalizations.of(context).listSearchAdd;
       bool keyboardIsShowing = MediaQuery.of(context).viewInsets.bottom > 0;
       if (currentSearchTerm.length > 0 || keyboardIsShowing) {
         floatingActionButton = null;
@@ -161,7 +162,7 @@ class _WordListPageState extends State<WordListPage> {
             child: Icon(Icons.add));
       }
     } else {
-      hintText = "${AppLocalizations.of(context)!.listSearchPrefix} $listName";
+      hintText = "${AppLocalizations.of(context).listSearchPrefix} $listName";
     }
 
     return Scaffold(

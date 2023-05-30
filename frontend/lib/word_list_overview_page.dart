@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
 import 'globals.dart';
@@ -133,7 +134,7 @@ class _WordListsOverviewPageState extends State<WordListsOverviewPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context)!.listsTitle,
+        title: AppLocalizations.of(context).listsTitle,
         actions: actions,
         floatingActionButton: floatingActionButton);
   }
@@ -152,7 +153,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: AppLocalizations.of(context)!.listEnterNewName,
+        hintText: AppLocalizations.of(context).listEnterNewName,
       ),
       autofocus: true,
       inputFormatters: [
@@ -177,7 +178,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
-              Text("${AppLocalizations.of(context)!.listFailedToMake}: $e."),
+              Text("${AppLocalizations.of(context).listFailedToMake}: $e."),
           backgroundColor: Colors.red));
       confirmed = false;
     }

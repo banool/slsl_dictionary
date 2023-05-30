@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:video_player/video_player.dart';
 
 import 'common.dart';
@@ -225,7 +226,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       } else {
         errorWidgets[idx] = Column(children: [
           Text(
-            "${AppLocalizations.of(context)!.unexpectedErrorLoadingVideo} $videoLink: $e",
+            "${AppLocalizations.of(context).unexpectedErrorLoadingVideo} $videoLink: $e",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 11),
           )

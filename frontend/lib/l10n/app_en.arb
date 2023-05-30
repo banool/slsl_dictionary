@@ -1,4 +1,6 @@
 {
+    "appTitle": "SLSL Dictionary",
+
     "newsTitle": "News",
 
     "searchTitle": "Search",
@@ -9,10 +11,24 @@
     "searchHintText": "Search for a word",
 
     "flashcardsAllOfSriLanka": "All of Sri Lanka",
-    "nFlashcardsSelected": "{count,plural, =1{card} other{cards} selected}",
-    "@nFlashcardsSelected": {"placeholders": {"count": {}}},
-    "nFlashcardsDue": "{count,plural, =1{card} other{cards} due}",
-    "@nFlashcardsDue": {"placeholders": {"count": {}}},
+    "nFlashcardsSelected": "{count, plural, =0{cards} =1{cards} other{cards}}",
+    "@nFlashcardsSelected": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
+    "nFlashcardsDue": "{count, plural, =0{cards} =1{cards} other{cards}}",
+    "@nFlashcardsDue": {
+        "placeholders": {
+            "count": {
+                "type": "num",
+                "format": "compact"
+            }
+        }
+    },
     "flashcardsRevisionSources": "Revision Sources",
     "flashcardsSelectListsToRevise": "Select lists to revise",
     "flashcardsSelectLists": "Select Lists",
@@ -24,7 +40,7 @@
     "flashcardsStrategy": "Strategy",
     "flashcardsRegions": "Regions",
     "flashcardsStart": "Start",
-    "flashcardsOnlyOneCard": "Show only one set of cards per word"
+    "flashcardsOnlyOneCard": "Show only one set of cards per word",
 
     "flashcardsNext": "Next",
     "flashcardsForgot": "Forgot",
@@ -91,4 +107,5 @@
 
     "startupFailureMessage": "Failed to start the app correctly. First, please confirm you are using the latest version of the app. If you are, please email daniel@dport.me with a screenshot showing this error.",
     "unexpectedErrorLoadingVideo": "Unexpected error loading",
+    "deviceDefault": "Device Default"
 }

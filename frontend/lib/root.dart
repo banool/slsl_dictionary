@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:slsl_dictionary/entries_logic.dart';
 
 import 'common.dart';
 import 'flashcards_landing_page.dart';
@@ -15,7 +18,38 @@ const SETTINGS_ROUTE = "/settings";
 final GlobalKey<NavigatorState> rootNavigatorKey =
     GlobalKey<NavigatorState>(debugLabel: 'root');
 
-class RootApp extends StatelessWidget {
+late Locale systemLocale;
+
+class RootApp extends StatefulWidget {
+  RootApp({required this.startingLocale});
+
+  final Locale startingLocale;
+
+  @override
+  _RootAppState createState() => _RootAppState(locale: startingLocale);
+
+  static void applyLocaleOverride(BuildContext context, Locale newLocale) {
+    _RootAppState state = context.findAncestorStateOfType<_RootAppState>()!;
+
+    state.setState(() {
+      state.locale = newLocale;
+    });
+  }
+
+  static void clearLocaleOverride(BuildContext context) {
+    _RootAppState state = context.findAncestorStateOfType<_RootAppState>()!;
+
+    state.setState(() {
+      state.locale = systemLocale;
+    });
+  }
+}
+
+class _RootAppState extends State<RootApp> {
+  _RootAppState({required this.locale});
+
+  Locale locale;
+
   final GoRouter router = GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: SEARCH_ROUTE,
@@ -67,6 +101,9 @@ class RootApp extends StatelessWidget {
         },
         child: MaterialApp.router(
           title: APP_NAME,
+          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          localizationsDelegates: AppLocalizations.localizationsDelegates,
+          supportedLocales: LANGUAGE_TO_LOCALE.values,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
               primarySwatch: MAIN_COLOR,

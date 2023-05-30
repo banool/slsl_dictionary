@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import 'common.dart';
 import 'flashcards_logic.dart';
@@ -149,18 +150,18 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
         String days = longestStreakDays == 1 ? "day" : "days";
 
         leftColumn = [
-          getText("${AppLocalizations.of(context)!.flashcardsTotalReviews}:",
+          getText("${AppLocalizations.of(context).flashcardsTotalReviews}:",
               bold: true),
-          getText("${AppLocalizations.of(context)!.flashcardsSuccessRate}:",
+          getText("${AppLocalizations.of(context).flashcardsSuccessRate}:",
               bold: true),
-          getText("${AppLocalizations.of(context)!.flashcardsSuccessfulCards}:",
+          getText("${AppLocalizations.of(context).flashcardsSuccessfulCards}:",
               bold: true),
           getText(
-              "${AppLocalizations.of(context)!.flashcardsUnsuccessfulCards}:",
+              "${AppLocalizations.of(context).flashcardsUnsuccessfulCards}:",
               bold: true),
-          getText("${AppLocalizations.of(context)!.flashcardsUniqueWords}:",
+          getText("${AppLocalizations.of(context).flashcardsUniqueWords}:",
               bold: true),
-          getText("${AppLocalizations.of(context)!.flashcardsLongestStreak}:",
+          getText("${AppLocalizations.of(context).flashcardsLongestStreak}:",
               bold: true),
         ];
         rightColumn = [
@@ -176,7 +177,7 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
         int totalRandomReviews =
             sharedPreferences.getInt(KEY_RANDOM_REVIEWS_COUNTER) ?? 0;
         leftColumn = [
-          getText("${AppLocalizations.of(context)!.flashcardsTotalReviews}:",
+          getText("${AppLocalizations.of(context).flashcardsTotalReviews}:",
               bold: true),
         ];
         rightColumn = [getText("$totalRandomReviews")];
@@ -189,7 +190,7 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
           String dateString = getDatetimeString(dt);
           // TODO Localize this date string if this isn't happening already.
           disclaimer = Text(
-              "${AppLocalizations.of(context)!.flashcardsStatsCollectedSince} $dateString");
+              "${AppLocalizations.of(context).flashcardsStatsCollectedSince} $dateString");
         }
         break;
     }
@@ -197,7 +198,7 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
     return Scaffold(
         appBar: AppBar(
           title: Text(
-              AppLocalizations.of(context)!.flashcardsRevisionProgressTitle),
+              AppLocalizations.of(context).flashcardsRevisionProgressTitle),
           centerTitle: true,
         ),
         body: CustomScrollView(slivers: [
@@ -208,8 +209,7 @@ class _RevisionHistoryPageState extends State<RevisionHistoryPage> {
                   Padding(
                     padding: EdgeInsets.only(top: 50),
                   ),
-                  Text(AppLocalizations.of(context)!
-                      .flashcardsRevisionStategyToShow),
+                  Text(AppLocalizations.of(context).flashcardsRevisionStategyToShow),
                   Padding(
                     padding: EdgeInsets.only(top: 15),
                   ),

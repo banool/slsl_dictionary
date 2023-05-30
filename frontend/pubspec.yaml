@@ -23,10 +23,11 @@ dependencies:
   flutter_cache_manager:
   flutter_localizations:
     sdk: flutter
+  flutter_markdown: ^0.6.14
   flutter_native_splash:
   go_router: 6.5.9
   http:
-  intl:
+  intl: any
   launch_review:
   mailto:
   multi_select_flutter:
@@ -58,5 +59,6 @@ flutter_native_splash:
 
 flutter:
   uses-material-design: true
+  generate: true
   assets:
     - assets/data/dump.json

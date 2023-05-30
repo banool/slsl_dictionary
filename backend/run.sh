@@ -37,6 +37,7 @@ python manage.py initadmin
 if [ "$SKIP_COLLECTSTATIC" = "true" ]; then
     echo "Skipping collectstatic"
 else
+    echo "Running collectstatic"
     python manage.py collectstatic -c --noinput
 fi
 

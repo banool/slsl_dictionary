@@ -2,6 +2,7 @@ import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:slsl_dictionary/language_dropdown.dart';
 
 import 'common.dart';
 import 'entries_types.dart';
@@ -31,6 +32,9 @@ class _EntryPageState extends State<EntryPage> {
   bool isFavourited = false;
 
   PlaybackSpeed playbackSpeed = PlaybackSpeed.One;
+
+  // On the word page we let people override the language.
+  Locale? localeOverride;
 
   @override
   void initState() {
@@ -65,16 +69,6 @@ class _EntryPageState extends State<EntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Widget> pages = [];
-    for (int i = 0; i < entry.getSubEntries().length; i++) {
-      SubEntry subEntry = entry.getSubEntries()[i];
-      SubEntryPage subEntryPage = SubEntryPage(
-        entry: entry,
-        subEntry: subEntry,
-      );
-      pages.add(subEntryPage);
-    }
-
     Icon starIcon;
     if (isFavourited) {
       starIcon = Icon(Icons.star,
@@ -103,12 +97,11 @@ class _EntryPageState extends State<EntryPage> {
     }
 
     actions += [
-      /*
-      getSwitchLanguageAppBarActionWidget((p0) {
-        // todo, switch the stuff we're showing in the entry
-        // don't change the app language though
+      LanguagePopUpMenuState(onChanged: (language) {
+        setState(() {
+          localeOverride = LANGUAGE_TO_LOCALE[language]!;
+        });
       }),
-      */
       getPlaybackSpeedDropdownWidget(
         (p) {
           setState(() {
@@ -123,36 +116,41 @@ class _EntryPageState extends State<EntryPage> {
       )
     ];
 
-    // TODO: Make this overridable on the page.
-    Locale currentLocale = Localizations.localeOf(context);
+    // If there is no locale override just use the app-level locale.
+    Locale locale = localeOverride ?? Localizations.localeOf(context);
 
     return InheritedPlaybackSpeed(
         playbackSpeed: playbackSpeed,
-        child: Scaffold(
-          appBar: AppBar(
-              // TODO: Handle when this is null.
-              title: Text(entry.getPhrase(currentLocale)!),
-              actions: buildActionButtons(actions)),
-          bottomNavigationBar: Padding(
-            padding: EdgeInsets.only(top: 5, bottom: 10),
-            child: DotsIndicator(
-              dotsCount: entry.getSubEntries().length,
-              position: currentPage,
-              decorator: DotsDecorator(
-                color: Colors.black, // Inactive color
-                activeColor: MAIN_COLOR,
-              ),
-            ),
-          ),
-          body: Center(
-              child: PageView.builder(
-                  itemCount: entry.getSubEntries().length,
-                  itemBuilder: (context, index) => SubEntryPage(
-                        entry: entry,
-                        subEntry: entry.getSubEntries()[index],
+        child: Localizations.override(
+            context: context,
+            locale: locale,
+            child: Builder(builder: (context) {
+              var phrase = entry.getPhrase(locale) ??
+                  AppLocalizations.of(context).wordDataMissing;
+              return Scaffold(
+                  appBar: AppBar(
+                      title: Text(phrase),
+                      actions: buildActionButtons(actions)),
+                  bottomNavigationBar: Padding(
+                    padding: EdgeInsets.only(top: 5, bottom: 10),
+                    child: DotsIndicator(
+                      dotsCount: entry.getSubEntries().length,
+                      position: currentPage,
+                      decorator: DotsDecorator(
+                        color: Colors.black, // Inactive color
+                        activeColor: MAIN_COLOR,
                       ),
-                  onPageChanged: onPageChanged)),
-        ));
+                    ),
+                  ),
+                  body: Center(
+                      child: PageView.builder(
+                          itemCount: entry.getSubEntries().length,
+                          itemBuilder: (context, index) => SubEntryPage(
+                                entry: entry,
+                                subEntry: entry.getSubEntries()[index],
+                              ),
+                          onPageChanged: onPageChanged)));
+            })));
   }
 }
 
@@ -262,8 +260,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    // TODO: Make this overridable on the page.
-    Locale currentLocale = Localizations.localeOf(context);
+    Locale locale = Localizations.localeOf(context);
 
     var videoPlayerScreen = VideoPlayerScreen(
       videoLinks: subEntry.getVideos(),
@@ -272,7 +269,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
     // of above the entries (as well as other layout changes).
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
-    Widget? keyentriesWidget =
+    Widget? relatedWordsWidget =
         getRelatedEntriesWidget(context, subEntry, shouldUseHorizontalDisplay);
     Widget regionalInformationWidget =
         getRegionalInformationWidget(subEntry, shouldUseHorizontalDisplay);
@@ -280,11 +277,11 @@ class _SubEntryPageState extends State<SubEntryPage> {
     if (!shouldUseHorizontalDisplay) {
       List<Widget> children = [];
       children.add(videoPlayerScreen);
-      if (keyentriesWidget != null) {
-        children.add(keyentriesWidget);
+      if (relatedWordsWidget != null) {
+        children.add(Center(child: relatedWordsWidget));
       }
       children.add(Expanded(
-        child: definitions(context, subEntry.getDefinitions(currentLocale)),
+        child: Definitions(context, subEntry.getDefinitions(locale)),
       ));
       children.add(regionalInformationWidget);
       return Column(
@@ -310,12 +307,11 @@ class _SubEntryPageState extends State<SubEntryPage> {
             // The issue is the parent has infinite width and height
             // and Expanded doesn't seem to be working.
             List<Widget> children = [];
-            if (keyentriesWidget != null) {
-              children.add(keyentriesWidget);
+            if (relatedWordsWidget != null) {
+              children.add(relatedWordsWidget);
             }
             children.add(Expanded(
-                child: definitions(
-                    context, subEntry.getDefinitions(currentLocale))));
+                child: Definitions(context, subEntry.getDefinitions(locale))));
             return ConstrainedBox(
                 constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.4, maxHeight: screenHeight * 0.7),
@@ -329,7 +325,14 @@ class _SubEntryPageState extends State<SubEntryPage> {
   }
 }
 
-Widget definitions(BuildContext context, List<Definition> definitions) {
+Widget Definitions(BuildContext context, List<Definition> definitions) {
+  if (definitions.isEmpty) {
+    return Center(
+        child: Text(
+      AppLocalizations.of(context).wordNoDefinitions,
+      textAlign: TextAlign.center,
+    ));
+  }
   return ListView.builder(
     itemCount: definitions.length,
     itemBuilder: (context, index) {

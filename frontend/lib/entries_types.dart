@@ -32,12 +32,16 @@ abstract class SubEntry {
   List<Region> getRegions();
 }
 
+const LANGUAGE_ENGLISH = "English";
+const LANGUAGE_SINHALA = "සිංහල";
+const LANGUAGE_TAMIL = "தமிழ்";
+
 const Map<String, Locale> LANGUAGE_TO_LOCALE = {
-  "English": Locale('en', ''),
+  LANGUAGE_ENGLISH: Locale('en', ''),
   // Use word for Sinhala in Sinhala
-  "සිංහල": Locale('si', ''),
+  LANGUAGE_SINHALA: Locale('si', ''),
   // Use word for Tamil in Tamil
-  "தமிழ்": Locale('ta', ''),
+  LANGUAGE_TAMIL: Locale('ta', ''),
 };
 
 Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
@@ -49,8 +53,6 @@ class MyEntry implements Entry {
   final String? word_in_tamil;
   final String? word_in_sinhala;
 
-  final String? related_words;
-
   final String? category;
 
   final List<MySubEntry> sub_entries;
@@ -59,7 +61,6 @@ class MyEntry implements Entry {
       {required this.word_in_english,
       this.word_in_tamil,
       this.word_in_sinhala,
-      this.related_words,
       this.category,
       required this.sub_entries});
 
@@ -75,11 +76,11 @@ class MyEntry implements Entry {
 
   @override
   String? getPhrase(Locale locale) {
-    if (locale == LANGUAGE_TO_LOCALE["English"]) {
+    if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_ENGLISH]!) {
       return word_in_english;
-    } else if (locale == LANGUAGE_TO_LOCALE["Tamil"]) {
+    } else if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_TAMIL]) {
       return word_in_tamil;
-    } else if (locale == LANGUAGE_TO_LOCALE["Sinhala"]) {
+    } else if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_SINHALA]) {
       return word_in_sinhala;
     } else {
       throw Exception("Unknown locale $locale");
@@ -108,11 +109,12 @@ class MySubEntry implements SubEntry {
   final String region;
   final String? related_words;
 
-  MySubEntry(
-      {required this.videos,
-      required this.region,
-      this.definitions,
-      this.related_words});
+  MySubEntry({
+    required this.videos,
+    this.definitions,
+    required this.region,
+    this.related_words,
+  });
 
   factory MySubEntry.fromJson(Map<String, dynamic> json) =>
       _$MySubEntryFromJson(json);
@@ -154,11 +156,15 @@ class MySubEntry implements SubEntry {
   @override
   List<Definition> getDefinitions(Locale locale) {
     List<Definition> out = [];
-    for (var definition in definitions ?? []) {
+    print("yoooooooooooo definitions $definitions");
+    for (Definition definition in definitions ?? []) {
+      print(definition.language);
+      print(locale.languageCode);
       if (definition.language.toLowerCase() == locale.languageCode) {
         out.add(definition);
       }
     }
+    print("yoooooooooooo out $out");
     return out;
   }
 

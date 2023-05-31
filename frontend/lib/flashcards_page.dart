@@ -12,6 +12,8 @@ import 'types.dart';
 import 'video_player_screen.dart';
 import 'word_page.dart';
 
+// TODO: Refuse to show flashcards if there is no word in the current app language.
+// TODO: Add the language override button.
 class FlashcardsPage extends StatefulWidget {
   FlashcardsPage({
     Key? key,

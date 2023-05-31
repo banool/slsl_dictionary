@@ -13,8 +13,8 @@ import 'advisories.dart';
 import 'common.dart';
 import 'entries_types.dart';
 import 'globals.dart';
+import 'language_dropdown.dart';
 import 'root.dart';
-import 'settings_page.dart';
 import 'word_list_logic.dart';
 
 Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {

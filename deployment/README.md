@@ -13,7 +13,7 @@ Note that sometimes deployment will fail due to this issue: https://github.com/b
 ## Cloud Function
 To run the cloud function manually do this:
 ```
-gcloud functions call --region asia-south1 `pulumi stack output functionName`
+gcloud functions call --region us-east1 `pulumi stack output functionName`
 ```
 
 You should see output like this:

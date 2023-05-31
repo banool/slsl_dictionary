@@ -156,7 +156,7 @@ class _EntryPageState extends State<EntryPage> {
   }
 }
 
-Widget? getRelatedEntrysWidget(
+Widget? getRelatedEntriesWidget(
     BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay) {
   int numRelatedWords = subEntry.getRelatedWords().length;
   if (numRelatedWords == 0) {
@@ -273,7 +273,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
     Widget? keyentriesWidget =
-        getRelatedEntrysWidget(context, subEntry, shouldUseHorizontalDisplay);
+        getRelatedEntriesWidget(context, subEntry, shouldUseHorizontalDisplay);
     Widget regionalInformationWidget =
         getRegionalInformationWidget(subEntry, shouldUseHorizontalDisplay);
 

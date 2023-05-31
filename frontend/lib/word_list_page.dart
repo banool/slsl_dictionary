@@ -62,10 +62,10 @@ class _EntryListPageState extends State<EntryListPage> {
     setState(() {
       if (currentSearchTerm.length > 0) {
         if (inEditMode) {
-          Set<Entry> entriesGlobalWithoutEntrysAlreadyInList =
+          Set<Entry> entriesGlobalWithoutEntriesAlreadyInList =
               entriesGlobal.difference(entryList.entries);
           entriesSearched = searchList(context, currentSearchTerm,
-              entriesGlobalWithoutEntrysAlreadyInList, {});
+              entriesGlobalWithoutEntriesAlreadyInList, {});
         } else {
           entriesSearched = searchList(
               context, currentSearchTerm, entryList.entries, entryList.entries);
@@ -102,7 +102,7 @@ class _EntryListPageState extends State<EntryListPage> {
     });
   }
 
-  Future<void> refreshEntrys() async {
+  Future<void> refreshEntries() async {
     setState(() {
       search();
     });
@@ -211,7 +211,7 @@ class _EntryListPageState extends State<EntryListPage> {
                 child: Padding(
               padding: EdgeInsets.only(left: 8),
               child: listWidget(
-                  context, entriesSearched, entriesGlobal, refreshEntrys,
+                  context, entriesSearched, entriesGlobal, refreshEntries,
                   showFavouritesButton: entryList.key == KEY_FAVOURITES_ENTRIES,
                   deleteEntryFn: inEditMode && currentSearchTerm.length == 0
                       ? removeEntry
@@ -230,8 +230,8 @@ class _EntryListPageState extends State<EntryListPage> {
 Widget listWidget(
   BuildContext context,
   List<Entry?> entriesSearched,
-  Set<Entry> allEntrys,
-  Function refreshEntrysFn, {
+  Set<Entry> allEntries,
+  Function refreshEntriesFn, {
   bool showFavouritesButton = true,
   Future<void> Function(Entry)? deleteEntryFn,
   Future<void> Function(Entry)? addEntryFn,
@@ -263,7 +263,7 @@ Widget listWidget(
       }
       return ListTile(
         key: ValueKey(entry.getKey()),
-        title: listItem(context, entry, refreshEntrysFn,
+        title: listItem(context, entry, refreshEntriesFn,
             showFavouritesButton: showFavouritesButton),
         trailing: trailing,
       );
@@ -275,7 +275,7 @@ Widget listWidget(
 // aren't the the favourites list, since that star icon might be confusing
 // and lead people to beleive they're interacting with the non-favourites
 // list they just came from.
-Widget listItem(BuildContext context, Entry entry, Function refreshEntrysFn,
+Widget listItem(BuildContext context, Entry entry, Function refreshEntriesFn,
     {bool showFavouritesButton = true}) {
   return TextButton(
     child: Align(
@@ -287,7 +287,7 @@ Widget listItem(BuildContext context, Entry entry, Function refreshEntrysFn,
     onPressed: () async => {
       await navigateToEntryPage(context, entry,
           showFavouritesButton: showFavouritesButton),
-      await refreshEntrysFn(),
+      await refreshEntriesFn(),
     },
   );
 }

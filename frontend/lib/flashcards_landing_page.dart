@@ -118,7 +118,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     });
   }
 
-  int getNumValidSubEntrys() {
+  int getNumValidSubEntries() {
     if (filteredSubEntries.values.length == 0) {
       return 0;
     }
@@ -133,7 +133,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
   bool startValid() {
     var revisionStrategy = loadRevisionStrategy();
     bool flashcardTypesValid = numEnabledFlashcardTypes > 0;
-    bool numfilteredSubEntriesValid = getNumValidSubEntrys() > 0;
+    bool numfilteredSubEntriesValid = getNumValidSubEntries() > 0;
     bool numCardsValid =
         getNumDueCards(dolphinInformation.dolphin, revisionStrategy) > 0;
     bool validBasedOnRevisionStrategy = true;

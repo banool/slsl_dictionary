@@ -39,36 +39,36 @@ Set<Entry> getEntriesFromLists(List<String> listsToUse) {
 
 Map<String, List<SubEntryWrapper>> getSubEntriesFromEntries(
     Set<Entry> favourites) {
-  Map<String, List<SubEntryWrapper>> subEntrys = Map();
+  Map<String, List<SubEntryWrapper>> subEntries = Map();
   for (Entry e in favourites) {
     int i = 0;
-    subEntrys[e.getKey()] = [];
+    subEntries[e.getKey()] = [];
     for (SubEntry sw in e.getSubEntries()) {
-      subEntrys[e.getKey()]!.add(SubEntryWrapper(subEntry: sw, index: i));
+      subEntries[e.getKey()]!.add(SubEntryWrapper(subEntry: sw, index: i));
       i += 1;
     }
   }
-  return subEntrys;
+  return subEntries;
 }
 
-int getNumSubEntries(Map<String, List<SubEntry>> subEntrys) {
-  if (subEntrys.values.length == 0) {
+int getNumSubEntries(Map<String, List<SubEntry>> subEntries) {
+  if (subEntries.values.length == 0) {
     return 0;
   }
-  if (subEntrys.values.length == 1) {
-    return subEntrys.values.toList()[0].length;
+  if (subEntries.values.length == 1) {
+    return subEntries.values.toList()[0].length;
   }
-  return subEntrys.values.map((v) => v.length).reduce((a, b) => a + b);
+  return subEntries.values.map((v) => v.length).reduce((a, b) => a + b);
 }
 
 Map<String, List<SubEntryWrapper>> filterSubEntries(
-    Map<String, List<SubEntryWrapper>> subEntrys,
+    Map<String, List<SubEntryWrapper>> subEntries,
     List<Region> allowedRegions,
     bool useUnknownRegionSigns,
     bool oneCardPerEntry) {
   Map<String, List<SubEntryWrapper>> out = Map();
 
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
     List<SubEntryWrapper> validSubEntries = [];
     for (SubEntryWrapper sww in e.value) {
       if (validSubEntries.length > 0 && oneCardPerEntry) {
@@ -97,12 +97,12 @@ Map<String, List<SubEntryWrapper>> filterSubEntries(
 }
 
 // You should provide this function the filtered list of SubEntries.
-List<Master> getMasters(Map<String, List<SubEntryWrapper>> subEntrys,
+List<Master> getMasters(Map<String, List<SubEntryWrapper>> subEntries,
     bool entryToSign, bool signToEntry) {
-  print("Making masters from ${subEntrys.length} entries");
+  print("Making masters from ${subEntries.length} entries");
   List<Master> masters = [];
   Set<String> keys = {};
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
     String entry = e.key;
     for (SubEntryWrapper sww in e.value) {
       List<Combination> combinations = [];
@@ -136,11 +136,11 @@ int getNumCards(DolphinSR dolphin) {
 }
 
 DolphinInformation getDolphinInformation(
-    Map<String, List<SubEntryWrapper>> subEntrys, List<Master> masters,
+    Map<String, List<SubEntryWrapper>> subEntries, List<Master> masters,
     {List<Review>? reviews}) {
   reviews = reviews ?? [];
   Map<String, SubEntryWrapper> keyToSubEntryMap = Map();
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntrys.entries) {
+  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
     for (SubEntryWrapper sww in e.value) {
       // TODO: Make sure this is okay vs the key needing to have entry.key in it.
       keyToSubEntryMap[sww.subEntry.getKey()] = sww;

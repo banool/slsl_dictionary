@@ -36,23 +36,6 @@ class Entry(models.Model):
         help_text="This is a field we might use down the line for some kind of predefined word list feature.",
     )
 
-    # This can be used to help with search. These can be any language.
-    # TODO: Make a new form field type to accept these.
-    related_words = models.CharField(
-        max_length=256,
-        null=True,
-        blank=True,
-        validators=[
-            RegexValidator(
-                regex=COMMA_SEPARATED_LIST_REGEX,
-                message="Please enter a comma separated list",
-            )
-        ],
-        help_text='Comma separated, for example: "great, awesome, fantastic"',
-    )
-
-    # blah = models.FileField(upload_to='router_specifications')
-
     datetime_added = models.DateTimeField(auto_now_add=True)
     datetime_modified = models.DateTimeField(auto_now=True)
 
@@ -104,6 +87,21 @@ class SubEntry(models.Model):
         max_length=3,
         choices=Region.choices,
         default=Region.ALL_OF_SRI_LANKA,
+    )
+
+    # This can be used to help with search. These can be any language.
+    # TODO: Make a new form field type to accept these.
+    related_words = models.CharField(
+        max_length=256,
+        null=True,
+        blank=True,
+        validators=[
+            RegexValidator(
+                regex=COMMA_SEPARATED_LIST_REGEX,
+                message="Please enter a comma separated list",
+            )
+        ],
+        help_text='Optional. Comma separated, for example: "great, really awesome, fantastic"',
     )
 
     def __str__(self):

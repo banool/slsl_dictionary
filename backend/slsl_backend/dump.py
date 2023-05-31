@@ -15,7 +15,6 @@ def build_dump_models():
         "word_in_english",
         "word_in_tamil",
         "word_in_sinhala",
-        "related_words",
         "category",
     )
 
@@ -91,9 +90,9 @@ def build_dump():
 
     out = build_dump_models()
 
+    LOG.info(f"Returning data dump containing {len(out)} entries")
+
     # Throw out the Entry IDs and just take the values.
     out = {"data": out}
-
-    LOG.info(f"Returning data dump containing {len(out)} entries")
 
     return out

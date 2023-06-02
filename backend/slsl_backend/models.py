@@ -4,7 +4,12 @@ from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-COMMA_SEPARATED_LIST_REGEX = re.compile(r"(^$)|(\w+)(,\s*\w+)*")
+COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)(\w+(?:,\s*\w(\w|\s)*)*)?$")
+
+
+class EntryType(models.TextChoices):
+    WORD = "WORD", _("Word")
+    PHRASE = "PHRASE", _("Phrase")
 
 
 # This class defines a single entry, aka word.
@@ -34,6 +39,15 @@ class Entry(models.Model):
         null=True,
         blank=True,
         help_text="This is a field we might use down the line for some kind of predefined word list feature.",
+    )
+
+    # This field defines whether the entry is, for now, a word or phrase.
+    entry_type = models.CharField(
+        max_length=32,
+        null=False,
+        help_text="Whether this entry is a word or a phrase. If unsure, use word.",
+        choices=EntryType.choices,
+        default=EntryType.WORD,
     )
 
     datetime_added = models.DateTimeField(auto_now_add=True)

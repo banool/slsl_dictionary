@@ -26,6 +26,7 @@ class SubEntryAdmin(NestedStackedInline):
 
 class EntryAdmin(NestedModelAdmin):
     search_fields = ["word_in_english", "word_in_tamil", "word_in_sinhala"]
+    list_filter = ["entry_type", "category"]
     inlines = [
         SubEntryAdmin,
     ]

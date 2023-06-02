@@ -16,6 +16,7 @@ def build_dump_models():
         "word_in_tamil",
         "word_in_sinhala",
         "category",
+        "entry_type",
     )
 
     # Build a map of Entry ID to Entry as a dict.

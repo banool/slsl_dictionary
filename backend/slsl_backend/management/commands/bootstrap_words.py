@@ -1,3 +1,7 @@
+# Update: I would not advise running this multiple times against the same data, I don't
+# think the naming scheme is consistent or stable enough in the original data, nor the
+# behavior on the backend side currently consistent enough, to make this work very well.
+#
 # This file defines a management command that consumes the initial video files from the
 # video bank and creates the corresponding database entries + uploads the videos. It is
 # written such that it should be safe to call it multiple times and it won't upload

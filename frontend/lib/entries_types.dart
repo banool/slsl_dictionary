@@ -1,8 +1,23 @@
-import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:slsl_dictionary/common.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 part 'entries_types.g.dart';
+
+enum EntryType {
+  WORD,
+  PHRASE,
+}
+
+String getEntryTypePretty(BuildContext context, EntryType entryType) {
+  switch (entryType) {
+    case EntryType.WORD:
+      return AppLocalizations.of(context).entryTypeWords;
+    case EntryType.PHRASE:
+      return AppLocalizations.of(context).entryTypePhrases;
+  }
+}
 
 abstract class Entry implements Comparable<Entry> {
   // Used for comparing entries.
@@ -11,6 +26,9 @@ abstract class Entry implements Comparable<Entry> {
   // This could be a word or phrase. This can return null if there is nothing
   // available for the given locale.
   String? getPhrase(Locale locale);
+
+  // Get the type of this entry.
+  EntryType getEntryType();
 
   List<SubEntry> getSubEntries();
 }
@@ -54,6 +72,7 @@ class MyEntry implements Entry {
   final String? word_in_sinhala;
 
   final String? category;
+  final String entry_type;
 
   final List<MySubEntry> sub_entries;
 
@@ -62,6 +81,7 @@ class MyEntry implements Entry {
       this.word_in_tamil,
       this.word_in_sinhala,
       this.category,
+      required this.entry_type,
       required this.sub_entries});
 
   factory MyEntry.fromJson(Map<String, dynamic> json) =>
@@ -95,6 +115,17 @@ class MyEntry implements Entry {
   @override
   int compareTo(Entry other) {
     return this.getKey().compareTo(other.getKey());
+  }
+
+  @override
+  EntryType getEntryType() {
+    if (entry_type == "WORD") {
+      return EntryType.WORD;
+    } else if (entry_type == "PHRASE") {
+      return EntryType.PHRASE;
+    } else {
+      throw Exception("Unknown entry type $entry_type");
+    }
   }
 }
 
@@ -156,7 +187,6 @@ class MySubEntry implements SubEntry {
   @override
   List<Definition> getDefinitions(Locale locale) {
     List<Definition> out = [];
-    print("yoooooooooooo definitions $definitions");
     for (Definition definition in definitions ?? []) {
       print(definition.language);
       print(locale.languageCode);
@@ -164,7 +194,6 @@ class MySubEntry implements SubEntry {
         out.add(definition);
       }
     }
-    print("yoooooooooooo out $out");
     return out;
   }
 

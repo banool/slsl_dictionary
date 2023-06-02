@@ -105,31 +105,13 @@ class LanguageDropdownState extends State<LanguageDropdown> {
   }
 }
 
-class LanguagePopUpMenuState extends StatelessWidget {
+class LanguagePopUpMenu extends StatelessWidget {
   final void Function(String?) onChanged;
 
-  const LanguagePopUpMenuState({super.key, required this.onChanged});
+  const LanguagePopUpMenu({super.key, required this.onChanged});
 
   @override
   Widget build(BuildContext context) {
-    String noOverride = AppLocalizations.of(context).deviceDefault;
-
-    // Build list of possible language.
-    List<DropdownMenuItem<String>> languageDropdownOptions = [];
-
-    // Add system locale.
-    languageDropdownOptions.add(DropdownMenuItem<String>(
-        value: NO_OVERRIDE_KEY, child: Text(noOverride)));
-
-    // Add the rest of the language options.
-    languageDropdownOptions
-        .addAll(LANGUAGE_TO_LOCALE.keys.map((String language) {
-      return DropdownMenuItem<String>(
-        value: language,
-        child: Text(language),
-      );
-    }).toList());
-
     return PopupMenuButton<String>(
       icon: Icon(
         Icons.language,

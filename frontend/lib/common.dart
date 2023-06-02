@@ -34,6 +34,9 @@ const String KEY_SHOULD_CACHE = "should_cache";
 
 const String KEY_ADVISORY_VERSION = "advisory_version";
 
+const String KEY_SEARCH_FOR_WORDS = "search_for_words";
+const String KEY_SEARCH_FOR_PHRASES = "search_for_phrases";
+
 const String KEY_FAVOURITES_ENTRIES = "favourites_entries";
 const String KEY_LAST_DICTIONARY_DATA_CHECK_TIME = "last_data_check_time";
 const String KEY_DICTIONARY_DATA_CURRENT_VERSION = "current_data_version";
@@ -57,7 +60,7 @@ Future<void> navigateToEntryPage(BuildContext context, Entry entry,
 
 // Search a list of entries and return top matching items.
 List<Entry> searchList(BuildContext context, String searchTerm,
-    Set<Entry> entries, Set<Entry> fallback) {
+    List<EntryType> entryTypes, Set<Entry> entries, Set<Entry> fallback) {
   final SplayTreeMap<double, List<Entry>> st =
       SplayTreeMap<double, List<Entry>>();
   if (searchTerm == "") {
@@ -70,8 +73,12 @@ List<Entry> searchList(BuildContext context, String searchTerm,
     caseSensitive: false,
     multiLine: false,
   );
+  print("Searching with entryTypes $entryTypes");
   Locale currentLocale = Localizations.localeOf(context);
   for (Entry e in entries) {
+    if (!entryTypes.contains(e.getEntryType())) {
+      continue;
+    }
     String? phrase = e.getPhrase(currentLocale);
     if (phrase == null) {
       continue;

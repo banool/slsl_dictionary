@@ -107,6 +107,10 @@
     "wordNoDefinitions": "No definitions data available for this word / phrase",
     "wordDataMissing": "Data missing",
 
+    "entryTypeWords": "Words",
+    "entryTypePhrases": "Phrases",
+    "entrySelectEntryTypes": "Select Entry Types",
+
     "relatedWords": "Related words",
 
     "startupFailureMessage": "Failed to start the app correctly. First, please confirm you are using the latest version of the app. If you are, please email daniel@dport.me with a screenshot showing this error.",

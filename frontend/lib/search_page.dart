@@ -30,25 +30,30 @@ class _SearchPageState extends State<SearchPage> {
   List<Entry?> entriesSearched = [];
   int currentNavBarIndex = 0;
 
+  String? searchTerm;
+
   final _searchFieldController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     if (initialQuery != null) {
+      searchTerm = initialQuery;
       _searchFieldController.text = initialQuery!;
-      search(initialQuery!);
+      search(initialQuery!, getEntryTypes());
     }
   }
 
-  void search(String searchTerm) {
+  void search(String searchTerm, List<EntryType> entryTypes) {
     setState(() {
-      entriesSearched = searchList(context, searchTerm, entriesGlobal, {});
+      entriesSearched =
+          searchList(context, searchTerm, entryTypes, entriesGlobal, {});
     });
   }
 
   void clearSearch() {
     setState(() {
+      searchTerm = null;
       entriesSearched = [];
       _searchFieldController.clear();
     });
@@ -83,32 +88,64 @@ class _SearchPageState extends State<SearchPage> {
           mainAxisSize: MainAxisSize.max,
           children: [
             Padding(
-              padding: EdgeInsets.only(bottom: 10, left: 32, right: 32, top: 0),
-              child: Form(
-                  key: ValueKey("searchPage.searchForm"),
-                  child: Column(children: <Widget>[
-                    TextField(
-                      controller: _searchFieldController,
-                      decoration: InputDecoration(
-                        hintText: AppLocalizations.of(context).searchHintText,
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            clearSearch();
+                padding:
+                    EdgeInsets.only(bottom: 10, left: 32, right: 12, top: 0),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Form(
+                        key: ValueKey("searchPage.searchForm"),
+                        child: TextField(
+                          controller: _searchFieldController,
+                          decoration: InputDecoration(
+                            hintText:
+                                AppLocalizations.of(context).searchHintText,
+                            suffixIcon: IconButton(
+                              onPressed: () {
+                                clearSearch();
+                              },
+                              icon: Icon(Icons.clear),
+                            ),
+                          ),
+                          // The validator receives the text that the user has entered.
+                          onChanged: (String value) {
+                            setState(() {
+                              searchTerm = value;
+                            });
+                            search(value, getEntryTypes());
                           },
-                          icon: Icon(Icons.clear),
+                          autofocus: true,
+                          textInputAction: TextInputAction.search,
+                          keyboardType: TextInputType.visiblePassword,
+                          autocorrect: false,
                         ),
                       ),
-                      // The validator receives the text that the user has entered.
-                      onChanged: (String value) {
-                        search(value);
-                      },
-                      autofocus: true,
-                      textInputAction: TextInputAction.search,
-                      keyboardType: TextInputType.visiblePassword,
-                      autocorrect: false,
                     ),
-                  ])),
-            ),
+                    EntryTypeMultiPopUpMenu(onChanged: (_entryTypes) async {
+                      for (EntryType type in EntryType.values) {
+                        var key;
+                        if (type == EntryType.WORD) {
+                          key = KEY_SEARCH_FOR_WORDS;
+                        } else {
+                          key = KEY_SEARCH_FOR_PHRASES;
+                        }
+                        // It would be best to wait for this to complete but
+                        // given this generally happens lightning fast I'll
+                        // leave it as a todo.
+                        if (_entryTypes.contains(type)) {
+                          await sharedPreferences.setBool(key, true);
+                        } else {
+                          await sharedPreferences.setBool(key, false);
+                        }
+                        setState(() {
+                          if (searchTerm != null) {
+                            search(searchTerm!, getEntryTypes());
+                          }
+                        });
+                      }
+                    }),
+                  ],
+                )),
             new Expanded(
               child: Padding(
                   padding: EdgeInsets.only(left: 8),
@@ -176,4 +213,86 @@ Widget listItem(BuildContext context, Entry entry) {
             style: TextStyle(color: Colors.black))),
     onPressed: () => navigateToEntryPage(context, entry),
   );
+}
+
+// This widget lets users select which entry types they want to see.
+class EntryTypeMultiPopUpMenu extends StatefulWidget {
+  final Future<void> Function(List<EntryType>) onChanged;
+
+  const EntryTypeMultiPopUpMenu({Key? key, required this.onChanged})
+      : super(key: key);
+
+  @override
+  EntryTypeMultiPopUpMenuState createState() => EntryTypeMultiPopUpMenuState();
+}
+
+class EntryTypeMultiPopUpMenuState extends State<EntryTypeMultiPopUpMenu> {
+  List<EntryType> _selectedEntryTypes = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedEntryTypes = getEntryTypes();
+  }
+
+  Future<void> _showDialog(BuildContext context) async {
+    await showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return StatefulBuilder(
+              builder: (BuildContext context, StateSetter setState) {
+            return AlertDialog(
+              title: Text(AppLocalizations.of(context).entrySelectEntryTypes),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: EntryType.values
+                    .map((entryType) => CheckboxListTile(
+                          title: Text(getEntryTypePretty(context, entryType)),
+                          value: _selectedEntryTypes.contains(entryType),
+                          onChanged: (bool? value) {
+                            setState(() {
+                              if (value == true) {
+                                setState(() {
+                                  _selectedEntryTypes.add(entryType);
+                                });
+                              } else {
+                                // Ensure at least one entry type is selected.
+                                if (_selectedEntryTypes.length == 1) {
+                                  return;
+                                }
+                                setState(() {
+                                  _selectedEntryTypes.remove(entryType);
+                                });
+                              }
+                            });
+                          },
+                        ))
+                    .toList(),
+              ),
+            );
+          });
+        });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(Icons.filter_list),
+      onPressed: () async {
+        await _showDialog(context);
+        await widget.onChanged(_selectedEntryTypes);
+      },
+    );
+  }
+}
+
+List<EntryType> getEntryTypes() {
+  List<EntryType> entryTypes = [];
+  if (sharedPreferences.getBool(KEY_SEARCH_FOR_WORDS) ?? true) {
+    entryTypes.add(EntryType.WORD);
+  }
+  if (sharedPreferences.getBool(KEY_SEARCH_FOR_PHRASES) ?? false) {
+    entryTypes.add(EntryType.PHRASE);
+  }
+  return entryTypes;
 }

@@ -65,10 +65,10 @@ class _EntryListPageState extends State<EntryListPage> {
           Set<Entry> entriesGlobalWithoutEntriesAlreadyInList =
               entriesGlobal.difference(entryList.entries);
           entriesSearched = searchList(context, currentSearchTerm,
-              entriesGlobalWithoutEntriesAlreadyInList, {});
+              EntryType.values, entriesGlobalWithoutEntriesAlreadyInList, {});
         } else {
-          entriesSearched = searchList(
-              context, currentSearchTerm, entryList.entries, entryList.entries);
+          entriesSearched = searchList(context, currentSearchTerm,
+              EntryType.values, entryList.entries, entryList.entries);
         }
       } else {
         entriesSearched = List.from(entryList.entries);

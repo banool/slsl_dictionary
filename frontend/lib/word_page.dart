@@ -97,7 +97,7 @@ class _EntryPageState extends State<EntryPage> {
     }
 
     actions += [
-      LanguagePopUpMenuState(onChanged: (language) {
+      LanguagePopUpMenu(onChanged: (language) {
         setState(() {
           localeOverride = LANGUAGE_TO_LOCALE[language]!;
         });

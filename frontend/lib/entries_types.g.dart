@@ -11,6 +11,7 @@ MyEntry _$MyEntryFromJson(Map<String, dynamic> json) => MyEntry(
       word_in_tamil: json['word_in_tamil'] as String?,
       word_in_sinhala: json['word_in_sinhala'] as String?,
       category: json['category'] as String?,
+      entry_type: json['entry_type'] as String,
       sub_entries: (json['sub_entries'] as List<dynamic>)
           .map((e) => MySubEntry.fromJson(e as Map<String, dynamic>))
           .toList(),
@@ -21,6 +22,7 @@ Map<String, dynamic> _$MyEntryToJson(MyEntry instance) => <String, dynamic>{
       'word_in_tamil': instance.word_in_tamil,
       'word_in_sinhala': instance.word_in_sinhala,
       'category': instance.category,
+      'entry_type': instance.entry_type,
       'sub_entries': instance.sub_entries,
     };
 

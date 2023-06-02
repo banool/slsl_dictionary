@@ -13,8 +13,9 @@
 # It doesn't handle partial Entry uploads very well though, so don't cancel the script
 # part way through if you can avoid it / clean up the latest word if you did have to.
 #
-# At the time of writing (2023-06-02) this script is idempotent, but this may not be
-# true in the future, so be careful.
+# Even at the time of writing (2023-06-02) this script is not idempotent because the
+# data in the site once added could have changed, making the logic to find things we've
+# already uploaded incorrect. So be careful, try to only use this for brand new data.
 #
 # From slsl_backend run this command like this:
 #

@@ -477,6 +477,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
               ),
               Center(
                   child: LanguageDropdown(
+                      includeDeviceDefaultOption: false,
                       initialLanguage:
                           sharedPreferences.getString(KEY_REVISION_LANGUAGE),
                       onChanged: (language) {

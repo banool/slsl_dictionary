@@ -174,7 +174,7 @@ class SettingsPageState extends State<SettingsPage> {
                   AppLocalizations.of(context).settingsReportAppIssueGithub),
               trailing: Container(),
               onPressed: (BuildContext context) async {
-                var url = 'https://github.com/banool/auslan_dictionary/issues';
+                var url = 'https://github.com/banool/slsl_dictionary/issues';
                 await launch(url, forceSafariVC: false);
               },
             ),
@@ -184,7 +184,7 @@ class SettingsPageState extends State<SettingsPage> {
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var mailto = Mailto(
-                    to: ['danielporteous1@gmail.com'],
+                    to: ['d@dport.me'],
                     subject: 'Issue with SLSL Dictionary',
                     body:
                         'Please tell me what device you are using and describe the issue in detail. Thanks!');

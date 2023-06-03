@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
+import 'advisories.dart';
 import 'common.dart';
 import 'entries_types.dart';
 import 'globals.dart';
@@ -64,7 +65,8 @@ class _SearchPageState extends State<SearchPage> {
     if (advisoriesResponse != null &&
         advisoriesResponse!.newAdvisories &&
         !advisoryShownOnce) {
-      Future.delayed(Duration(milliseconds: 500), () => showAdvisoryDialog());
+      Future.delayed(
+          Duration(milliseconds: 500), () => showAdvisoryDialog(context));
       advisoryShownOnce = true;
     }
 
@@ -89,7 +91,7 @@ class _SearchPageState extends State<SearchPage> {
           children: [
             Padding(
                 padding:
-                    EdgeInsets.only(bottom: 10, left: 32, right: 12, top: 0),
+                    EdgeInsets.only(bottom: 10, left: 32, right: 10, top: 0),
                 child: Row(
                   children: [
                     Expanded(
@@ -121,29 +123,32 @@ class _SearchPageState extends State<SearchPage> {
                         ),
                       ),
                     ),
-                    EntryTypeMultiPopUpMenu(onChanged: (_entryTypes) async {
-                      for (EntryType type in EntryType.values) {
-                        var key;
-                        if (type == EntryType.WORD) {
-                          key = KEY_SEARCH_FOR_WORDS;
-                        } else {
-                          key = KEY_SEARCH_FOR_PHRASES;
-                        }
-                        // It would be best to wait for this to complete but
-                        // given this generally happens lightning fast I'll
-                        // leave it as a todo.
-                        if (_entryTypes.contains(type)) {
-                          await sharedPreferences.setBool(key, true);
-                        } else {
-                          await sharedPreferences.setBool(key, false);
-                        }
-                        setState(() {
-                          if (searchTerm != null) {
-                            search(searchTerm!, getEntryTypes());
+                    Padding(
+                        padding: EdgeInsets.only(left: 4),
+                        child: EntryTypeMultiPopUpMenu(
+                            onChanged: (_entryTypes) async {
+                          for (EntryType type in EntryType.values) {
+                            var key;
+                            if (type == EntryType.WORD) {
+                              key = KEY_SEARCH_FOR_WORDS;
+                            } else {
+                              key = KEY_SEARCH_FOR_PHRASES;
+                            }
+                            // It would be best to wait for this to complete but
+                            // given this generally happens lightning fast I'll
+                            // leave it as a todo.
+                            if (_entryTypes.contains(type)) {
+                              await sharedPreferences.setBool(key, true);
+                            } else {
+                              await sharedPreferences.setBool(key, false);
+                            }
+                            setState(() {
+                              if (searchTerm != null) {
+                                search(searchTerm!, getEntryTypes());
+                              }
+                            });
                           }
-                        });
-                      }
-                    }),
+                        })),
                   ],
                 )),
             new Expanded(
@@ -162,7 +167,7 @@ class _SearchPageState extends State<SearchPage> {
         context,
         Icon(Icons.article),
         () async {
-          showAdvisoryDialog();
+          showAdvisoryDialog(context);
         },
       ));
     }
@@ -171,27 +176,6 @@ class _SearchPageState extends State<SearchPage> {
         body: body,
         title: AppLocalizations.of(context).searchTitle,
         actions: actions);
-  }
-
-  void showAdvisoryDialog() {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-              title: Text(AppLocalizations.of(context).newsTitle),
-              content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: advisoriesResponse!.advisories
-                      .map((e) => Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  e.date,
-                                  textAlign: TextAlign.start,
-                                ),
-                                e.asMarkdown()
-                              ]))
-                      .toList()),
-            ));
   }
 }
 

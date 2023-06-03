@@ -11,6 +11,7 @@ import 'flashcards_help_page_en.dart';
 import 'flashcards_logic.dart';
 import 'flashcards_page.dart';
 import 'globals.dart';
+import 'language_dropdown.dart';
 import 'revision_history_page.dart';
 import 'settings_page.dart';
 import 'top_level_scaffold.dart';
@@ -38,7 +39,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
   late List<String> listsToReview;
   late Set<Entry> entriesFromLists;
 
-  Map<String, List<SubEntryWrapper>> filteredSubEntries = Map();
+  Map<Entry, List<SubEntry>> filteredSubEntries = Map();
 
   late DolphinInformation dolphinInformation;
   List<Review>? existingReviews;
@@ -77,21 +78,16 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     // Get the entries from all these lists.
     entriesFromLists = getEntriesFromLists(listsToReview);
 
-    print("liststoreview ${listsToReview}");
-    print("entriesfromlists ${entriesFromLists}");
-
     // Get the subentries from all these entries.
-    Map<String, List<SubEntryWrapper>> subEntriesToReview =
+    Map<Entry, List<SubEntry>> subEntriesToReview =
         getSubEntriesFromEntries(entriesFromLists);
 
     // Load up all the data needed to filter the subentries.
-    // TODO
     List<Region> allowedRegions =
         (sharedPreferences.getStringList(KEY_FLASHCARD_REGIONS) ?? [])
             .map((i) => Region.values[int.parse(i)])
             .toList();
 
-    print("allowedRegions ${allowedRegions}");
     bool useUnknownRegionSigns =
         sharedPreferences.getBool(KEY_USE_UNKNOWN_REGION_SIGNS) ?? true;
     bool oneCardPerEntry =
@@ -147,7 +143,14 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     revisionStrategy = revisionStrategy ?? loadRevisionStrategy();
     var wordToSign = sharedPreferences.getBool(KEY_WORD_TO_SIGN) ?? true;
     var signToEntry = sharedPreferences.getBool(KEY_SIGN_TO_WORD) ?? true;
-    var masters = getMasters(filteredSubEntries, wordToSign, signToEntry);
+    // If they haven't selected a revision language before default to English.
+    // It'd be better to get the device language but it's a pain to get access
+    // to it here.
+    var revisionLocale = LANGUAGE_TO_LOCALE[
+            sharedPreferences.getString(KEY_REVISION_LANGUAGE)] ??
+        LOCALE_ENGLISH;
+    var masters =
+        getMasters(revisionLocale, filteredSubEntries, wordToSign, signToEntry);
     switch (revisionStrategy) {
       case RevisionStrategy.Random:
         return getDolphinInformation(filteredSubEntries, masters);
@@ -186,10 +189,11 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             .map((e) => int.parse(e))
             .toList();
 
+    // TODO: What to do with this??
     String regionsString = AppLocalizations.of(context).flashcardsAllOfSriLanka;
 
     String additionalRegionsValuesString = additionalRegionsValues
-        .map((i) => Region.values[i].pretty)
+        .map((i) => Region.values[i].getPretty(context))
         .toList()
         .join(", ");
 
@@ -360,7 +364,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                     listType: MultiSelectListType.CHIP,
                     title: Text(AppLocalizations.of(context).flashcardsRegions),
                     items: Region.values
-                        .map((e) => MultiSelectItem(e.index, e.pretty))
+                        .map((e) =>
+                            MultiSelectItem(e.index, e.getPretty(context)))
                         .toList(),
                     initialValue: additionalRegionsValues,
                     onConfirm: (values) {
@@ -460,6 +465,29 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             textAlign: TextAlign.center,
           ),
           Expanded(child: settings),
+          Padding(
+            padding: EdgeInsets.only(left: 35, top: 15),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                AppLocalizations.of(context).flashcardsRevisionLanguage,
+                style: TextStyle(
+                    fontSize: 16, color: Color.fromARGB(255, 100, 100, 100)),
+                textAlign: TextAlign.start,
+              ),
+              Center(
+                  child: LanguageDropdown(
+                      initialLanguage:
+                          sharedPreferences.getString(KEY_REVISION_LANGUAGE),
+                      onChanged: (language) {
+                        var selectedLocale = LANGUAGE_TO_LOCALE[language]!;
+                        sharedPreferences.setString(
+                            KEY_REVISION_LANGUAGE, language);
+                        updateRevisionSettings();
+                        return selectedLocale;
+                      })),
+            ]),
+          )
         ],
       )),
       color: settingsBackgroundColor,

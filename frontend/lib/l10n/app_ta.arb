@@ -10,7 +10,6 @@
 
     "searchHintText": "ஒரு சொல்லை தேடு",
 
-    "flashcardsAllOfSriLanka": "இலங்கையின் முழுவதும்",
     "nFlashcardsSelected": "{count, plural, =0{அட்டைகள்} =1{அட்டைகள்} other{அட்டைகள்}}",
     "@nFlashcardsSelected": {
         "placeholders": {
@@ -43,6 +42,10 @@
     "flashcardsStart": "தொடங்கு",
     "flashcardsOnlyOneCard": "ஒரு சொல்லுக்கு ஒரு அட்டை மட்டுமே காட்டு",
 
+    "flashcardsRevisionLanguage": "todo",
+    "flashcardsAllOfSriLanka": "இலங்கையின் முழுவதும்",
+    "flashcardsNorthEast": "todo",
+
     "flashcardsNext": "அடுத்து",
     "flashcardsForgot": "மறந்துவிட்டேன்",
     "flashcardsGotIt": "பெற்றேன்!",
@@ -72,6 +75,7 @@
     "settingsAppStoreFeedback": "App Store மீது கருத்தை அளி",
     "na": "பொருள் தெரியவில்லை",
 
+    "settingsLanguage": "todo",
     "settingsRevision": "மாற்றம்",
     "settingsHideRevision": "மாற்றத்தை மறை",
     "settingsDeleteRevisionProgress": "அனைத்து மாற்ற முன்னேற்றத்தையும் அழி",
@@ -97,6 +101,7 @@
     "listNameInvalid": "தவறான பெயர், இது ஏற்கனவே கண்டுபிடிக்கப்படவேண்டும்",
     "listEnterNewName": "புதிய பட்டியலின் பெயரை உள்ளிடு",
     "listFailedToMake": "புதிய பட்டியலை உருவாக்க முடியவில்லை",
+    "listNewList": "todo",
 
     "listSearchAdd": "சேர்க்க சொற்களைத் தேடு",
     "listSearchPrefix": "தேடல்",

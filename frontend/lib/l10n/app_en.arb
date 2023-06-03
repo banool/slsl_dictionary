@@ -10,7 +10,6 @@
 
     "searchHintText": "Search for a word",
 
-    "flashcardsAllOfSriLanka": "All of Sri Lanka",
     "nFlashcardsSelected": "{count, plural, =0{cards} =1{cards} other{cards}}",
     "@nFlashcardsSelected": {
         "placeholders": {
@@ -43,6 +42,10 @@
     "flashcardsStart": "Start",
     "flashcardsOnlyOneCard": "Show only one set of cards per word",
 
+    "flashcardsRevisionLanguage": "Revision Language",
+    "flashcardsAllOfSriLanka": "All of Sri Lanka",
+    "flashcardsNorthEast": "North East",
+
     "flashcardsNext": "Next",
     "flashcardsForgot": "Forgot",
     "flashcardsGotIt": "Got it!",
@@ -72,6 +75,7 @@
     "settingsAppStoreFeedback": "Give feedback on App Store",
     "na": "N/A",
 
+    "settingsLanguage": "Language",
     "settingsRevision": "Revision",
     "settingsHideRevision": "Hide revision feature",
     "settingsDeleteRevisionProgress": "Delete all revision progress",
@@ -97,6 +101,7 @@
     "listNameInvalid": "Invalid name, this should have been caught already",
     "listEnterNewName": "Enter new list name",
     "listFailedToMake": "Failed to make new list",
+    "listNewList": "New List",
 
     "listSearchAdd": "Search for words to add",
     "listSearchPrefix": "Search",

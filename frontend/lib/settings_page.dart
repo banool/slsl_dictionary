@@ -220,7 +220,7 @@ class SettingsPageState extends State<SettingsPage> {
         padding: EdgeInsets.only(left: 35, top: 15),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            "Language",
+            AppLocalizations.of(context).settingsLanguage,
             style: TextStyle(
                 fontSize: 13, color: Color.fromARGB(255, 100, 100, 100)),
             textAlign: TextAlign.start,

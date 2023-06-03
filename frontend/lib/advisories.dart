@@ -1,3 +1,5 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
 
@@ -40,7 +42,7 @@ Future<AdvisoriesResponse?> getAdvisories() async {
   try {
     String url =
         'https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md';
-    var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 4));
+    var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 3));
     rawData = result.body;
   } catch (e) {
     print("Failed to get advisory: $e");
@@ -96,4 +98,27 @@ Future<AdvisoriesResponse?> getAdvisories() async {
 
   return new AdvisoriesResponse(
       advisories: advisories, newAdvisories: newAdvisories);
+}
+
+void showAdvisoryDialog(BuildContext context) {
+  showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+          title: Text(AppLocalizations.of(context).newsTitle),
+          content: getAdvisoriesInner()));
+}
+
+Widget getAdvisoriesInner() {
+  return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: advisoriesResponse!.advisories
+          .map((e) =>
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                  e.date,
+                  textAlign: TextAlign.start,
+                ),
+                e.asMarkdown()
+              ]))
+          .toList());
 }

@@ -39,7 +39,10 @@ class EntryList {
     List<String> entriesRaw = sharedPreferences.getStringList(key) ?? [];
     print("Loaded raw entries: $entriesRaw");
     for (String s in entriesRaw) {
-      Entry? matchingEntry = keyedEntriesGlobal[s];
+      // We use the one keyed by English because for this app the value returned
+      // by getKey is the word / phrase in English, since that field is required
+      // to be set on entries.
+      Entry? matchingEntry = keyedByEnglishEntriesGlobal[s];
       if (matchingEntry != null) {
         entries.add(matchingEntry);
       } else {
@@ -91,6 +94,7 @@ class EntryList {
     return "${name}_entries".replaceAll(" ", "_");
   }
 
+  // No matter what locale they use we use the key of the entry for storage.
   Future<void> write() async {
     await sharedPreferences.setStringList(
         key, entries.map((e) => e.getKey()).toList());

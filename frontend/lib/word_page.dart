@@ -97,11 +97,15 @@ class _EntryPageState extends State<EntryPage> {
     }
 
     actions += [
-      LanguagePopUpMenu(onChanged: (language) {
-        setState(() {
-          localeOverride = LANGUAGE_TO_LOCALE[language]!;
-        });
-      }),
+      LanguageDropdown(
+          asPopUpMenu: true,
+          includeDeviceDefaultOption: false,
+          onChanged: (language) {
+            setState(() {
+              localeOverride = LANGUAGE_TO_LOCALE[language]!;
+            });
+            return localeOverride!;
+          }),
       getPlaybackSpeedDropdownWidget(
         (p) {
           setState(() {
@@ -168,12 +172,18 @@ Widget? getRelatedEntriesWidget(
     Color color;
     void Function()? navFunction;
     Entry? relatedEntry;
-    if (keyedEntriesGlobal.containsKey(relatedWord)) {
-      relatedEntry = keyedEntriesGlobal[relatedWord];
+    if (keyedByEnglishEntriesGlobal.containsKey(relatedWord)) {
+      relatedEntry = keyedByEnglishEntriesGlobal[relatedWord];
+    } else if (keyedByTamilEntriesGlobal.containsKey(relatedWord)) {
+      relatedEntry = keyedByTamilEntriesGlobal[relatedWord];
+    } else if (keyedBySinhalaEntriesGlobal.containsKey(relatedWord)) {
+      relatedEntry = keyedBySinhalaEntriesGlobal[relatedWord];
+    }
+
+    if (relatedEntry != null) {
       color = MAIN_COLOR;
       navFunction = () => navigateToEntryPage(context, relatedEntry!);
     } else {
-      relatedEntry = null;
       color = Colors.black;
       navFunction = null;
     }
@@ -212,9 +222,10 @@ Widget? getRelatedEntriesWidget(
 }
 
 Widget getRegionalInformationWidget(
-    SubEntry subEntry, bool shouldUseHorizontalDisplay,
+    BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay,
     {bool hide = false}) {
-  String regionsStr = subEntry.getRegions().map((r) => r.pretty).join(", ");
+  String regionsStr =
+      subEntry.getRegions().map((r) => r.getPretty(context)).join(", ");
   if (hide) {
     regionsStr = "";
   }
@@ -271,8 +282,8 @@ class _SubEntryPageState extends State<SubEntryPage> {
 
     Widget? relatedWordsWidget =
         getRelatedEntriesWidget(context, subEntry, shouldUseHorizontalDisplay);
-    Widget regionalInformationWidget =
-        getRegionalInformationWidget(subEntry, shouldUseHorizontalDisplay);
+    Widget regionalInformationWidget = getRegionalInformationWidget(
+        context, subEntry, shouldUseHorizontalDisplay);
 
     if (!shouldUseHorizontalDisplay) {
       List<Widget> children = [];

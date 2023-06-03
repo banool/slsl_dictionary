@@ -10,7 +10,6 @@
 
     "searchHintText": "වචනයක් සොයන්න",
 
-    "flashcardsAllOfSriLanka": "ශ්‍රී ලංකාවේ සියලුම",
     "nFlashcardsSelected": "{count, plural, =0{cards} =1{cards} other{cards}}",
     "@nFlashcardsSelected": {
         "placeholders": {
@@ -43,6 +42,10 @@
     "flashcardsStart": "ආරම්භ කරන්න",
     "flashcardsOnlyOneCard": "වචනයකට කාඩ් කට්ටලයක් පමණින් පෙන්වන්න",
 
+    "flashcardsRevisionLanguage": "todo",
+    "flashcardsAllOfSriLanka": "ශ්‍රී ලංකාවේ සියලුම",
+    "flashcardsNorthEast": "todo",
+
     "flashcardsNext": "මීළඟ",
     "flashcardsForgot": "අමතක වුනා",
     "flashcardsGotIt": "ගත්තා!",
@@ -72,6 +75,7 @@
     "settingsAppStoreFeedback": "App Store පිළිච්ච දෙන්න",
     "na": "නොදනී",
 
+    "settingsLanguage": "todo",
     "settingsRevision": "සංශෝධන",
     "settingsHideRevision": "සංශෝධන විශේෂාංග සඟවන්න",
     "settingsDeleteRevisionProgress": "සියලුම සංශෝධන ප්‍රගතිය මකන්න",
@@ -97,6 +101,7 @@
     "listNameInvalid": "අවලංගු නම, මෙය දැනටමත් අසාර්ථක විය යුතුය",
     "listEnterNewName": "නව ලැයිස්තු නම ඇතුළත් කරන්න",
     "listFailedToMake": "නව ලැයිස්තුව සාදා ගැනීමට අසාර්ථක විය",
+    "listNewList": "todo",
 
     "listSearchAdd": "එක් කිරීම සඳහා වචන සොයන්න",
     "listSearchPrefix": "සොයන්න",

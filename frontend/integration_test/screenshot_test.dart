@@ -134,17 +134,17 @@ void main() async {
     String listKey = EntryList.getKeyFromName(listName);
     await entryListManager.createEntryList(listKey);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["kangaroo"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["kangaroo"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["platypus"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["platypus"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["echidna"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["echidna"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["dog"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["dog"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["cat"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["cat"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedEntriesGlobal["bird"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["bird"]!);
 
     await sharedPreferences
         .setStringList(KEY_LISTS_TO_REVIEW, [KEY_FAVOURITES_ENTRIES, listKey]);

@@ -44,7 +44,16 @@ Set<MyEntry> loadEntriesInner(String data) {
 
 void updateKeyedEntriesGlobal() {
   for (Entry e in entriesGlobal) {
-    keyedEntriesGlobal[e.getKey()] = e;
+    // The key is the word in English, which is always present.
+    keyedByEnglishEntriesGlobal[e.getKey()] = e;
+    var keyTamil = e.getPhrase(LOCALE_TAMIL);
+    if (keyTamil != null) {
+      keyedByTamilEntriesGlobal[keyTamil] = e;
+    }
+    var keySinhala = e.getPhrase(LOCALE_SINHALA);
+    if (keySinhala != null) {
+      keyedBySinhalaEntriesGlobal[keySinhala] = e;
+    }
   }
 }
 
@@ -70,7 +79,7 @@ Future<bool> getNewData(bool forceCheck) async {
   // Check for new dictionary data. The versions here are just unixtimes.
   int currentVersion =
       sharedPreferences.getInt(KEY_DICTIONARY_DATA_CURRENT_VERSION) ?? 0;
-  var head = await http.head(Uri.parse(DATA_URL));
+  var head = await http.head(Uri.parse(DATA_URL)).timeout(Duration(seconds: 3));
   var latestVersion =
       HttpDate.parse(head.headers['last-modified']!).millisecondsSinceEpoch ~/
           1000;
@@ -85,7 +94,8 @@ Future<bool> getNewData(bool forceCheck) async {
   }
 
   // At this point, we know we need to download the new data. Let's do that.
-  String newData = (await http.get(Uri.parse(DATA_URL))).body;
+  String newData =
+      (await http.get(Uri.parse(DATA_URL)).timeout(Duration(seconds: 4))).body;
 
   // Assert that the data is valid. This will throw if it's not.
   loadEntriesInner(newData);

@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 
 import 'entries_types.dart';
@@ -15,18 +17,7 @@ class DolphinInformation {
   });
 
   DolphinSR dolphin;
-  Map<String, SubEntryWrapper> keyToSubEntryMap;
-}
-
-class SubEntryWrapper {
-  SubEntry subEntry;
-  // We need this to know how to build the link to Auslan Signbank.
-  int index;
-
-  SubEntryWrapper({
-    required this.subEntry,
-    required this.index,
-  });
+  Map<String, SubEntry> keyToSubEntryMap;
 }
 
 Set<Entry> getEntriesFromLists(List<String> listsToUse) {
@@ -37,15 +28,12 @@ Set<Entry> getEntriesFromLists(List<String> listsToUse) {
   return out;
 }
 
-Map<String, List<SubEntryWrapper>> getSubEntriesFromEntries(
-    Set<Entry> favourites) {
-  Map<String, List<SubEntryWrapper>> subEntries = Map();
+Map<Entry, List<SubEntry>> getSubEntriesFromEntries(Set<Entry> favourites) {
+  Map<Entry, List<SubEntry>> subEntries = Map();
   for (Entry e in favourites) {
-    int i = 0;
-    subEntries[e.getKey()] = [];
+    subEntries[e] = [];
     for (SubEntry sw in e.getSubEntries()) {
-      subEntries[e.getKey()]!.add(SubEntryWrapper(subEntry: sw, index: i));
-      i += 1;
+      subEntries[e]!.add(sw);
     }
   }
   return subEntries;
@@ -61,30 +49,30 @@ int getNumSubEntries(Map<String, List<SubEntry>> subEntries) {
   return subEntries.values.map((v) => v.length).reduce((a, b) => a + b);
 }
 
-Map<String, List<SubEntryWrapper>> filterSubEntries(
-    Map<String, List<SubEntryWrapper>> subEntries,
+Map<Entry, List<SubEntry>> filterSubEntries(
+    Map<Entry, List<SubEntry>> subEntries,
     List<Region> allowedRegions,
     bool useUnknownRegionSigns,
     bool oneCardPerEntry) {
-  Map<String, List<SubEntryWrapper>> out = Map();
+  Map<Entry, List<SubEntry>> out = Map();
 
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
-    List<SubEntryWrapper> validSubEntries = [];
-    for (SubEntryWrapper sww in e.value) {
+  for (MapEntry<Entry, List<SubEntry>> e in subEntries.entries) {
+    List<SubEntry> validSubEntries = [];
+    for (SubEntry se in e.value) {
       if (validSubEntries.length > 0 && oneCardPerEntry) {
         break;
       }
-      if (sww.subEntry.getRegions().contains(Region.ALL.pretty)) {
-        validSubEntries.add(sww);
+      if (se.getRegions().contains(Region.ALL)) {
+        validSubEntries.add(se);
         continue;
       }
-      if (sww.subEntry.getRegions().length == 0 && useUnknownRegionSigns) {
-        validSubEntries.add(sww);
+      if (se.getRegions().length == 0 && useUnknownRegionSigns) {
+        validSubEntries.add(se);
         continue;
       }
-      for (Region r in sww.subEntry.getRegions()) {
+      for (Region r in se.getRegions()) {
         if (allowedRegions.contains(r)) {
-          validSubEntries.add(sww);
+          validSubEntries.add(se);
           break;
         }
       }
@@ -97,14 +85,22 @@ Map<String, List<SubEntryWrapper>> filterSubEntries(
 }
 
 // You should provide this function the filtered list of SubEntries.
-List<Master> getMasters(Map<String, List<SubEntryWrapper>> subEntries,
-    bool entryToSign, bool signToEntry) {
+List<Master> getMasters(Locale revisionLocale,
+    Map<Entry, List<SubEntry>> subEntries, bool entryToSign, bool signToEntry) {
   print("Making masters from ${subEntries.length} entries");
   List<Master> masters = [];
   Set<String> keys = {};
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
-    String entry = e.key;
-    for (SubEntryWrapper sww in e.value) {
+  for (MapEntry<Entry, List<SubEntry>> e in subEntries.entries) {
+    Entry entry = e.key;
+    // If there is no word / phrase for the entry in the requested revision
+    // language don't use the entry.
+    String? phrase = entry.getPhrase(revisionLocale);
+    if (phrase == null) {
+      print(
+          "Skipping entry that doesn't have a phrase in the requested language");
+      continue;
+    }
+    for (SubEntry se in e.value) {
       List<Combination> combinations = [];
       if (entryToSign) {
         combinations.add(Combination(front: [0], back: [1]));
@@ -112,18 +108,18 @@ List<Master> getMasters(Map<String, List<SubEntryWrapper>> subEntries,
       if (signToEntry) {
         combinations.add(Combination(front: [1], back: [0]));
       }
-      var key = sww.subEntry.getKey();
+      var masterKey = se.getKey(entry);
       var m = Master(
-        id: key,
-        fields: [entry, VIDEO_LINKS_MARKER],
+        id: masterKey,
+        fields: [phrase, VIDEO_LINKS_MARKER],
         combinations: combinations,
       );
-      if (!keys.contains(key)) {
+      if (!keys.contains(masterKey)) {
         masters.add(m);
       } else {
-        print("Skipping master $m with duplicate key: $key");
+        print("Skipping master $m with duplicate key: $masterKey");
       }
-      keys.add(key);
+      keys.add(masterKey);
     }
   }
   masters.shuffle();
@@ -136,14 +132,14 @@ int getNumCards(DolphinSR dolphin) {
 }
 
 DolphinInformation getDolphinInformation(
-    Map<String, List<SubEntryWrapper>> subEntries, List<Master> masters,
+    Map<Entry, List<SubEntry>> subEntries, List<Master> masters,
     {List<Review>? reviews}) {
   reviews = reviews ?? [];
-  Map<String, SubEntryWrapper> keyToSubEntryMap = Map();
-  for (MapEntry<String, List<SubEntryWrapper>> e in subEntries.entries) {
-    for (SubEntryWrapper sww in e.value) {
+  Map<String, SubEntry> keyToSubEntryMap = Map();
+  for (MapEntry<Entry, List<SubEntry>> e in subEntries.entries) {
+    for (SubEntry se in e.value) {
       // TODO: Make sure this is okay vs the key needing to have entry.key in it.
-      keyToSubEntryMap[sww.subEntry.getKey()] = sww;
+      keyToSubEntryMap[se.getKey(e.key)] = se;
     }
   }
   DolphinSR dolphin = DolphinSR();

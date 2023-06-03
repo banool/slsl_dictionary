@@ -210,8 +210,7 @@ class _EntryListPageState extends State<EntryListPage> {
             Expanded(
                 child: Padding(
               padding: EdgeInsets.only(left: 8),
-              child: listWidget(
-                  context, entriesSearched, entriesGlobal, refreshEntries,
+              child: listWidget(context, entriesSearched, refreshEntries,
                   showFavouritesButton: entryList.key == KEY_FAVOURITES_ENTRIES,
                   deleteEntryFn: inEditMode && currentSearchTerm.length == 0
                       ? removeEntry
@@ -230,7 +229,6 @@ class _EntryListPageState extends State<EntryListPage> {
 Widget listWidget(
   BuildContext context,
   List<Entry?> entriesSearched,
-  Set<Entry> allEntries,
   Function refreshEntriesFn, {
   bool showFavouritesButton = true,
   Future<void> Function(Entry)? deleteEntryFn,
@@ -277,11 +275,15 @@ Widget listWidget(
 // list they just came from.
 Widget listItem(BuildContext context, Entry entry, Function refreshEntriesFn,
     {bool showFavouritesButton = true}) {
+  // Try to show the text in the selected locale but if not possible,
+  // fallback to the key, which in this case is the word in English.
+  Locale currentLocale = Localizations.localeOf(context);
+  var text = entry.getPhrase(currentLocale) ?? entry.getKey();
   return TextButton(
     child: Align(
         alignment: Alignment.topLeft,
         child: Text(
-          "${entry.getKey()}",
+          text,
           style: TextStyle(color: Colors.black),
         )),
     onPressed: () async => {

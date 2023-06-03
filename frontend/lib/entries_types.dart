@@ -35,7 +35,7 @@ abstract class Entry implements Comparable<Entry> {
 
 abstract class SubEntry {
   // Used for comparing sub-entries.
-  String getKey();
+  String getKey(Entry parentEntry);
 
   // Return the video URLs.
   List<String> getVideos();
@@ -51,15 +51,17 @@ abstract class SubEntry {
 }
 
 const LANGUAGE_ENGLISH = "English";
-const LANGUAGE_SINHALA = "සිංහල";
 const LANGUAGE_TAMIL = "தமிழ்";
+const LANGUAGE_SINHALA = "සිංහල";
+
+const LOCALE_ENGLISH = Locale("en", "");
+const LOCALE_TAMIL = Locale("ta", "");
+const LOCALE_SINHALA = Locale("si", "");
 
 const Map<String, Locale> LANGUAGE_TO_LOCALE = {
-  LANGUAGE_ENGLISH: Locale('en', ''),
-  // Use word for Sinhala in Sinhala
-  LANGUAGE_SINHALA: Locale('si', ''),
-  // Use word for Tamil in Tamil
-  LANGUAGE_TAMIL: Locale('ta', ''),
+  LANGUAGE_ENGLISH: LOCALE_ENGLISH,
+  LANGUAGE_TAMIL: LOCALE_TAMIL,
+  LANGUAGE_SINHALA: LOCALE_SINHALA,
 };
 
 Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
@@ -96,11 +98,11 @@ class MyEntry implements Entry {
 
   @override
   String? getPhrase(Locale locale) {
-    if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_ENGLISH]!) {
+    if (locale == LOCALE_ENGLISH) {
       return word_in_english;
-    } else if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_TAMIL]) {
+    } else if (locale == LOCALE_TAMIL) {
       return word_in_tamil;
-    } else if (locale == LANGUAGE_TO_LOCALE[LANGUAGE_SINHALA]) {
+    } else if (locale == LOCALE_SINHALA) {
       return word_in_sinhala;
     } else {
       throw Exception("Unknown locale $locale");
@@ -155,12 +157,15 @@ class MySubEntry implements SubEntry {
   // This is for DolphinSR. The video attached to a subword is the best we have
   // to globally identify it. If the video changes for a subword, the subword
   // itself has effectively changed for review purposes and it'd make sense to
-  // consider it a new master anyway.
+  // consider it a new master anyway. In addition to the video we accept the
+  // Entry that this SubEntry comes from; we need the key from _that_ to
+  // uniquely identify the subentry (some subentries from different entries
+  // might use the same video).
   @override
-  String getKey() {
+  String getKey(Entry parentEntry) {
     var videoLinks = List.from(this.videos);
     videoLinks.sort();
-    return videoLinks[0];
+    return videoLinks[0] + parentEntry.getKey();
   }
 
   Region get regionType {
@@ -240,12 +245,12 @@ enum Region {
 }
 
 extension PrintRegion on Region {
-  String get pretty {
+  String getPretty(BuildContext context) {
     switch (this) {
       case Region.ALL:
-        return "All of Sri Lanka";
+        return AppLocalizations.of(context).flashcardsAllOfSriLanka;
       case Region.NORTH_EAST:
-        return "North East";
+        return AppLocalizations.of(context).flashcardsNorthEast;
     }
   }
 }

@@ -168,7 +168,8 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     children: children,
     mainAxisSize: MainAxisSize.min,
   );
-  bool confirmed = await confirmAlert(context, body, title: "New List");
+  bool confirmed = await confirmAlert(context, body,
+      title: AppLocalizations.of(context).listNewList);
   if (confirmed) {
     String name = controller.text;
     try {

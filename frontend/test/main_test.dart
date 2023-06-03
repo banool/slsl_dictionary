@@ -12,7 +12,7 @@ void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   entriesGlobal = {
-    MyEntry(word_in_english: "friend", sub_entries: [
+    MyEntry(word_in_english: "friend", entry_type: "WORD", sub_entries: [
       MySubEntry(
           videos: ["http://mysite.com/video.mp4"],
           region: "ALL",
@@ -47,7 +47,7 @@ void main() async {
     List<Master> masters = [];
     for (Entry e in entriesGlobal) {
       for (SubEntry se in e.getSubEntries()) {
-        var m = Master(id: se.getKey(), fields: [
+        var m = Master(id: se.getKey(e), fields: [
           e.getKey(),
           se.getVideos().join("=====")
         ], combinations: [

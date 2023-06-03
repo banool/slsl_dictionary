@@ -275,7 +275,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     }
 
     Widget regionalInformationWidget = getRegionalInformationWidget(
-        subEntry, shouldUseHorizontalDisplay,
+        context, subEntry, shouldUseHorizontalDisplay,
         hide: !revealed);
 
     Widget? ratingButtonsRow;
@@ -331,7 +331,8 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
                 context,
                 MaterialPageRoute(
                     builder: (context) => EntryPage(
-                          entry: keyedEntriesGlobal[word]!,
+                          // TODO: I'm not sure this is valid, double check.
+                          entry: keyedByEnglishEntriesGlobal[word]!,
                           showFavouritesButton: false,
                         )));
           })
@@ -523,7 +524,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     if (currentCard != null) {
       DRCard card = currentCard!;
 
-      SubEntryWrapper subEntryWrapper = di.keyToSubEntryMap[card.master]!;
+      SubEntry subEntry = di.keyToSubEntryMap[card.master]!;
 
       String word;
       bool wordToSign = card.back![0] == VIDEO_LINKS_MARKER;
@@ -539,8 +540,8 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
       body = Center(
           child: InheritedPlaybackSpeed(
               playbackSpeed: playbackSpeed,
-              child: buildFlashcardWidget(card, subEntryWrapper.subEntry, word,
-                  wordToSign, currentCardRevealed)));
+              child: buildFlashcardWidget(
+                  card, subEntry, word, wordToSign, currentCardRevealed)));
       int progressString = getCardsReviewed() + 1;
       if (currentCardRevealed) {
         progressString -= 1;

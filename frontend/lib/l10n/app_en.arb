@@ -114,6 +114,7 @@
 
     "entryTypeWords": "Words",
     "entryTypePhrases": "Phrases",
+    "entryTypeFingerspelling": "Fingerspelling",
     "entrySelectEntryTypes": "Select Entry Types",
 
     "relatedWords": "Related words",

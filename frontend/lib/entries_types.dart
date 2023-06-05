@@ -8,6 +8,7 @@ part 'entries_types.g.dart';
 enum EntryType {
   WORD,
   PHRASE,
+  FINGERSPELLING,
 }
 
 String getEntryTypePretty(BuildContext context, EntryType entryType) {
@@ -16,6 +17,8 @@ String getEntryTypePretty(BuildContext context, EntryType entryType) {
       return AppLocalizations.of(context).entryTypeWords;
     case EntryType.PHRASE:
       return AppLocalizations.of(context).entryTypePhrases;
+    case EntryType.FINGERSPELLING:
+      return AppLocalizations.of(context).entryTypeFingerspelling;
   }
 }
 
@@ -37,8 +40,8 @@ abstract class SubEntry {
   // Used for comparing sub-entries.
   String getKey(Entry parentEntry);
 
-  // Return the video URLs.
-  List<String> getVideos();
+  // Return the URLs of the media.
+  List<String> getMedia();
 
   List<String> getRelatedWords();
 
@@ -125,6 +128,8 @@ class MyEntry implements Entry {
       return EntryType.WORD;
     } else if (entry_type == "PHRASE") {
       return EntryType.PHRASE;
+    } else if (entry_type == "FINGERSPELLING") {
+      return EntryType.FINGERSPELLING;
     } else {
       throw Exception("Unknown entry type $entry_type");
     }
@@ -185,7 +190,7 @@ class MySubEntry implements SubEntry {
   }
 
   @override
-  List<String> getVideos() {
+  List<String> getMedia() {
     return videos;
   }
 

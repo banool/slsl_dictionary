@@ -3,12 +3,13 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 0.0.15+15
+version: 0.0.17+17
 
 environment:
   sdk: '>=2.18.0 <3.0.0'
 
 dependencies:
+  cached_network_image: ^3.2.3
   carousel_slider:
   collection:
   cupertino_icons:

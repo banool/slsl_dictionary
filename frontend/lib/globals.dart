@@ -4,6 +4,7 @@ import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'advisories.dart';
+import 'common.dart';
 import 'entries_types.dart';
 import 'word_list_logic.dart';
 
@@ -29,7 +30,7 @@ late Set<Entry> favouritesGlobal;
 late EntryListManager entryListManager;
 
 late SharedPreferences sharedPreferences;
-late CacheManager videoCacheManager;
+late MyCacheManager myCacheManager;
 
 // Values of the knobs.
 late bool enableFlashcardsKnob;
@@ -44,3 +45,19 @@ late Color settingsBackgroundColor;
 // Advisory if there is a new one.
 AdvisoriesResponse? advisoriesResponse;
 bool advisoryShownOnce = false;
+
+class MyCacheManager extends CacheManager with ImageCacheManager {
+  static const key = 'mySignLanguageCacheManager';
+
+  static final MyCacheManager _instance = MyCacheManager._();
+  factory MyCacheManager() {
+    return _instance;
+  }
+
+  MyCacheManager._()
+      : super(Config(
+          key,
+          stalePeriod: const Duration(days: NUM_DAYS_TO_CACHE),
+          maxNrOfCacheObjects: 500,
+        ));
+}

@@ -39,14 +39,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   advisoriesResponse = await getAdvisories();
 
   // Build the cache manager.
-  String cacheManagerKey = "myVideoCacheManager";
-  videoCacheManager = CacheManager(
-    Config(
-      cacheManagerKey,
-      stalePeriod: const Duration(days: NUM_DAYS_TO_CACHE),
-      maxNrOfCacheObjects: 500,
-    ),
-  );
+  myCacheManager = MyCacheManager();
 
   await Future.wait<void>([
     // Load up the words information once at startup from disk.

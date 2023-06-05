@@ -274,7 +274,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
     Locale locale = Localizations.localeOf(context);
 
     var videoPlayerScreen = VideoPlayerScreen(
-      videoLinks: subEntry.getVideos(),
+      mediaLinks: subEntry.getMedia(),
     );
     // If the display is wide enough, show the video beside the entries instead
     // of above the entries (as well as other layout changes).

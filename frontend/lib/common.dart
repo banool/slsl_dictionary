@@ -36,6 +36,7 @@ const String KEY_ADVISORY_VERSION = "advisory_version";
 
 const String KEY_SEARCH_FOR_WORDS = "search_for_words";
 const String KEY_SEARCH_FOR_PHRASES = "search_for_phrases";
+const String KEY_SEARCH_FOR_FINGERSPELLING = "search_for_fingerspelling";
 
 const String KEY_FAVOURITES_ENTRIES = "favourites_entries";
 const String KEY_LAST_DICTIONARY_DATA_CHECK_TIME = "last_data_check_time";

@@ -237,8 +237,8 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     // See here for an explanation of why I pass in a key here:
     // https://stackoverflow.com/questions/55237188/flutter-is-not-rebuilding-same-widget-with-different-parameters
     var videoPlayerScreen = VideoPlayerScreen(
-      videoLinks: subEntry.getVideos(),
-      key: Key(subEntry.getVideos()[0]),
+      mediaLinks: subEntry.getMedia(),
+      key: Key(subEntry.getMedia()[0]),
     );
 
     Widget topWidget;

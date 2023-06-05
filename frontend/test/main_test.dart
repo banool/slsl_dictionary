@@ -49,7 +49,7 @@ void main() async {
       for (SubEntry se in e.getSubEntries()) {
         var m = Master(id: se.getKey(e), fields: [
           e.getKey(),
-          se.getVideos().join("=====")
+          se.getMedia().join("=====")
         ], combinations: [
           Combination(front: [0], back: [1]),
           Combination(front: [1], back: [0]),

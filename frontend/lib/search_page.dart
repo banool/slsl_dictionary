@@ -131,8 +131,12 @@ class _SearchPageState extends State<SearchPage> {
                             var key;
                             if (type == EntryType.WORD) {
                               key = KEY_SEARCH_FOR_WORDS;
-                            } else {
+                            } else if (type == EntryType.PHRASE) {
                               key = KEY_SEARCH_FOR_PHRASES;
+                            } else if (type == EntryType.FINGERSPELLING) {
+                              key = KEY_SEARCH_FOR_FINGERSPELLING;
+                            } else {
+                              throw Exception("Unknown entry type: $type");
                             }
                             // It would be best to wait for this to complete but
                             // given this generally happens lightning fast I'll
@@ -277,6 +281,9 @@ List<EntryType> getEntryTypes() {
   }
   if (sharedPreferences.getBool(KEY_SEARCH_FOR_PHRASES) ?? false) {
     entryTypes.add(EntryType.PHRASE);
+  }
+  if (sharedPreferences.getBool(KEY_SEARCH_FOR_FINGERSPELLING) ?? false) {
+    entryTypes.add(EntryType.FINGERSPELLING);
   }
   return entryTypes;
 }

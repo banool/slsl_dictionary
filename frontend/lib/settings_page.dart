@@ -106,7 +106,7 @@ class SettingsPageState extends State<SettingsPage> {
               title: getText(AppLocalizations.of(context).settingsDropCache),
               trailing: Container(),
               onPressed: (BuildContext context) async {
-                await videoCacheManager.emptyCache();
+                await myCacheManager.emptyCache();
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
                       Text(AppLocalizations.of(context).settingsCacheDropped),

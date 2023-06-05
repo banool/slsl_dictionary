@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -94,24 +95,25 @@ class InheritedPlaybackSpeed extends InheritedWidget {
 }
 
 class VideoPlayerScreen extends StatefulWidget {
-  VideoPlayerScreen({Key? key, required this.videoLinks}) : super(key: key);
+  VideoPlayerScreen({Key? key, required this.mediaLinks}) : super(key: key);
 
-  final List<String> videoLinks;
+  final List<String> mediaLinks;
 
   @override
   _VideoPlayerScreenState createState() =>
-      _VideoPlayerScreenState(videoLinks: videoLinks);
+      _VideoPlayerScreenState(mediaLinks: mediaLinks);
 }
 
 class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
-  _VideoPlayerScreenState({required this.videoLinks});
+  _VideoPlayerScreenState({required this.mediaLinks});
 
-  final List<String> videoLinks;
+  final List<String> mediaLinks;
 
-  Map<int, VideoPlayerController> controllers = {};
+  Map<int, VideoPlayerController> videoControllers = {};
+  Map<int, VideoPlayerController> imageControllers = {};
   Map<int, Widget> errorWidgets = {};
 
-  List<Future<void>> initializeVideoPlayerFutures = [];
+  List<Future<void>> initializePlayerFutures = [];
 
   CarouselController? carouselController;
 
@@ -120,9 +122,9 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   @override
   void initState() {
     int idx = 0;
-    for (String videoLink in videoLinks) {
-      var f = initSingleVideo(videoLink, idx);
-      initializeVideoPlayerFutures.add(f);
+    for (String mediaLink in mediaLinks) {
+      var future = initSingleVideo(mediaLink, idx);
+      initializePlayerFutures.add(future);
       idx += 1;
     }
     // Make carousel slider controller.
@@ -130,7 +132,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     super.initState();
   }
 
-  Future<void> initSingleVideo(String videoLink, int idx) async {
+  Future<void> initSingleVideo(String mediaLink, int idx) async {
     bool shouldCache = sharedPreferences.getBool(KEY_SHOULD_CACHE) ?? true;
 
     VideoPlayerOptions videoPlayerOptions =
@@ -142,14 +144,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // the underlying video players depend on the extension to figure out
       // what kind of file we're working with. We need to remove the .bak
       // extension for the video player to work correctly.
-      if (videoLink.endsWith(".bak")) {
+      if (mediaLink.endsWith(".bak")) {
         shouldCache = false;
       }
       bool shouldDownloadDirectly = !shouldCache;
       if (shouldCache) {
         try {
-          print("Pulling video $videoLink from either cache or the internet");
-          File file = await videoCacheManager.getSingleFile(videoLink);
+          print("Pulling video $mediaLink from either cache or the internet");
+          File file = await myCacheManager.getSingleFile(mediaLink);
           controller = VideoPlayerController.file(file,
               videoPlayerOptions: videoPlayerOptions);
         } catch (e) {
@@ -162,23 +164,23 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         if (!shouldCache) {
           print("Caching is disabled, pulling from the network");
         }
-        if (videoLink.endsWith(".bak")) {
+        if (mediaLink.endsWith(".bak")) {
           print("Building video controller with custom .bak behaviour");
           HttpClient httpClient = new HttpClient();
-          var request = await httpClient.getUrl(Uri.parse(videoLink));
+          var request = await httpClient.getUrl(Uri.parse(mediaLink));
           var response = await request.close();
           if (response.statusCode != 200) {
-            throw "Failed to load $videoLink with custom .bak behaviour: $response";
+            throw "Failed to load $mediaLink with custom .bak behaviour: $response";
           }
           String dir = (await getTemporaryDirectory()).path;
           var bytes = await consolidateHttpClientResponseBytes(response);
-          String newFileName = videoLink.split("/").last.replaceAll(".bak", "");
+          String newFileName = mediaLink.split("/").last.replaceAll(".bak", "");
           File file = new File("$dir/$newFileName");
           await file.writeAsBytes(bytes);
           controller = VideoPlayerController.file(file,
               videoPlayerOptions: videoPlayerOptions);
         } else {
-          controller = VideoPlayerController.network(videoLink,
+          controller = VideoPlayerController.network(mediaLink,
               videoPlayerOptions: videoPlayerOptions);
         }
       }
@@ -200,48 +202,57 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       // would be invalid.
       if (mounted) {
         setState(() {
-          controllers[idx] = controller;
+          videoControllers[idx] = controller;
         });
       } else {
         print("Not calling setState because not mounted");
       }
     } catch (e) {
-      if ("$e".contains("Socket")) {
-        errorWidgets[idx] = Column(
-          children: [
-            Text(
-              "Failed to load video. Please confirm your device is connected to the internet. If it is, the Auslan Signbank servers may be having issues. This is not an issue with the app itself.",
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
-            ),
-            Padding(padding: EdgeInsets.only(top: 10)),
-            Text(
-              "$videoLink: $e",
-              style: TextStyle(fontSize: 11),
-              textAlign: TextAlign.center,
-            ),
-          ],
-          mainAxisAlignment: MainAxisAlignment.center,
-        );
-      } else {
-        errorWidgets[idx] = Column(children: [
-          Text(
-            "${AppLocalizations.of(context).unexpectedErrorLoadingVideo} $videoLink: $e",
-            textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 11),
-          )
-        ]);
-      }
+      errorWidgets[idx] = createErrorWidget(e, mediaLink);
     }
+  }
+
+  Widget createErrorWidget(Object error, String mediaLink) {
+    var out;
+    if ("$error".contains("Socket")) {
+      out = Column(
+        children: [
+          Text(
+            "Failed to load video. Please confirm your device is connected to the internet. If it is, the Auslan Signbank servers may be having issues. This is not an issue with the app itself.",
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 14),
+          ),
+          Padding(padding: EdgeInsets.only(top: 10)),
+          Text(
+            "$mediaLink: $error",
+            style: TextStyle(fontSize: 12),
+            textAlign: TextAlign.center,
+          ),
+        ],
+        mainAxisAlignment: MainAxisAlignment.center,
+      );
+    } else {
+      out = Column(children: [
+        Text(
+          "${AppLocalizations.of(context).unexpectedErrorLoadingVideo} $mediaLink: $error",
+          textAlign: TextAlign.center,
+          style: TextStyle(fontSize: 12),
+        )
+      ]);
+    }
+    return Padding(
+      padding: EdgeInsets.only(top: 20),
+      child: Center(child: out),
+    );
   }
 
   void onPageChanged(BuildContext context, int newPage) {
     setState(() {
-      for (VideoPlayerController c in controllers.values) {
+      for (VideoPlayerController c in videoControllers.values) {
         c.pause();
       }
       currentPage = newPage;
-      controllers[currentPage]?.play();
+      videoControllers[currentPage]?.play();
     });
   }
 
@@ -249,7 +260,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
   void dispose() {
     super.dispose();
     // Ensure disposing of the VideoPlayerController to free up resources.
-    for (VideoPlayerController c in controllers.values) {
+    for (VideoPlayerController c in videoControllers.values) {
       c.dispose();
     }
   }
@@ -268,71 +279,94 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     // Get height of screen to ensure that the video only takes up
     // a certain proportion of it.
     List<Widget> items = [];
-    for (int idx = 0; idx < videoLinks.length; idx++) {
-      var futureBuilder = FutureBuilder(
-          future: initializeVideoPlayerFutures[idx],
-          builder: (context, snapshot) {
-            var waitingWidget = Padding(
-                padding: EdgeInsets.only(top: 20),
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ));
-            if (snapshot.connectionState != ConnectionState.done) {
-              return waitingWidget;
-            }
-            if (errorWidgets.containsKey(idx)) {
-              return Padding(
+    for (int idx = 0; idx < mediaLinks.length; idx++) {
+      var mediaLink = mediaLinks[idx];
+      var item;
+      if (mediaLink.endsWith(".jpg")) {
+        item = Padding(
+            padding: EdgeInsets.all(10),
+            child: CachedNetworkImage(
+                imageUrl: mediaLink,
+                cacheManager: myCacheManager,
+                progressIndicatorBuilder: (context, url, downloadProgress) =>
+                    Padding(
+                        padding: EdgeInsets.only(top: 20),
+                        child: SizedBox(
+                          child: Center(
+                            child: CircularProgressIndicator(
+                              value: downloadProgress.progress,
+                            ),
+                          ),
+                          height: 100.0,
+                          width: 100.0,
+                        )),
+                errorWidget: (context, url, error) =>
+                    createErrorWidget(error, mediaLink)));
+      } else {
+        item = FutureBuilder(
+            future: initializePlayerFutures[idx],
+            builder: (context, snapshot) {
+              var waitingWidget = Padding(
                   padding: EdgeInsets.only(top: 20),
-                  child: Center(child: errorWidgets[idx]!));
-            }
-            if (!controllers.containsKey(idx)) {
-              return waitingWidget;
-            }
-            var controller = controllers[idx]!;
+                  child: Center(
+                    child: CircularProgressIndicator(),
+                  ));
+              if (snapshot.connectionState != ConnectionState.done) {
+                return waitingWidget;
+              }
+              if (errorWidgets.containsKey(idx)) {
+                return errorWidgets[idx]!;
+              }
+              if (!videoControllers.containsKey(idx)) {
+                return waitingWidget;
+              }
+              var controller = videoControllers[idx]!;
 
-            // Set playback speed here, since we need the context.
-            setPlaybackSpeed(context, controller);
+              // Set playback speed here, since we need the context.
+              setPlaybackSpeed(context, controller);
 
-            // Set it again repeatedly since there can be a weird race.
-            // I have confirmed that even from within video_player.dart, it is
-            // trying to set the correct value but the video still plays at
-            // the wrong playback speed.
-            Future.delayed(Duration(milliseconds: 100),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 250),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 500),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 1000),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 2000),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 4000),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 6000),
-                () => setPlaybackSpeed(context, controller));
-            Future.delayed(Duration(milliseconds: 8000),
-                () => setPlaybackSpeed(context, controller));
+              // Set it again repeatedly since there can be a weird race.
+              // I have confirmed that even from within video_player.dart, it is
+              // trying to set the correct value but the video still plays at
+              // the wrong playback speed.
+              Future.delayed(Duration(milliseconds: 100),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 250),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 500),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 1000),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 2000),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 4000),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 6000),
+                  () => setPlaybackSpeed(context, controller));
+              Future.delayed(Duration(milliseconds: 8000),
+                  () => setPlaybackSpeed(context, controller));
 
-            // Play or pause the video based on whether this is the first video.
-            if (idx == currentPage) {
-              controller.play();
-            } else {
-              controller.pause();
-            }
+              // Play or pause the video based on whether this is the first video.
+              if (idx == currentPage) {
+                controller.play();
+              } else {
+                controller.pause();
+              }
 
-            var player = VideoPlayer(controller);
-            var videoContainer =
-                Container(padding: EdgeInsets.only(top: 15), child: player);
-            return videoContainer;
-          });
-      items.add(futureBuilder);
+              var player = VideoPlayer(controller);
+              var videoContainer =
+                  Container(padding: EdgeInsets.only(top: 15), child: player);
+              return videoContainer;
+            });
+      }
+      items.add(item);
     }
     double aspectRatio;
-    if (controllers.containsKey(currentPage)) {
-      aspectRatio = controllers[currentPage]!.value.aspectRatio;
+    if (videoControllers.containsKey(currentPage)) {
+      aspectRatio = videoControllers[currentPage]!.value.aspectRatio;
     } else {
-      aspectRatio = 16 / 9;
+      // This is a fallback value for if the video hasn't loaded yet.
+      aspectRatio = 16 / 12;
     }
     var slider = CarouselSlider(
       carouselController: carouselController,

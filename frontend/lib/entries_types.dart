@@ -54,17 +54,17 @@ abstract class SubEntry {
 }
 
 const LANGUAGE_ENGLISH = "English";
-const LANGUAGE_TAMIL = "தமிழ்";
 const LANGUAGE_SINHALA = "සිංහල";
+const LANGUAGE_TAMIL = "தமிழ்";
 
 const LOCALE_ENGLISH = Locale("en", "");
-const LOCALE_TAMIL = Locale("ta", "");
 const LOCALE_SINHALA = Locale("si", "");
+const LOCALE_TAMIL = Locale("ta", "");
 
 const Map<String, Locale> LANGUAGE_TO_LOCALE = {
   LANGUAGE_ENGLISH: LOCALE_ENGLISH,
-  LANGUAGE_TAMIL: LOCALE_TAMIL,
   LANGUAGE_SINHALA: LOCALE_SINHALA,
+  LANGUAGE_TAMIL: LOCALE_TAMIL,
 };
 
 Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
@@ -73,8 +73,8 @@ Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
 @JsonSerializable()
 class MyEntry implements Entry {
   final String word_in_english;
-  final String? word_in_tamil;
   final String? word_in_sinhala;
+  final String? word_in_tamil;
 
   final String? category;
   final String entry_type;
@@ -83,8 +83,8 @@ class MyEntry implements Entry {
 
   MyEntry(
       {required this.word_in_english,
-      this.word_in_tamil,
       this.word_in_sinhala,
+      this.word_in_tamil,
       this.category,
       required this.entry_type,
       required this.sub_entries});
@@ -103,10 +103,10 @@ class MyEntry implements Entry {
   String? getPhrase(Locale locale) {
     if (locale == LOCALE_ENGLISH) {
       return word_in_english;
-    } else if (locale == LOCALE_TAMIL) {
-      return word_in_tamil;
     } else if (locale == LOCALE_SINHALA) {
       return word_in_sinhala;
+    } else if (locale == LOCALE_TAMIL) {
+      return word_in_tamil;
     } else {
       throw Exception("Unknown locale $locale");
     }

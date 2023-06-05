@@ -26,11 +26,11 @@ class Entry(models.Model):
     word_in_english = models.CharField(
         max_length=256, verbose_name="Word in English", null=False, unique=True
     )
-    word_in_tamil = models.CharField(
-        max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
-    )
     word_in_sinhala = models.CharField(
         max_length=256, null=True, blank=True, verbose_name="Word in Sinhala"
+    )
+    word_in_tamil = models.CharField(
+        max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
     )
 
     # This is an optional field that we might use down the line for some kind of

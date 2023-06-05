@@ -21,10 +21,10 @@ It is possible to run the app locally while connecting to the production databas
 
 Login with the gcloud CLI:
 ```
-gcloud auth login --update-adc
-gcloud auth application-default login
-gcloud auth application-default set-quota-project slsl-dictionary
-gcloud config set project slsl-dictionary
+gcloud auth login --update-adc;
+gcloud auth application-default login;
+gcloud auth application-default set-quota-project slsl-dictionary;
+gcloud config set project slsl-dictionary;
 ```
 
 Run the Cloud SQL proxy:

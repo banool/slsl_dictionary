@@ -10,6 +10,7 @@ COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)(\w+(?:,\s*\w(\w|\s)*)*)?$")
 class EntryType(models.TextChoices):
     WORD = "WORD", _("Word")
     PHRASE = "PHRASE", _("Phrase")
+    FINGERSPELLING = "FINGERSPELLING", _("Fingerspelling")
 
 
 # This class defines a single entry, aka word.
@@ -123,6 +124,7 @@ class SubEntry(models.Model):
 
 
 # This links back to the SubEntry, implying there can be multiple Videos per SubEntry.
+# Video is a legacy name, this can also contain images, e.g. for fingerspelling.
 class Video(models.Model):
     # Link back to the SubEntry.
     sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
@@ -133,7 +135,7 @@ class Video(models.Model):
     # bucket. See settings.py for more.
     # TODO: Consider actually validating that the file is valid H.264 mp4.
     media = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=["mp4"])]
+        validators=[FileExtensionValidator(allowed_extensions=["mp4", "jpg"])]
     )
 
     def __str__(self):

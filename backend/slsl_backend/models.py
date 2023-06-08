@@ -4,7 +4,7 @@ from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
-COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)(\w+(?:,\s*\w(\w|\s)*)*)?$")
+COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)([\w|\s]+(?:,\s*\w(\w|\s)*)*)?$")
 
 
 class EntryType(models.TextChoices):

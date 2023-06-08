@@ -38,7 +38,7 @@ Make a file called `prod_secrets.json` where the following keys are different fr
 "sql_engine": "django.db.backends.postgresql",
 "sql_database": <sql_database>,
 "sql_host": "127.0.0.1",
-"sql_port": "5433",
+"sql_port": 5433,
 "sql_user": <sql_user>,
 "admin_username": <admin_username>,
 "admin_password": <admin_password>,
@@ -55,7 +55,7 @@ You'll notice we don't set `admin_bucket_name`. That's because for dev we just u
 
 Finally, run the server locally like this:
 ```
-poetry run ./run.sh 8080 dev true
+poetry run ./run.sh 8080 dev
 ```
 
 If when logging in you are prompted for a password in the pane where the server is running, enter the password for your laptop, I believe this is some keychain stuff (just a guess right now though).

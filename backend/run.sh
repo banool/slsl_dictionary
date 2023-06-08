@@ -2,7 +2,6 @@
 
 PORT=$1
 ENV=$2
-SKIP_COLLECTSTATIC=$3
 
 set -e
 

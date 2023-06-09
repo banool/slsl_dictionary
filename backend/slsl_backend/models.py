@@ -6,6 +6,8 @@ from django.utils.translation import gettext_lazy as _
 
 COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)([\w|\s]+(?:,\s*\w(\w|\s)*)*)?$")
 
+# TODO: Require that each entry has at least one sub entry and that each subentry has
+# at least one video.
 
 class EntryType(models.TextChoices):
     WORD = "WORD", _("Word")

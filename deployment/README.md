@@ -1,6 +1,14 @@
 # SLSL Dictionary: Deployment
 
 ## Deploy
+Login with the gcloud CLI:
+```
+gcloud auth login --update-adc;
+gcloud auth application-default login;
+gcloud auth application-default set-quota-project slsl-dictionary;
+gcloud config set project slsl-dictionary;
+```
+
 Deploy like this:
 ```
 pulumi up --yes --refresh

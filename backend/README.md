@@ -76,3 +76,12 @@ Note the symlink is necessary to avoid this issue: https://stackoverflow.com/que
 poetry run poe isort
 poetry run poe black
 ```
+
+## Generating csvs for translators
+For entries:
+```
+cd backend
+poetry run python manage.py generate_csv ~/out.csv
+```
+
+For the text of the app itself try just sharing the arb files as txt files.

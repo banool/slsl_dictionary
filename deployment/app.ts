@@ -34,7 +34,7 @@ export const adminService = new gcp.cloudrun.Service(
       metadata: {
         namespace: projectId,
         annotations: {
-          "autoscaling.knative.dev/minScale": "1",
+          "autoscaling.knative.dev/minScale": "0",
           "autoscaling.knative.dev/maxScale": "3",
           "run.googleapis.com/execution-environment": "gen2",
           // If this is true it makes sure we only get billed when handling a request,
@@ -67,8 +67,8 @@ export const adminService = new gcp.cloudrun.Service(
                 memory: "4Gi",
               },
               requests: {
-                cpu: "1",
-                memory: "1Gi",
+                cpu: "0.1",
+                memory: "128Mi",
               },
             },
           },

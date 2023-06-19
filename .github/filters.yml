@@ -7,10 +7,12 @@ ci: &ci
 
 backend:
   - *force
+  - *ci
   - 'backend/**'
 
 frontend:
   - *force
+  - *ci
   - 'frontend/lib/**'
   - 'frontend/ios/**'
   - 'frontend/android/**'

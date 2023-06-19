@@ -8,8 +8,8 @@ part of 'entries_types.dart';
 
 MyEntry _$MyEntryFromJson(Map<String, dynamic> json) => MyEntry(
       word_in_english: json['word_in_english'] as String,
-      word_in_tamil: json['word_in_tamil'] as String?,
       word_in_sinhala: json['word_in_sinhala'] as String?,
+      word_in_tamil: json['word_in_tamil'] as String?,
       category: json['category'] as String?,
       entry_type: json['entry_type'] as String,
       sub_entries: (json['sub_entries'] as List<dynamic>)
@@ -19,8 +19,8 @@ MyEntry _$MyEntryFromJson(Map<String, dynamic> json) => MyEntry(
 
 Map<String, dynamic> _$MyEntryToJson(MyEntry instance) => <String, dynamic>{
       'word_in_english': instance.word_in_english,
-      'word_in_tamil': instance.word_in_tamil,
       'word_in_sinhala': instance.word_in_sinhala,
+      'word_in_tamil': instance.word_in_tamil,
       'category': instance.category,
       'entry_type': instance.entry_type,
       'sub_entries': instance.sub_entries,

@@ -1,8 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.banool.auslan_dictionary">
+    package="com.banool.slsl_dictionary">
     <application
         android:name="${applicationName}"
-        android:label="Auslan Dictionary"
+        android:label="SLSL Dictionary"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity

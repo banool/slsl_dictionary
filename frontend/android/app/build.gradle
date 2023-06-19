@@ -25,14 +25,11 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
-/*
-https://github.com/flutter/flutter/issues/18232
 def keystoreProperties = new Properties()
 def keystorePropertiesFile = rootProject.file('key.properties')
 if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 }
-*/
 
 android {
     compileSdkVersion 33
@@ -56,15 +53,13 @@ android {
 
     defaultConfig {
         multiDexEnabled true
-        applicationId "com.banool.auslan_dictionary"
-        minSdkVersion 16
-        targetSdkVersion 31
+        applicationId "com.banool.slsl_dictionary"
+        minSdkVersion 23
+        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
 
-    /*
-    https://github.com/flutter/flutter/issues/18232
     signingConfigs {
         release {
             keyAlias keystoreProperties['keyAlias']
@@ -73,13 +68,10 @@ android {
             storePassword keystoreProperties['storePassword']
         }
     }
-    */
 
     buildTypes {
         release {
-            signingConfig null
-            // https://github.com/flutter/flutter/issues/18232
-            // signingConfig signingConfigs.release
+            signingConfig signingConfigs.release
         }
     }
 }

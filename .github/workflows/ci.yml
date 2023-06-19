@@ -96,3 +96,48 @@ jobs:
         admin_bucket_name: "slsl-admin-bucket-31cc83f"
         media_bucket_name: "ignored"
       run: poetry run python manage.py collectstatic --noinput
+
+  # Build and release the Android app. These secrets originate from the
+  # slsl_dictionary_secrets repo. Note, this doesn't work until you've done a single
+  # manual upload on the Google Play Console UI and submitted a release to the alpha
+  # track. For that, run flutter build appbundle yourself (you'll have to copy the
+  # secrets in to frontend/android temporarily). See more here:
+  # https://stackoverflow.com/a/69899877/3846032
+  release_android:
+    needs: [changes]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v3
+
+    - run: echo "${{ secrets.UPLOAD_KEYSTORE }}" | base64 -d > android/upload_keystore.jks
+    - run: echo "${{ secrets.KEY_PROPERTIES }}" | base64 -d > android/key.properties
+
+    - uses: actions/setup-java@v3
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+
+    - uses: subosito/flutter-action@v1
+      with:
+        flutter-version: '3.10.4'
+        channel: stable
+
+    - run: flutter pub get
+    - run: flutter gen-l10n
+
+    - run: flutter test
+
+    # This will produce a signed appbundle.
+    - run: flutter build appbundle
+
+    - name: Publish Android build to internal track
+      uses: r0adkll/upload-google-play@v1.0.15
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
+        packageName: com.banool.slsl_dictionary
+        releaseFile: frontend/build/app/outputs/bundle/release/app-release.aab
+        track: internal

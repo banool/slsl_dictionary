@@ -1,7 +1,6 @@
 import 'dart:io' show HttpOverrides, Platform;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slsl_dictionary/entries_loader.dart';

@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 0.0.27+27
+version: 0.0.28+28
 
 environment:
   sdk: '>=2.18.0 <3.0.0'

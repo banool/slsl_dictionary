@@ -67,7 +67,7 @@ Future<void> takeScreenshot(
       "${screenshotNameInfo.getAndIncrementCounter().toString().padLeft(2, '0')}-"
       "$name";
   await tester.pumpAndSettle();
-  sleep(Duration(milliseconds: 250));
+  await Future.delayed(const Duration(milliseconds: 500));
   if (Platform.isAndroid) {
     await takeScreenshotForAndroid(binding, name);
   } else {
@@ -120,7 +120,10 @@ class ScreenshotNameInfo {
   }
 }
 
+// https://github.com/flutter/flutter/issues/89651#issuecomment-1237416761
 void main() async {
+  await Future.delayed(const Duration(seconds: 3));
+
   // ignore: unnecessary_cast
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
       as IntegrationTestWidgetsFlutterBinding;
@@ -128,23 +131,34 @@ void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets("takeScreenshots", (WidgetTester tester) async {
+    keyedByEnglishEntriesGlobal = {};
+
+    await Future.delayed(const Duration(seconds: 3));
     await setup();
+
+    // Wait for the data to be downloaded.
+    while (keyedByEnglishEntriesGlobal.isEmpty) {
+      await Future.delayed(const Duration(milliseconds: 500));
+      print("Waiting for data to be downloaded...");
+    }
+
+    print("Data has been downloaded, continuing");
 
     String listName = "Animals";
     String listKey = EntryList.getKeyFromName(listName);
     await entryListManager.createEntryList(listKey);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["kangaroo"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["bear"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["platypus"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["fish"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["echidna"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["rabbit"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["dog"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["elephant"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["cat"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["tiger"]!);
     await entryListManager.entryLists[listKey]!
-        .addEntry(keyedByEnglishEntriesGlobal["bird"]!);
+        .addEntry(keyedByEnglishEntriesGlobal["wolf"]!);
 
     await sharedPreferences
         .setStringList(KEY_LISTS_TO_REVIEW, [KEY_FAVOURITES_ENTRIES, listKey]);
@@ -174,10 +188,10 @@ void main() async {
     await tester.pumpAndSettle();
     await takeScreenshot(tester, binding, screenshotNameInfo, "insideList");
 
-    final Finder dogButton = find.byKey(ValueKey("dog"));
+    final Finder dogButton = find.byKey(ValueKey("bear"));
     await tester.tap(dogButton);
     await tester.pumpAndSettle();
-    sleep(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 5));
     await takeScreenshot(tester, binding, screenshotNameInfo, "wordPage");
 
     await tester.pumpAndSettle();
@@ -205,15 +219,15 @@ void main() async {
     final Finder startAppBarButton = find.byKey(ValueKey("startButton"));
     await tester.tap(startAppBarButton);
     await tester.pumpAndSettle();
-    sleep(Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 4));
     await takeScreenshot(tester, binding, screenshotNameInfo, "revisionPage");
 
-    sleep(Duration(milliseconds: 500));
+    await Future.delayed(const Duration(seconds: 1));
     await tester.pumpAndSettle();
     final Finder revealTapArea = find.byKey(ValueKey("revealTapArea"));
     await tester.tap(revealTapArea);
     await tester.pumpAndSettle();
-    sleep(Duration(seconds: 4));
+    await Future.delayed(const Duration(seconds: 4));
     await tester.pumpAndSettle();
     await takeScreenshot(
         tester, binding, screenshotNameInfo, "revisionPageRevealed");

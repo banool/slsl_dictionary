@@ -118,6 +118,8 @@ class LanguageDropdownState extends State<LanguageDropdown> {
   }
 
   Widget buildDropdown(BuildContext context) {
+    Locale currentLocale = Localizations.localeOf(context);
+
     // Build list of possible languages.
     List<DropdownMenuItem<String>> languageOptions = [];
 
@@ -151,8 +153,10 @@ class LanguageDropdownState extends State<LanguageDropdown> {
             selectedLanguageOption = initialLanguage!;
           } else if (widgetLocaleOverride != null) {
             selectedLanguageOption = LOCALE_TO_LANGUAGE[widgetLocaleOverride]!;
-          } else {
+          } else if (includeDeviceDefaultOption) {
             selectedLanguageOption = NO_OVERRIDE_KEY;
+          } else {
+            selectedLanguageOption = LOCALE_TO_LANGUAGE[currentLocale]!;
           }
 
           return DropdownButton<String>(

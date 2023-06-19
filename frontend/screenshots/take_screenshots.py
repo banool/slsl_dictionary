@@ -90,6 +90,8 @@ async def get_uuids_of_ios_simulators(simulators):
     out = {}
     for s in simulators:
         for line in command_output.splitlines():
+            if "unavailable" in line:
+                continue
             r = "    " + re.escape(s) + r" \((.*?)\) \(.*"
             m = re.match(r, line)
             if m is not None:
@@ -102,6 +104,8 @@ async def start_ios_simulators(uuids_of_ios_simulators):
     await run_command(["open", "-a", "Simulator"])
 
     async def start_ios_simulator(uuid):
+        # If this fails it likely means the necessary simulator has not been added
+        # in xcode.
         await run_command(["xcrun", "simctl", "boot", uuid])
 
     await asyncio.gather(
@@ -187,7 +191,7 @@ async def main():
         LOG.setLevel("INFO")
 
     uuids_of_ios_simulators = await get_uuids_of_ios_simulators(IOS_SIMULATORS)
-    LOG.info(f"iOS simulatior name to UUID: {uuids_of_ios_simulators}")
+    LOG.info(f"iOS simulator name to UUID: {uuids_of_ios_simulators}")
 
     if not args.android_only:
         LOG.info("Launching iOS simulators")

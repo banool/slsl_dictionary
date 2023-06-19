@@ -37,6 +37,8 @@ First, make sure you've implemented the fix in https://github.com/flutter/flutte
 }
 ```
 
+Update: I don't believe this is necessary anymore ^
+
 You may also need to `flutter clean` after this.
 
 Then run this:
@@ -52,7 +54,7 @@ The Apple App Store will expect that you also upload a build for this app versio
 
 For Android, you need to just go to the Google Play Console and do it manually right now.
 
-See my [Stack OVverflow question](https://stackoverflow.com/questions/71699078/how-to-locate-elements-in-ios-ui-test-for-flutter-fastlane-screnshots/71801310#71801310) for more information about this whole setup.
+See my [Stack Overflow question](https://stackoverflow.com/questions/71699078/how-to-locate-elements-in-ios-ui-test-for-flutter-fastlane-screnshots/71801310#71801310) for more information about this whole setup.
 
 ## General dev guide
 When first pulling this repo, add this to `.git/hooks/pre-commit`:

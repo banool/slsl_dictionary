@@ -1,5 +1,5 @@
 {
-    "appTitle": "ශ්‍රී ලංකා සංකේත භාෂා වචන මාලාව",
+    "appTitle": "ශ්‍රී ලංකා සංඥා භාෂා ශබ්දකෝෂය",
 
     "newsTitle": "පුවත්",
 
@@ -32,59 +32,60 @@
     "flashcardsSelectListsToRevise": "සංශෝධනය කිරීමට ලැයිස්තු තෝරන්න",
     "flashcardsSelectLists": "ලැයිස්තු තෝරන්න",
     "flashcardsTypes": "ෆ්ලෑෂ්කාඩ් වර්ග",
-    "flashcardsSignToWord": "සංකේතය -> වචනය",
-    "flashcardsWordToSign": "වචනය -> සංකේතය",
+    "flashcardsSignToWord": "සංඥා -> වචනය",
+    "flashcardsWordToSign": "වචනය -> සංඥා",
     "flashcardsRevisionSettings": "සංශෝධන සැකසුම්",
     "flashcardsSelectRevisionStrategy": "සංශෝධන ක්‍රමය තෝරන්න",
-    "flashcardsStrategy": "ක්‍රමය",
-    "flashcardsSelectSignRegions": "සංකේත කලාප තෝරන්න",
+    "flashcardsStrategy": "උපාය මාර්ගය",
+    "flashcardsSelectSignRegions": "සංඥා කලාප තෝරන්න",
     "flashcardsRegions": "කළාප",
     "flashcardsStart": "ආරම්භ කරන්න",
     "flashcardsOnlyOneCard": "වචනයකට කාඩ් කට්ටලයක් පමණින් පෙන්වන්න",
 
-    "flashcardsRevisionLanguage": "todo",
-    "flashcardsAllOfSriLanka": "ශ්‍රී ලංකාවේ සියලුම",
-    "flashcardsNorthEast": "todo",
+    "flashcardsRevisionLanguage": "සංශෝධන භාෂාව",
+    "flashcardsAllOfSriLanka": "මුළු ලංකාවම",
+    "flashcardsNorthEast": "උතුරු නැගෙනහිර",
 
     "flashcardsNext": "මීළඟ",
     "flashcardsForgot": "අමතක වුනා",
-    "flashcardsGotIt": "ගත්තා!",
+    "flashcardsGotIt": "සොයා ගත්තා!",
 
-    "flashcardsWhatIsSignForWord": "මෙම වචනය සඳහා සංකේතය කුමක්ද?",
-    "flashcardsWhatDoesSignMean": "මෙම සංකේතය අර්ථයකුමද?",
-    "flashcardsOpenDictionaryEntry": "වචන මාලාව විවෘත කරන්න",
+    "flashcardsWhatIsSignForWord": "මෙම වචනය සඳහා සංඥා භාෂාව කුමක්ද?",
+    "flashcardsWhatDoesSignMean": "මෙම සංඥාවේ අර්ථයකුමද?",
+    "flashcardsOpenDictionaryEntry": "ශබ්දකෝෂය වචන මාලාව විවෘත කරන්න",
 
-    "flashcardsSuccessRate": "සාර්ථකතා අනුපාතය",
-    "flashcardsTotalCards": "මුළු කාඩ්",
+    "flashcardsSuccessRate": "සාර්ථකත්ව අනුපාතය",
+    "flashcardsTotalCards": "සම්පූර්ණ කාඩ්",
     "flashcardsSuccessfulCards": "සාර්ථක කාඩ්",
-    "flashcardsIncorrectCards": "නොනිවැරදි කාඩ්",
+    "flashcardsIncorrectCards": "වැරදි කාඩ්",
 
     "flashcardsTotalReviews": "මුළු සමාලෝචන",
     "flashcardsUnsuccessfulCards": "අසාර්ථක කාඩ්",
     "flashcardsUniqueWords": "අනන්‍ය වචන",
-    "flashcardsLongestStreak": "හොඳම ක්‍රියාවලිය",
+    "flashcardsLongestStreak": "දිගම ක්‍රියාවලිය",
     "flashcardsStatsCollectedSince": "සංඛ්‍යාන දැනට ඇතුලත් කර ඇත",
 
     "flashcardsRevisionSummaryTitle": "සංශෝධන සාරාංශය",
     "flashcardsRevisionProgressTitle": "සංශෝධන ප්‍රගතිය",
-    "flashcardsRevisionStategyToShow": "සංඛ්‍යාන සඳහා සංශෝධන ක්‍රමය පෙන්වන්න",
+    "flashcardsRevisionStategyToShow": "සංඛ්‍යාලේඛන පෙන්වීමට සඳහා සංශෝධන උපාය මාර්ගය පෙන්වන්න",
 
     "setPlaybackSpeedTo": "ප්‍රතිවාදන වේගය සකසන්න",
 
-    "settingsPlayStoreFeedback": "Play Store පිළිච්ච දෙන්න",
-    "settingsAppStoreFeedback": "App Store පිළිච්ච දෙන්න",
+    "settingsPlayStoreFeedback": "Play Store ප්‍රතිචාරය දෙන්න",
+    "settingsAppStoreFeedback": "App Store ප්‍රතිචාරය දෙන්න",
     "na": "නොදනී",
 
-    "settingsLanguage": "todo",
+    "settingsLanguage": "භාෂාව",
     "settingsRevision": "සංශෝධන",
     "settingsHideRevision": "සංශෝධන විශේෂාංග සඟවන්න",
     "settingsDeleteRevisionProgress": "සියලුම සංශෝධන ප්‍රගතිය මකන්න",
-    "settingsDeleteRevisionProgressExplanation": "මෙය ඔබේ සියලුම සමාලෝචන ප්‍රගතිය මුළු කාලය සඳහා අවකාශ පුනරාවර්තනය හා අහඹු සමාලෝචන ක්‍රමයන් මකා දමයි. ඔබේ ලැයිස්තු (සුදුසුකම් ඇතුළුව) බලපාන්නේ නැත. ඔබට මෙය කිරීමට 100% සුන්දර වුනාද?",
+    "settingsDeleteRevisionProgressExplanation": "මෙය මගින් ඔබගේ සියලුම සමාලෝචන, ප්‍රගතිය මාකාදමයි.(ඔබගේ ලැයිස්තු ප්‍රියතමයන් බලපාන්නේ නැත.)
+ඔබට මෙය කිරීමට අවශ්‍ය බව 100% විශ්වාසද?",
     "settingsProgressDeleted": "සියලුම සමාලෝචන ප්‍රගතිය මකාදමා ඇත",
-    "settingsCache": "කැෂේ",
-    "settingsCacheVideos": "වීඩියෝ කැෂේ කරන්න",
-    "settingsDropCache": "කැෂේ ඉවත් කරන්න",
-    "settingsCacheDropped": "කැෂේ ඉවත් කළ ඇත",
+    "settingsCache": "තාවකාලික මතකයන්",
+    "settingsCacheVideos": "වීඩියෝ තාවකාලික මතකයන් කරන්න",
+    "settingsDropCache": "තාවකාලික මතකයන් ඉවත් කරන්න",
+    "settingsCacheDropped": "තාවකාලික මතකයන් ඉවත් කළ ඇත",
     "settingsData": "දත්ත",
     "settingsCheckNewData": "නව ශබ්දකෝෂ දත්ත සඳහා පරීක්ෂා කරන්න",
     "settingsDataUpdated": "ශබ්දකෝෂ දත්ත සාර්ථකව යාවත්කාලීන කළ ඇත",
@@ -98,10 +99,10 @@
 
     "listFavourites": "ප්‍රියතම",
     "listNameCannotBeEmpty": "ලැයිස්තු නම හිස් විය නොහැක",
-    "listNameInvalid": "අවලංගු නම, මෙය දැනටමත් අසාර්ථක විය යුතුය",
-    "listEnterNewName": "නව ලැයිස්තු නම ඇතුළත් කරන්න",
+    "listNameInvalid": "වලංගු නොවන නම, මෙය දැනටමත් අල්ලාගෙන තිබිය යුතුය",
+    "listEnterNewName": "නව නම ලැයිස්තු ඇතුළත් කරන්න",
     "listFailedToMake": "නව ලැයිස්තුව සාදා ගැනීමට අසාර්ථක විය",
-    "listNewList": "todo",
+    "listNewList": "නව ලැයිස්තු",
 
     "listSearchAdd": "එක් කිරීම සඳහා වචන සොයන්න",
     "listSearchPrefix": "සොයන්න",
@@ -114,12 +115,13 @@
 
     "entryTypeWords": "වචන",
     "entryTypePhrases": "වාක්ය ඛණ්ඩ",
-    "entryTypeFingerspelling": "todo",
+    "entryTypeFingerspelling": "ඇඟිලි කථාව",
     "entrySelectEntryTypes": "ඇතුල්වීමේ වර්ග තෝරන්න",
 
-    "relatedWords": "සම්බන්ධ වචන",
+    "relatedWords": "අදාළ වචන
+",
 
-    "startupFailureMessage": "යෙදුම නිශ්චිත ලෙස ආරම්භ කිරීම වැරදි විය. පළමුව, කරුණාකර ඔබ යෙදුමේ නවතම අනුවාදය භාවිතා කරන බව සහතික කරන්න. ඔබ එසේ නම්, කරුණාකර මෙම දෝෂය පෙන්වන පුනරුපුවරුවක් සමග daniel@dport.me වෙත ඊමේල් කරන්න.",
+    "startupFailureMessage": "යෙදුම නිවැරදිව ආරම්භ කිරීමට අසමත් විය. කරුණාකර , පළමුව, ඔබ යෙදුමේ නවතම අනුවාදය භාවිතා කරන බව සහතික කරන්න. ඔබ එසේ නම්, කරුණාකර මෙම දෝෂය පෙන්වන පුනරුපුවරුවක් සමග daniel@dport.me වෙත ඊමේල් කරන්න.",
     "unexpectedErrorLoadingVideo": "අනපේක්ෂිත දෝෂය පූරණය කරමින්",
-    "deviceDefault": "උපාංග පෙරනිමි"
+    "deviceDefault": "ප්‍රදාන උපාංග"
 }

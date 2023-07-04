@@ -147,42 +147,28 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       if (mediaLink.endsWith(".bak")) {
         shouldCache = false;
       }
-      bool shouldDownloadDirectly = !shouldCache;
+      // We should only download directly if the user has disabled caching or
+      // if we're in a web environment, in which case the web player cannot
+      // use a file system based cache.
+      bool shouldDownloadDirectly = !shouldCache || kIsWeb;
       if (shouldCache) {
         try {
-          print("Pulling video $mediaLink from either cache or the internet");
+          print("Attempting to pull video $mediaLink from the cache");
           File file = await myCacheManager.getSingleFile(mediaLink);
           controller = VideoPlayerController.file(file,
               videoPlayerOptions: videoPlayerOptions);
         } catch (e) {
           print(
-              "Failed to use cache despite caching being enabled, just trying to download directly: $e");
+              "Failed to use cache for $mediaLink despite caching being enabled, just trying to download directly: $e");
           shouldDownloadDirectly = true;
         }
       }
       if (shouldDownloadDirectly) {
         if (!shouldCache) {
-          print("Caching is disabled, pulling from the network");
+          print("Caching is disabled, pulling $mediaLink from the network");
         }
-        if (mediaLink.endsWith(".bak")) {
-          print("Building video controller with custom .bak behaviour");
-          HttpClient httpClient = new HttpClient();
-          var request = await httpClient.getUrl(Uri.parse(mediaLink));
-          var response = await request.close();
-          if (response.statusCode != 200) {
-            throw "Failed to load $mediaLink with custom .bak behaviour: $response";
-          }
-          String dir = (await getTemporaryDirectory()).path;
-          var bytes = await consolidateHttpClientResponseBytes(response);
-          String newFileName = mediaLink.split("/").last.replaceAll(".bak", "");
-          File file = new File("$dir/$newFileName");
-          await file.writeAsBytes(bytes);
-          controller = VideoPlayerController.file(file,
-              videoPlayerOptions: videoPlayerOptions);
-        } else {
-          controller = VideoPlayerController.network(mediaLink,
-              videoPlayerOptions: videoPlayerOptions);
-        }
+        controller = VideoPlayerController.network(mediaLink,
+            videoPlayerOptions: videoPlayerOptions);
       }
 
       // Use the controller to loop the video.
@@ -208,6 +194,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
         print("Not calling setState because not mounted");
       }
     } catch (e) {
+      print("Error loading video: $e");
       errorWidgets[idx] = createErrorWidget(e, mediaLink);
     }
   }

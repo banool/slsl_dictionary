@@ -79,8 +79,7 @@
     "settingsRevision": "සංශෝධන",
     "settingsHideRevision": "සංශෝධන විශේෂාංග සඟවන්න",
     "settingsDeleteRevisionProgress": "සියලුම සංශෝධන ප්‍රගතිය මකන්න",
-    "settingsDeleteRevisionProgressExplanation": "මෙය මගින් ඔබගේ සියලුම සමාලෝචන, ප්‍රගතිය මාකාදමයි.(ඔබගේ ලැයිස්තු ප්‍රියතමයන් බලපාන්නේ නැත.)
-ඔබට මෙය කිරීමට අවශ්‍ය බව 100% විශ්වාසද?",
+    "settingsDeleteRevisionProgressExplanation": "මෙය මගින් ඔබගේ සියලුම සමාලෝචන, ප්‍රගතිය මාකාදමයි. (ඔබගේ ලැයිස්තු ප්‍රියතමයන් බලපාන්නේ නැත.) ඔබට මෙය කිරීමට අවශ්‍ය බව 100% විශ්වාසද?",
     "settingsProgressDeleted": "සියලුම සමාලෝචන ප්‍රගතිය මකාදමා ඇත",
     "settingsCache": "තාවකාලික මතකයන්",
     "settingsCacheVideos": "වීඩියෝ තාවකාලික මතකයන් කරන්න",
@@ -118,10 +117,9 @@
     "entryTypeFingerspelling": "ඇඟිලි කථාව",
     "entrySelectEntryTypes": "ඇතුල්වීමේ වර්ග තෝරන්න",
 
-    "relatedWords": "අදාළ වචන
-",
+    "relatedWords": "අදාළ වචන",
 
-    "startupFailureMessage": "යෙදුම නිවැරදිව ආරම්භ කිරීමට අසමත් විය. කරුණාකර , පළමුව, ඔබ යෙදුමේ නවතම අනුවාදය භාවිතා කරන බව සහතික කරන්න. ඔබ එසේ නම්, කරුණාකර මෙම දෝෂය පෙන්වන පුනරුපුවරුවක් සමග daniel@dport.me වෙත ඊමේල් කරන්න.",
+    "startupFailureMessage": "යෙදුම නිවැරදිව ආරම්භ කිරීමට අසමත් විය. කරුණාකර, පළමුව, ඔබ යෙදුමේ නවතම අනුවාදය භාවිතා කරන බව සහතික කරන්න. ඔබ එසේ නම්, කරුණාකර මෙම දෝෂය පෙන්වන පුනරුපුවරුවක් සමග daniel@dport.me වෙත ඊමේල් කරන්න.",
     "unexpectedErrorLoadingVideo": "අනපේක්ෂිත දෝෂය පූරණය කරමින්",
     "deviceDefault": "ප්‍රදාන උපාංග"
 }

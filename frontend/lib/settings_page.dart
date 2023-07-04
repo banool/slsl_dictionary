@@ -1,5 +1,6 @@
 import 'dart:io' show Platform;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:launch_review/launch_review.dart';
@@ -37,7 +38,9 @@ class SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
     String appStoreTileString;
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      appStoreTileString = "todo";
+    } else if (Platform.isAndroid) {
       appStoreTileString =
           AppLocalizations.of(context).settingsPlayStoreFeedback;
     } else if (Platform.isIOS) {

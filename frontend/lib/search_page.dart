@@ -65,8 +65,7 @@ class _SearchPageState extends State<SearchPage> {
     if (advisoriesResponse != null &&
         advisoriesResponse!.newAdvisories &&
         !advisoryShownOnce) {
-      Future.delayed(
-          Duration(milliseconds: 500), () => showAdvisoryDialog(context));
+      Future.delayed(Duration(milliseconds: 500), () => showAdvisoryDialog());
       advisoryShownOnce = true;
     }
 
@@ -171,7 +170,7 @@ class _SearchPageState extends State<SearchPage> {
         context,
         Icon(Icons.article),
         () async {
-          showAdvisoryDialog(context);
+          showAdvisoryDialog();
         },
       ));
     }

@@ -37,7 +37,7 @@ class EntryList {
   static LinkedHashSet<Entry> loadEntryList(String key) {
     LinkedHashSet<Entry> entries = LinkedHashSet();
     List<String> entriesRaw = sharedPreferences.getStringList(key) ?? [];
-    print("Loaded raw entries: $entriesRaw");
+    print("Loaded entries in list (key: $key): $entriesRaw");
     for (String s in entriesRaw) {
       // We use the one keyed by English because for this app the value returned
       // by getKey is the word / phrase in English, since that field is required

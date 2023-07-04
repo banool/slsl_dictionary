@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path_provider/path_provider.dart';
 import 'package:slsl_dictionary/entries_types.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'common.dart';
 import 'globals.dart';
@@ -18,17 +19,47 @@ Future<File> get _dictionaryDataFilePath async {
 }
 
 Future<Set<Entry>> loadEntries() async {
-  String data;
+  String? data;
+
+  // First try to read the data from local storage.
   try {
-    // First try to read the data from local storage.
-    final path = await _dictionaryDataFilePath;
-    data = await path.readAsString();
+    if (kIsWeb) {
+      // If we're on web use local storage, in which we just store all the data
+      // as a value in the kv store.
+      data = sharedPreferences.getString(KEY_WEB_DICTIONARY_DATA);
+    } else {
+      // If we're not on web, read data from the application directory, in
+      // which we store it as an actual file.
+      final path = await _dictionaryDataFilePath;
+      data = await path.readAsString();
+    }
+  } catch (e) {
+    print("Failed to entries data from local storage: $e");
+  }
+
+  if (data == null) {
+    print("No data was found");
+    return {};
+  }
+
+  try {
     print("Loaded entries from local storage downloaded from the internet");
     return loadEntriesInner(data);
   } catch (e) {
-    // Return nothing if there was no data in local storage.
-    print("Failed to entries data from local storage: $e");
+    print("Failed to deserialize data from local storage: $e");
     return {};
+  }
+}
+
+Future<void> writeEntries(String newData) async {
+  if (kIsWeb) {
+    // If we're on web use local storage. Currently the dump file is around
+    // 1mb and local storage should support 5mb per site, so this should be
+    // sufficient for now: https://stackoverflow.com/q/2989284/3846032.
+    await sharedPreferences.setString(KEY_WEB_DICTIONARY_DATA, newData);
+  } else {
+    final path = await _dictionaryDataFilePath;
+    await path.writeAsString(newData);
   }
 }
 
@@ -100,9 +131,9 @@ Future<bool> getNewData(bool forceCheck) async {
   // Assert that the data is valid. This will throw if it's not.
   loadEntriesInner(newData);
 
-  // Write the data to file.
-  final path = await _dictionaryDataFilePath;
-  await path.writeAsString(newData);
+  // Write the data to file, which we read again afterwards to load it into
+  // memory.
+  writeEntries(newData);
 
   // Now, record the new version that we downloaded.
   await sharedPreferences.setInt(

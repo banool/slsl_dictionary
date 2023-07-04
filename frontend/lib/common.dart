@@ -32,6 +32,8 @@ const String KEY_LOCALE_OVERRIDE = "locale_override";
 
 const String KEY_SHOULD_CACHE = "should_cache";
 
+const String KEY_WEB_DICTIONARY_DATA = "web_dictionary_data";
+
 const String KEY_ADVISORY_VERSION = "advisory_version";
 
 const String KEY_SEARCH_FOR_WORDS = "search_for_words";
@@ -75,7 +77,7 @@ List<Entry> searchList(BuildContext context, String searchTerm,
     caseSensitive: false,
     multiLine: false,
   );
-  print("Searching with entryTypes $entryTypes");
+  print("Searching ${entries.length} entries with entryTypes $entryTypes");
   Locale currentLocale = Localizations.localeOf(context);
   for (Entry e in entries) {
     if (!entryTypes.contains(e.getEntryType())) {

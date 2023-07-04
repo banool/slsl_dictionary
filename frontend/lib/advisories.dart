@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:http/http.dart' as http;
+import 'package:slsl_dictionary/root.dart';
 
 import 'common.dart';
 import 'globals.dart';
@@ -100,9 +101,9 @@ Future<AdvisoriesResponse?> getAdvisories() async {
       advisories: advisories, newAdvisories: newAdvisories);
 }
 
-void showAdvisoryDialog(BuildContext context) {
+void showAdvisoryDialog() {
   showDialog(
-      context: context,
+      context: rootNavigatorKey.currentContext!,
       builder: (context) => AlertDialog(
           title: Text(AppLocalizations.of(context).newsTitle),
           content: getAdvisoriesInner()));

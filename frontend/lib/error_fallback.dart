@@ -1,7 +1,6 @@
 import 'dart:io' show HttpClient, HttpOverrides, SecurityContext;
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:slsl_dictionary/advisories.dart';
 
 import 'common.dart';
@@ -24,7 +23,8 @@ class ErrorFallback extends StatelessWidget {
     }
     List<Widget> children = [
       Text(
-        AppLocalizations.of(context).startupFailureMessage,
+        // AppLocalizations.of(context).startupFailureMessage,
+        "Failed to start the app correctly. First, please confirm you are using the latest version of the app. If you are, please email daniel@dport.me with a screenshot showing this error.",
         textAlign: TextAlign.center,
         style: TextStyle(fontWeight: FontWeight.bold),
       ),

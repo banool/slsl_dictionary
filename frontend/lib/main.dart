@@ -15,6 +15,7 @@ import 'globals.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
 import 'word_list_logic.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 
 // Setup the app. Be careful when reordering things here, later functions
 // implicitly depend on the side effects of earlier functions.
@@ -29,9 +30,12 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   sharedPreferences = await SharedPreferences.getInstance();
 
   // Set the HTTP proxy if necessary.
-  Map<String, String> proxy = await SystemProxy.getProxySettings() ?? {};
-  HttpOverrides.global = new ProxiedHttpOverrides(proxy["host"], proxy["port"]);
-  print("Set HTTP proxy overrides to $proxy");
+  if (!kIsWeb) {
+    Map<String, String> proxy = await SystemProxy.getProxySettings() ?? {};
+    HttpOverrides.global =
+        new ProxiedHttpOverrides(proxy["host"], proxy["port"]);
+    print("Set HTTP proxy overrides to $proxy");
+  }
 
   // Load up the advisories before doing anything else so it can be displayed
   // in the error page.
@@ -73,7 +77,9 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   showFlashcards = getShowFlashcards();
 
   // Get background color of settings pages.
-  if (Platform.isAndroid) {
+  if (kIsWeb) {
+    settingsBackgroundColor = Color.fromRGBO(240, 240, 240, 1);
+  } else if (Platform.isAndroid) {
     settingsBackgroundColor = Color.fromRGBO(240, 240, 240, 1);
   } else if (Platform.isIOS) {
     settingsBackgroundColor = Color.fromRGBO(242, 242, 247, 1);

@@ -37,17 +37,15 @@ class SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    String appStoreTileString;
+    String? appStoreTileString;
     if (kIsWeb) {
-      appStoreTileString = "todo";
+      appStoreTileString = null;
     } else if (Platform.isAndroid) {
       appStoreTileString =
           AppLocalizations.of(context).settingsPlayStoreFeedback;
     } else if (Platform.isIOS) {
       appStoreTileString =
           AppLocalizations.of(context).settingsAppStoreFeedback;
-    } else {
-      appStoreTileString = AppLocalizations.of(context).na;
     }
 
     EdgeInsetsDirectional margin =
@@ -168,7 +166,8 @@ class SettingsPageState extends State<SettingsPage> {
                   .settingsReportDictionaryDataIssue),
               trailing: Container(),
               onPressed: (BuildContext context) async {
-                var url = 'https://www.auslan.org.au/feedback/';
+                var url =
+                    'https://github.com/banool/slsl_dictionary/issues/new/choose';
                 await launch(url, forceSafariVC: false);
               },
             ),
@@ -199,14 +198,17 @@ class SettingsPageState extends State<SettingsPage> {
                 }
               },
             ),
-            SettingsTile.navigation(
-              title: getText(appStoreTileString),
-              trailing: Container(),
-              onPressed: (BuildContext context) async {
-                await LaunchReview.launch(iOSAppId: "todo", writeReview: true);
-              },
-            ),
-          ],
+            appStoreTileString != null
+                ? SettingsTile.navigation(
+                    title: getText(appStoreTileString),
+                    trailing: Container(),
+                    onPressed: (BuildContext context) async {
+                      await LaunchReview.launch(
+                          iOSAppId: "6445848879", writeReview: true);
+                    },
+                  )
+                : null,
+          ].where((element) => element != null).cast<SettingsTile>().toList(),
           margin: margin),
     ];
 

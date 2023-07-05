@@ -100,9 +100,9 @@ class _EntryPageState extends State<EntryPage> {
       LanguageDropdown(
           asPopUpMenu: true,
           includeDeviceDefaultOption: false,
-          onChanged: (language) {
+          onChanged: (languageCode) {
             setState(() {
-              localeOverride = LANGUAGE_TO_LOCALE[language]!;
+              localeOverride = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
             });
             return localeOverride!;
           }),

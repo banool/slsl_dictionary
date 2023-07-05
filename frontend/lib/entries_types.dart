@@ -53,22 +53,26 @@ abstract class SubEntry {
   List<Region> getRegions();
 }
 
+const LANGUAGE_CODE_ENGLISH = "en";
+const LANGUAGE_CODE_SINHALA = "si";
+const LANGUAGE_CODE_TAMIL = "ta";
+
 const LANGUAGE_ENGLISH = "English";
 const LANGUAGE_SINHALA = "සිංහල";
 const LANGUAGE_TAMIL = "தமிழ்";
 
-const LOCALE_ENGLISH = Locale("en", "");
-const LOCALE_SINHALA = Locale("si", "");
-const LOCALE_TAMIL = Locale("ta", "");
-
-const Map<String, Locale> LANGUAGE_TO_LOCALE = {
-  LANGUAGE_ENGLISH: LOCALE_ENGLISH,
-  LANGUAGE_SINHALA: LOCALE_SINHALA,
-  LANGUAGE_TAMIL: LOCALE_TAMIL,
+const Map<String, String> LANGUAGE_CODE_TO_PRETTY = {
+  LANGUAGE_CODE_ENGLISH: LANGUAGE_ENGLISH,
+  LANGUAGE_CODE_SINHALA: LANGUAGE_SINHALA,
+  LANGUAGE_CODE_TAMIL: LANGUAGE_TAMIL,
 };
 
-Map<Locale, String> LOCALE_TO_LANGUAGE = Map.fromEntries(
-    LANGUAGE_TO_LOCALE.entries.map((e) => MapEntry(e.value, e.key)));
+Map<String, Locale> LANGUAGE_CODE_TO_LOCALE = Map.fromEntries(
+    LANGUAGE_CODE_TO_PRETTY.keys.map((e) => MapEntry(e, Locale(e))));
+
+Locale LOCALE_ENGLISH = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_ENGLISH]!;
+Locale LOCALE_SINHALA = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_SINHALA]!;
+Locale LOCALE_TAMIL = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_TAMIL]!;
 
 @JsonSerializable()
 class MyEntry implements Entry {

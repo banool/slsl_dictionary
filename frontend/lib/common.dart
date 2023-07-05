@@ -46,7 +46,7 @@ const String KEY_DICTIONARY_DATA_CURRENT_VERSION = "current_data_version";
 const String KEY_HIDE_FLASHCARDS_FEATURE = "hide_flashcards_feature";
 const String KEY_FLASHCARD_REGIONS = "flashcard_regions";
 const String KEY_REVISION_STRATEGY = "revision_strategy";
-const String KEY_REVISION_LANGUAGE = "revision_language";
+const String KEY_REVISION_LANGUAGE_CODE = "revision_language_code";
 
 const int DATA_CHECK_INTERVAL = 60 * 60 * 1; // 1 hour.
 

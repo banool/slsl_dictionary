@@ -13,20 +13,20 @@ class LanguageDropdown extends StatefulWidget {
       {Key? key,
       this.asPopUpMenu = false,
       this.includeDeviceDefaultOption = true,
-      this.initialLanguage,
+      this.initialLanguageCode,
       this.onChanged})
       : super(key: key);
 
   final bool asPopUpMenu;
   final bool includeDeviceDefaultOption;
-  final String? initialLanguage;
+  final String? initialLanguageCode;
   final Locale Function(String)? onChanged;
 
   @override
   LanguageDropdownState createState() => LanguageDropdownState(
       asPopUpMenu: asPopUpMenu,
       includeDeviceDefaultOption: includeDeviceDefaultOption,
-      initialLanguage: initialLanguage,
+      initialLanguageCode: initialLanguageCode,
       onChanged: onChanged);
 }
 
@@ -36,7 +36,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
   // If given, this will be used as the initial value for the dropdown rather
   // than the device locale.
-  final String? initialLanguage;
+  final String? initialLanguageCode;
 
   // If given this will override the default functionality where it sets the
   // app and DB level locale settings. This is expected to take in a language
@@ -46,7 +46,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
   LanguageDropdownState(
       {required this.asPopUpMenu,
       required this.includeDeviceDefaultOption,
-      this.initialLanguage,
+      this.initialLanguageCode,
       this.onChanged});
 
   Locale? widgetLocaleOverride;
@@ -72,7 +72,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
       return null;
     }
     // Set locale override, both in the DB and in the app live right now.
-    Locale localeOverride = LANGUAGE_TO_LOCALE[language]!;
+    Locale localeOverride = LANGUAGE_CODE_TO_LOCALE[language]!;
     RootApp.applyLocaleOverride(context, localeOverride);
     await LocaleOverride.writeLocaleOverride(localeOverride);
     return localeOverride;
@@ -104,10 +104,11 @@ class LanguageDropdownState extends State<LanguageDropdown> {
         }
 
         // Add the rest of the language options.
-        languageOptions.addAll(LANGUAGE_TO_LOCALE.keys.map((String language) {
+        languageOptions
+            .addAll(LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
           return PopupMenuItem<String>(
-            value: language,
-            child: Text(language),
+            value: e.key,
+            child: Text(e.value),
           );
         }).toList());
 
@@ -131,10 +132,10 @@ class LanguageDropdownState extends State<LanguageDropdown> {
     }
 
     // Add the rest of the language options.
-    languageOptions.addAll(LANGUAGE_TO_LOCALE.keys.map((String language) {
+    languageOptions.addAll(LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
       return DropdownMenuItem<String>(
-        value: language,
-        child: Text(language),
+        value: e.key,
+        child: Text(e.value),
       );
     }).toList());
 
@@ -147,20 +148,21 @@ class LanguageDropdownState extends State<LanguageDropdown> {
             );
           }
 
-          // Determine which option should be selected.
-          String selectedLanguageOption;
-          if (initialLanguage != null) {
-            selectedLanguageOption = initialLanguage!;
+          // Determine which option should be selected. Either a language code
+          // or NO_OVERRIDE_KEY.
+          String selectedLanguageCode;
+          if (initialLanguageCode != null) {
+            selectedLanguageCode = initialLanguageCode!;
           } else if (widgetLocaleOverride != null) {
-            selectedLanguageOption = LOCALE_TO_LANGUAGE[widgetLocaleOverride]!;
+            selectedLanguageCode = widgetLocaleOverride!.languageCode;
           } else if (includeDeviceDefaultOption) {
-            selectedLanguageOption = NO_OVERRIDE_KEY;
+            selectedLanguageCode = NO_OVERRIDE_KEY;
           } else {
-            selectedLanguageOption = LOCALE_TO_LANGUAGE[currentLocale]!;
+            selectedLanguageCode = currentLocale.languageCode;
           }
 
           return DropdownButton<String>(
-            value: selectedLanguageOption,
+            value: selectedLanguageCode,
             items: languageOptions,
             onChanged: (String? newValue) async {
               Locale? newLocale;
@@ -187,7 +189,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 // requires and returns Locale objects.
 class LocaleOverride {
   static Future<void> writeLocaleOverride(Locale locale) async {
-    sharedPreferences.setString(KEY_LOCALE_OVERRIDE, locale.toString());
+    sharedPreferences.setString(KEY_LOCALE_OVERRIDE, locale.languageCode);
   }
 
   static Future<void> clearLocaleOverride() async {
@@ -195,10 +197,10 @@ class LocaleOverride {
   }
 
   static Future<Locale?> getLocaleOverride() async {
-    var localeRaw = sharedPreferences.getString(KEY_LOCALE_OVERRIDE);
-    if (localeRaw == null) {
+    var languageCode = sharedPreferences.getString(KEY_LOCALE_OVERRIDE);
+    if (languageCode == null) {
       return null;
     }
-    return Locale(localeRaw);
+    return Locale(languageCode);
   }
 }

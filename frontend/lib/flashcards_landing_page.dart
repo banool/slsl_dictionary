@@ -146,8 +146,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     // If they haven't selected a revision language before default to English.
     // It'd be better to get the device language but it's a pain to get access
     // to it here.
-    var revisionLocale = LANGUAGE_TO_LOCALE[
-            sharedPreferences.getString(KEY_REVISION_LANGUAGE)] ??
+    var revisionLocale = LANGUAGE_CODE_TO_LOCALE[
+            sharedPreferences.getString(KEY_REVISION_LANGUAGE_CODE)] ??
         LOCALE_ENGLISH;
     var masters =
         getMasters(revisionLocale, filteredSubEntries, wordToSign, signToEntry);
@@ -478,12 +478,13 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
               Center(
                   child: LanguageDropdown(
                       includeDeviceDefaultOption: false,
-                      initialLanguage:
-                          sharedPreferences.getString(KEY_REVISION_LANGUAGE),
-                      onChanged: (language) {
-                        var selectedLocale = LANGUAGE_TO_LOCALE[language]!;
+                      initialLanguageCode: sharedPreferences
+                          .getString(KEY_REVISION_LANGUAGE_CODE),
+                      onChanged: (languageCode) {
+                        var selectedLocale =
+                            LANGUAGE_CODE_TO_LOCALE[languageCode]!;
                         sharedPreferences.setString(
-                            KEY_REVISION_LANGUAGE, language);
+                            KEY_REVISION_LANGUAGE_CODE, languageCode);
                         updateRevisionSettings();
                         return selectedLocale;
                       })),

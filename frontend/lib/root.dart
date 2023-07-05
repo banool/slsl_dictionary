@@ -102,7 +102,7 @@ class _RootAppState extends State<RootApp> {
           title: APP_NAME,
           onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
-          supportedLocales: LANGUAGE_TO_LOCALE.values,
+          supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
           locale: locale,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(

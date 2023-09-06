@@ -58,16 +58,18 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // Get knob values.
     (() async =>
         enableFlashcardsKnob = await readKnob("enable_flashcards", true))(),
-    (() async =>
-        downloadWordsDataKnob = await readKnob("download_words_data", false))(),
   ]);
 
-  updateKeyedEntriesGlobal();
-
-  // Check for new words data if appropriate.
-  // We don't wait for this on startup, it's too slow.
   if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
-    updateWordsData();
+    if (entriesGlobal.isEmpty) {
+      // If there is no entry data, wait for it before starting.
+      print("No entry data, waiting for it before starting...");
+      entriesGlobal = await loadEntries();
+      await updateWordsData();
+    } else {
+      // Otherwise, let it happen in the background.
+      updateWordsData();
+    }
   }
 
   // Build the word list manager.

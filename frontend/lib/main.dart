@@ -93,13 +93,16 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
       entriesGlobal = await loadEntriesFromCache();
       await updateWordsData();
     } else {
+      printAndLog(
+          "Local entry data cache found, updating it in the background...");
       // Otherwise, let it happen in the background.
       updateWordsData();
     }
   }
 
-  // Build the word list manager.
-  entryListManager = EntryListManager.fromStartup();
+  // Build the word list manager. This will wait for entriesGlobal to be
+  // populated.
+  fromStartupWaitForEntries();
 
   // Resolve values based on knobs.
   showFlashcards = getShowFlashcards();
@@ -153,10 +156,10 @@ Future<void> updateWordsData() async {
     printAndLog(
         "There was new data from the internet, loading it into memory...");
     entriesGlobal = await loadEntriesFromCache();
-    updateKeyedEntriesGlobal();
     printAndLog("Updated entriesGlobal!");
   } else {
     printAndLog(
         "There was no new words data from the internet, not updating entriesGlobal");
   }
+  updateKeyedEntriesGlobal();
 }

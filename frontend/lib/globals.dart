@@ -9,10 +9,10 @@ import 'common.dart';
 import 'entries_types.dart';
 import 'word_list_logic.dart';
 
-late Set<Entry> entriesGlobal;
-late Map<String, Entry> keyedByEnglishEntriesGlobal = {};
-late Map<String, Entry> keyedByTamilEntriesGlobal = {};
-late Map<String, Entry> keyedBySinhalaEntriesGlobal = {};
+Set<Entry> entriesGlobal = {};
+Map<String, Entry> keyedByEnglishEntriesGlobal = {};
+Map<String, Entry> keyedByTamilEntriesGlobal = {};
+Map<String, Entry> keyedBySinhalaEntriesGlobal = {};
 
 // For logging of things that occur in the background.
 MaxLengthQueue<String> backgroundLogs = MaxLengthQueue(200);

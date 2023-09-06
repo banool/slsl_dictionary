@@ -182,3 +182,14 @@ class EntryListManager {
     entryLists = modifiedList;
   }
 }
+
+// Wait for the entries to be populated first and then load lists.
+Future<void> fromStartupWaitForEntries() async {
+  while (keyedByEnglishEntriesGlobal.isEmpty) {
+    printAndLog("Waiting for entries to be populated...");
+    await Future.delayed(Duration(milliseconds: 200));
+  }
+  printAndLog("Loading entry lists...");
+  entryListManager = EntryListManager.fromStartup();
+  printAndLog("Loaded ${entryListManager.entryLists.length} 1 lists");
+}

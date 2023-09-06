@@ -152,19 +152,20 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       bool shouldDownloadDirectly = !shouldCache || kIsWeb;
       if (shouldCache) {
         try {
-          print("Attempting to pull video $mediaLink from the cache");
+          printAndLog("Attempting to pull video $mediaLink from the cache");
           File file = await myCacheManager.getSingleFile(mediaLink);
           controller = VideoPlayerController.file(file,
               videoPlayerOptions: videoPlayerOptions);
         } catch (e) {
-          print(
+          printAndLog(
               "Failed to use cache for $mediaLink despite caching being enabled, just trying to download directly: $e");
           shouldDownloadDirectly = true;
         }
       }
       if (shouldDownloadDirectly) {
         if (!shouldCache) {
-          print("Caching is disabled, pulling $mediaLink from the network");
+          printAndLog(
+              "Caching is disabled, pulling $mediaLink from the network");
         }
         controller = VideoPlayerController.network(mediaLink,
             videoPlayerOptions: videoPlayerOptions);
@@ -190,10 +191,10 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
           videoControllers[idx] = controller;
         });
       } else {
-        print("Not calling setState because not mounted");
+        printAndLog("Not calling setState because not mounted");
       }
     } catch (e) {
-      print("Error loading video: $e");
+      printAndLog("Error loading video: $e");
       errorWidgets[idx] = createErrorWidget(e, mediaLink);
     }
   }
@@ -220,7 +221,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     } else {
       out = Column(children: [
         Text(
-          "${AppLocalizations.of(context).unexpectedErrorLoadingVideo} $mediaLink: $error",
+          "${AppLocalizations.of(context)!.unexpectedErrorLoadingVideo} $mediaLink: $error",
           textAlign: TextAlign.center,
           style: TextStyle(fontSize: 12),
         )

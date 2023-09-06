@@ -31,11 +31,11 @@ class TopLevelScaffold extends StatelessWidget {
     var items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: Icon(Icons.search),
-        label: AppLocalizations.of(context).searchTitle,
+        label: AppLocalizations.of(context)!.searchTitle,
       ),
       BottomNavigationBarItem(
         icon: Icon(Icons.view_list),
-        label: AppLocalizations.of(context).listsTitle,
+        label: AppLocalizations.of(context)!.listsTitle,
       ),
     ];
 
@@ -43,14 +43,14 @@ class TopLevelScaffold extends StatelessWidget {
       items.add(
         BottomNavigationBarItem(
           icon: Icon(Icons.style),
-          label: AppLocalizations.of(context).revisionTitle,
+          label: AppLocalizations.of(context)!.revisionTitle,
         ),
       );
     }
 
     items.add(BottomNavigationBarItem(
       icon: Icon(Icons.settings),
-      label: AppLocalizations.of(context).settingsTitle,
+      label: AppLocalizations.of(context)!.settingsTitle,
     ));
 
     return Scaffold(

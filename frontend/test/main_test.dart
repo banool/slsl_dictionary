@@ -66,6 +66,6 @@ void main() async {
   });
 
   test('json data valid', () async {
-    await loadEntries();
+    await loadEntriesFromCache();
   });
 }

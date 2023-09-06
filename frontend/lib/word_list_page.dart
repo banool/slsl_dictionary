@@ -150,7 +150,7 @@ class _EntryListPageState extends State<EntryListPage> {
 
     String hintText;
     if (inEditMode) {
-      hintText = AppLocalizations.of(context).listSearchAdd;
+      hintText = AppLocalizations.of(context)!.listSearchAdd;
       bool keyboardIsShowing = MediaQuery.of(context).viewInsets.bottom > 0;
       if (currentSearchTerm.length > 0 || keyboardIsShowing) {
         floatingActionButton = null;
@@ -163,7 +163,7 @@ class _EntryListPageState extends State<EntryListPage> {
             child: Icon(Icons.add));
       }
     } else {
-      hintText = "${AppLocalizations.of(context).listSearchPrefix} $listName";
+      hintText = "${AppLocalizations.of(context)!.listSearchPrefix} $listName";
     }
 
     return Scaffold(

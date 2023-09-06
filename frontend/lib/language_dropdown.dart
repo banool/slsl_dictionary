@@ -100,7 +100,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
         if (includeDeviceDefaultOption) {
           languageOptions.add(PopupMenuItem<String>(
               value: NO_OVERRIDE_KEY,
-              child: Text(AppLocalizations.of(context).deviceDefault)));
+              child: Text(AppLocalizations.of(context)!.deviceDefault)));
         }
 
         // Add the rest of the language options.
@@ -128,7 +128,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
     if (includeDeviceDefaultOption) {
       languageOptions.add(DropdownMenuItem<String>(
           value: NO_OVERRIDE_KEY,
-          child: Text(AppLocalizations.of(context).deviceDefault)));
+          child: Text(AppLocalizations.of(context)!.deviceDefault)));
     }
 
     // Add the rest of the language options.

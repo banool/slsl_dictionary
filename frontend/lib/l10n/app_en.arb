@@ -91,6 +91,7 @@
     "settingsDataUpToDate": "Data is already up to date",
     "settingsLegal": "Legal",
     "settingsSeeLegal": "See legal information",
+    "settingsBackgroundLogs": "Background logs",
     "settingsHelp": "Help",
     "settingsReportDictionaryDataIssue": "Report issue with dictionary data",
     "settingsReportAppIssueGithub": "Report issue with app (GitHub)",

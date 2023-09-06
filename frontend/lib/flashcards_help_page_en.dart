@@ -34,7 +34,7 @@ Widget getFlashcardsHelpPageEn(BuildContext context) {
           "used throughout the whole country, but you may also opt in to seeing "
           "signs from specific regions (e.g. Northern, VIC, WA, etc). ",
     ],
-    "What does \"${AppLocalizations.of(context).flashcardsOnlyOneCard}\" mean?":
+    "What does \"${AppLocalizations.of(context)!.flashcardsOnlyOneCard}\" mean?":
         [
       "Based on the other filtering options you have set, there may be "
           "situations where there are multiple sub-entries for a single entry. "

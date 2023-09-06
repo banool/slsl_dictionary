@@ -2,6 +2,7 @@ import 'dart:io' show Platform;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:mailto/mailto.dart';
@@ -42,10 +43,10 @@ class SettingsPageState extends State<SettingsPage> {
       appStoreTileString = null;
     } else if (Platform.isAndroid) {
       appStoreTileString =
-          AppLocalizations.of(context).settingsPlayStoreFeedback;
+          AppLocalizations.of(context)!.settingsPlayStoreFeedback;
     } else if (Platform.isIOS) {
       appStoreTileString =
-          AppLocalizations.of(context).settingsAppStoreFeedback;
+          AppLocalizations.of(context)!.settingsAppStoreFeedback;
     }
 
     EdgeInsetsDirectional margin =
@@ -54,11 +55,11 @@ class SettingsPageState extends State<SettingsPage> {
     SettingsSection? featuresSection;
     if (enableFlashcardsKnob && !getShouldUseHorizontalLayout(context)) {
       featuresSection = SettingsSection(
-        title: Text(AppLocalizations.of(context).settingsRevision),
+        title: Text(AppLocalizations.of(context)!.settingsRevision),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              AppLocalizations.of(context).settingsHideRevision,
+              AppLocalizations.of(context)!.settingsHideRevision,
               style: TextStyle(fontSize: 15),
             ),
             initialValue:
@@ -67,13 +68,13 @@ class SettingsPageState extends State<SettingsPage> {
           ),
           SettingsTile.navigation(
               title: getText(
-                AppLocalizations.of(context).settingsDeleteRevisionProgress,
+                AppLocalizations.of(context)!.settingsDeleteRevisionProgress,
               ),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 bool confirmed = await confirmAlert(
                     context,
-                    Text(AppLocalizations.of(context)
+                    Text(AppLocalizations.of(context)!
                         .settingsDeleteRevisionProgressExplanation));
                 if (confirmed) {
                   await writeReviews([], [], force: true);
@@ -81,7 +82,7 @@ class SettingsPageState extends State<SettingsPage> {
                   await sharedPreferences.remove(KEY_FIRST_RANDOM_REVIEW);
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                     content: Text(
-                        AppLocalizations.of(context).settingsProgressDeleted),
+                        AppLocalizations.of(context)!.settingsProgressDeleted),
                     backgroundColor: MAIN_COLOR,
                   ));
                 }
@@ -93,24 +94,24 @@ class SettingsPageState extends State<SettingsPage> {
 
     List<AbstractSettingsSection?> sections = [
       SettingsSection(
-        title: Text(AppLocalizations.of(context).settingsCache),
+        title: Text(AppLocalizations.of(context)!.settingsCache),
         tiles: [
           SettingsTile.switchTile(
             title: Text(
-              AppLocalizations.of(context).settingsCacheVideos,
+              AppLocalizations.of(context)!.settingsCacheVideos,
               style: TextStyle(fontSize: 15),
             ),
             initialValue: sharedPreferences.getBool(KEY_SHOULD_CACHE) ?? true,
             onToggle: onChangeShouldCache,
           ),
           SettingsTile.navigation(
-              title: getText(AppLocalizations.of(context).settingsDropCache),
+              title: getText(AppLocalizations.of(context)!.settingsDropCache),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 await myCacheManager.emptyCache();
                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content:
-                      Text(AppLocalizations.of(context).settingsCacheDropped),
+                      Text(AppLocalizations.of(context)!.settingsCacheDropped),
                   backgroundColor: MAIN_COLOR,
                 ));
               }),
@@ -118,20 +119,20 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-        title: Text(AppLocalizations.of(context).settingsData),
+        title: Text(AppLocalizations.of(context)!.settingsData),
         tiles: [
           SettingsTile.navigation(
-            title: getText(AppLocalizations.of(context).settingsCheckNewData),
+            title: getText(AppLocalizations.of(context)!.settingsCheckNewData),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               bool updated = await getNewData(true);
               String message;
               if (updated) {
-                entriesGlobal = await loadEntries();
+                entriesGlobal = await loadEntriesFromCache();
                 updateKeyedEntriesGlobal();
-                message = AppLocalizations.of(context).settingsDataUpdated;
+                message = AppLocalizations.of(context)!.settingsDataUpdated;
               } else {
-                message = AppLocalizations.of(context).settingsDataUpToDate;
+                message = AppLocalizations.of(context)!.settingsDataUpToDate;
               }
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                   content: Text(message), backgroundColor: MAIN_COLOR));
@@ -142,10 +143,10 @@ class SettingsPageState extends State<SettingsPage> {
       ),
       featuresSection,
       SettingsSection(
-        title: Text(AppLocalizations.of(context).settingsLegal),
+        title: Text(AppLocalizations.of(context)!.settingsLegal),
         tiles: [
           SettingsTile.navigation(
-            title: getText(AppLocalizations.of(context).settingsSeeLegal),
+            title: getText(AppLocalizations.of(context)!.settingsSeeLegal),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               return await Navigator.push(
@@ -159,10 +160,10 @@ class SettingsPageState extends State<SettingsPage> {
         margin: margin,
       ),
       SettingsSection(
-          title: Text(AppLocalizations.of(context).settingsHelp),
+          title: Text(AppLocalizations.of(context)!.settingsHelp),
           tiles: [
             SettingsTile.navigation(
-              title: getText(AppLocalizations.of(context)
+              title: getText(AppLocalizations.of(context)!
                   .settingsReportDictionaryDataIssue),
               trailing: Container(),
               onPressed: (BuildContext context) async {
@@ -173,7 +174,7 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                  AppLocalizations.of(context).settingsReportAppIssueGithub),
+                  AppLocalizations.of(context)!.settingsReportAppIssueGithub),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var url = 'https://github.com/banool/slsl_dictionary/issues';
@@ -182,7 +183,7 @@ class SettingsPageState extends State<SettingsPage> {
             ),
             SettingsTile.navigation(
               title: getText(
-                  AppLocalizations.of(context).settingsReportAppIssueEmail),
+                  AppLocalizations.of(context)!.settingsReportAppIssueEmail),
               trailing: Container(),
               onPressed: (BuildContext context) async {
                 var mailto = Mailto(
@@ -194,7 +195,7 @@ class SettingsPageState extends State<SettingsPage> {
                 if (await canLaunch(url)) {
                   await launch(url);
                 } else {
-                  print('Could not launch $url');
+                  printAndLog('Could not launch $url');
                 }
               },
             ),
@@ -208,6 +209,17 @@ class SettingsPageState extends State<SettingsPage> {
                     },
                   )
                 : null,
+            SettingsTile.navigation(
+                title: getText(
+                    AppLocalizations.of(context)!.settingsBackgroundLogs),
+                trailing: Container(),
+                onPressed: (BuildContext context) async {
+                  return await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => BackgroundLogsPage(),
+                      ));
+                }),
           ].where((element) => element != null).cast<SettingsTile>().toList(),
           margin: margin),
     ];
@@ -225,7 +237,7 @@ class SettingsPageState extends State<SettingsPage> {
         padding: EdgeInsets.only(left: 35, top: 15),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            AppLocalizations.of(context).settingsLanguage,
+            AppLocalizations.of(context)!.settingsLanguage,
             style: TextStyle(
                 fontSize: 13, color: Color.fromARGB(255, 100, 100, 100)),
             textAlign: TextAlign.start,
@@ -251,7 +263,7 @@ class SettingsPageState extends State<SettingsPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context).settingsTitle,
+        title: AppLocalizations.of(context)!.settingsTitle,
         actions: actions);
   }
 }
@@ -302,6 +314,46 @@ class LegalInformationPage extends StatelessWidget {
                       await launch(url, forceSafariVC: false);
                     },
                   ),
+                ])));
+  }
+}
+
+class BackgroundLogsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Background Logs"),
+        ),
+        body: Padding(
+            padding: EdgeInsets.only(bottom: 10, left: 20, right: 32, top: 20),
+            child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                mainAxisSize: MainAxisSize.max,
+                children: [
+                  TextButton(
+                    child: Text("Copy logs to clipboard",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: MAIN_COLOR)),
+                    onPressed: () async {
+                      await Clipboard.setData(
+                          ClipboardData(text: backgroundLogs.items.join("\n")));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text("Logs copied to clipboard"),
+                          backgroundColor: MAIN_COLOR));
+                    },
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 10),
+                  ),
+                  Expanded(
+                      child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: Text(backgroundLogs.items.join("\n"),
+                              style: TextStyle(
+                                  height:
+                                      1.8 //You can set your custom height here
+                                  )))),
                 ])));
   }
 }

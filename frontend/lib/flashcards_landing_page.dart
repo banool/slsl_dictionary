@@ -50,7 +50,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     WidgetsBinding.instance
         .addObserver(LifecycleEventHandler(resumeCallBack: () async {
       updateRevisionSettings();
-      print("Updated revision settings on foregrounding");
+      printAndLog("Updated revision settings on foregrounding");
     }));
     updateRevisionSettings();
     initialValueSignToEntry =
@@ -159,7 +159,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           setState(() {
             existingReviews = readReviews();
           });
-          print("Start: Read ${existingReviews!.length} reviews from storage");
+          printAndLog(
+              "Start: Read ${existingReviews!.length} reviews from storage");
         }
         return getDolphinInformation(filteredSubEntries, masters,
             reviews: existingReviews);
@@ -190,7 +191,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             .toList();
 
     // TODO: What to do with this??
-    String regionsString = AppLocalizations.of(context).flashcardsAllOfSriLanka;
+    String regionsString =
+        AppLocalizations.of(context)!.flashcardsAllOfSriLanka;
 
     String additionalRegionsValuesString = additionalRegionsValues
         .map((i) => Region.values[i].getPretty(context))
@@ -209,11 +211,11 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
     switch (revisionStrategy) {
       case RevisionStrategy.Random:
         cardNumberString =
-            AppLocalizations.of(context).nFlashcardsSelected(cardsToDo);
+            AppLocalizations.of(context)!.nFlashcardsSelected(cardsToDo);
         break;
       case RevisionStrategy.SpacedRepetition:
         cardNumberString =
-            AppLocalizations.of(context).nFlashcardsDue(cardsToDo);
+            AppLocalizations.of(context)!.nFlashcardsDue(cardsToDo);
         break;
     }
     cardNumberString = "${cardsToDo} " + cardNumberString;
@@ -223,13 +225,13 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         title: Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Text(
-              AppLocalizations.of(context).flashcardsRevisionSources,
+              AppLocalizations.of(context)!.flashcardsRevisionSources,
               style: TextStyle(fontSize: 16),
             )),
         tiles: [
           SettingsTile.navigation(
             title: getText(
-                AppLocalizations.of(context).flashcardsSelectListsToRevise),
+                AppLocalizations.of(context)!.flashcardsSelectListsToRevise),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
@@ -243,7 +245,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                   return MultiSelectDialog<String>(
                     listType: MultiSelectListType.CHIP,
                     title: Text(
-                        AppLocalizations.of(context).flashcardsSelectLists),
+                        AppLocalizations.of(context)!.flashcardsSelectLists),
                     items: items,
                     initialValue: listsToReview,
                     onConfirm: (List<String> values) async {
@@ -273,13 +275,13 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           title: Padding(
               padding: EdgeInsets.only(bottom: 5),
               child: Text(
-                AppLocalizations.of(context).flashcardsTypes,
+                AppLocalizations.of(context)!.flashcardsTypes,
                 style: TextStyle(fontSize: 16),
               )),
           tiles: [
             SettingsTile.switchTile(
                 title: Text(
-                  AppLocalizations.of(context).flashcardsSignToWord,
+                  AppLocalizations.of(context)!.flashcardsSignToWord,
                   style: TextStyle(fontSize: 15),
                 ),
                 initialValue:
@@ -290,7 +292,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 }),
             SettingsTile.switchTile(
                 title: Text(
-                  AppLocalizations.of(context).flashcardsWordToSign,
+                  AppLocalizations.of(context)!.flashcardsWordToSign,
                   style: TextStyle(fontSize: 15),
                 ),
                 initialValue:
@@ -304,21 +306,21 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         title: Padding(
             padding: EdgeInsets.only(bottom: 5),
             child: Text(
-              AppLocalizations.of(context).flashcardsRevisionSettings,
+              AppLocalizations.of(context)!.flashcardsRevisionSettings,
               style: TextStyle(fontSize: 16),
             )),
         tiles: [
           SettingsTile.navigation(
             title: getText(
-                AppLocalizations.of(context).flashcardsSelectRevisionStrategy),
+                AppLocalizations.of(context)!.flashcardsSelectRevisionStrategy),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
                   context: context,
                   builder: (BuildContext context) {
                     SimpleDialog dialog = SimpleDialog(
-                      title:
-                          Text(AppLocalizations.of(context).flashcardsStrategy),
+                      title: Text(
+                          AppLocalizations.of(context)!.flashcardsStrategy),
                       children: RevisionStrategy.values
                           .map((e) => SimpleDialogOption(
                                 child: Container(
@@ -354,7 +356,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           ),
           SettingsTile.navigation(
             title: getText(
-                AppLocalizations.of(context).flashcardsSelectSignRegions),
+                AppLocalizations.of(context)!.flashcardsSelectSignRegions),
             trailing: Container(),
             onPressed: (BuildContext context) async {
               await showDialog(
@@ -362,7 +364,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                 builder: (ctx) {
                   return MultiSelectDialog(
                     listType: MultiSelectListType.CHIP,
-                    title: Text(AppLocalizations.of(context).flashcardsRegions),
+                    title:
+                        Text(AppLocalizations.of(context)!.flashcardsRegions),
                     items: Region.values
                         .map((e) =>
                             MultiSelectItem(e.index, e.getPretty(context)))
@@ -382,7 +385,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
           ),
           SettingsTile.switchTile(
             title: Text(
-              AppLocalizations.of(context).flashcardsOnlyOneCard,
+              AppLocalizations.of(context)!.flashcardsOnlyOneCard,
               style: TextStyle(fontSize: 15),
             ),
             initialValue:
@@ -424,7 +427,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         setState(() {
           existingReviews = readReviews();
         });
-        print("Pop: Read ${existingReviews!.length} reviews from storage");
+        printAndLog(
+            "Pop: Read ${existingReviews!.length} reviews from storage");
         updateRevisionSettings();
       };
     }
@@ -440,7 +444,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
               child: TextButton(
                 key: ValueKey("startButton"),
                 child: Text(
-                  AppLocalizations.of(context).flashcardsStart,
+                  AppLocalizations.of(context)!.flashcardsStart,
                   textAlign: TextAlign.center,
                   style: TextStyle(fontSize: 20),
                 ),
@@ -470,7 +474,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
             child:
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(
-                AppLocalizations.of(context).flashcardsRevisionLanguage,
+                AppLocalizations.of(context)!.flashcardsRevisionLanguage,
                 style: TextStyle(
                     fontSize: 16, color: Color.fromARGB(255, 100, 100, 100)),
                 textAlign: TextAlign.start,
@@ -521,7 +525,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context).revisionTitle,
+        title: AppLocalizations.of(context)!.revisionTitle,
         actions: actions);
   }
 }

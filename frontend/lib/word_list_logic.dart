@@ -37,7 +37,7 @@ class EntryList {
   static LinkedHashSet<Entry> loadEntryList(String key) {
     LinkedHashSet<Entry> entries = LinkedHashSet();
     List<String> entriesRaw = sharedPreferences.getStringList(key) ?? [];
-    print("Loaded entries in list (key: $key): $entriesRaw");
+    printAndLog("Loaded entries in list (key: $key): $entriesRaw");
     for (String s in entriesRaw) {
       // We use the one keyed by English because for this app the value returned
       // by getKey is the word / phrase in English, since that field is required
@@ -49,7 +49,8 @@ class EntryList {
         // In this case, the next time the user alters this list, the missing
         // entries will be removed from storage permanently. Otherwise we'll
         // keep filtering them out, which is no big deal.
-        print('Entry "$s" in entry list $key is no longer in the dictionary');
+        printAndLog(
+            'Entry "$s" in entry list $key is no longer in the dictionary');
       }
     }
     return entries;
@@ -152,10 +153,11 @@ class EntryListManager {
   // reorder the lists and persist that. Deny reordering the favourites.
   void reorder(int prev, int updated) {
     if (prev == 0 || updated == 0) {
-      print("Refusing to reorder with favourites list: $prev and $updated");
+      printAndLog(
+          "Refusing to reorder with favourites list: $prev and $updated");
       return;
     }
-    print("Moving item from $prev to $updated");
+    printAndLog("Moving item from $prev to $updated");
 
     MapEntry<String, EntryList> toMove = entryLists.entries.toList()[prev];
 

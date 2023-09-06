@@ -100,7 +100,7 @@ class _RootAppState extends State<RootApp> {
         },
         child: MaterialApp.router(
           title: APP_NAME,
-          onGenerateTitle: (context) => AppLocalizations.of(context).appTitle,
+          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
           localizationsDelegates: AppLocalizations.localizationsDelegates,
           supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
           locale: locale,

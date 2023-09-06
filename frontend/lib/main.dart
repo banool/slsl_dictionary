@@ -34,7 +34,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     Map<String, String> proxy = await SystemProxy.getProxySettings() ?? {};
     HttpOverrides.global =
         new ProxiedHttpOverrides(proxy["host"], proxy["port"]);
-    print("Set HTTP proxy overrides to $proxy");
+    printAndLog("Set HTTP proxy overrides to $proxy");
   }
 
   // Load up the advisories before doing anything else so it can be displayed
@@ -49,7 +49,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // We do this first because loadFavourites depends on it later.
     (() async {
       if (entriesGlobalReplacement == null) {
-        entriesGlobal = await loadEntries();
+        entriesGlobal = await loadEntriesFromCache();
       } else {
         entriesGlobal = entriesGlobalReplacement;
       }
@@ -63,8 +63,8 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
     if (entriesGlobal.isEmpty) {
       // If there is no entry data, wait for it before starting.
-      print("No entry data, waiting for it before starting...");
-      entriesGlobal = await loadEntries();
+      printAndLog("No entry data, waiting for it before starting...");
+      entriesGlobal = await loadEntriesFromCache();
       await updateWordsData();
     } else {
       // Otherwise, let it happen in the background.
@@ -93,11 +93,11 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   FlutterNativeSplash.remove();
 
   // Finally run the app.
-  print("Setup complete, running app");
+  printAndLog("Setup complete, running app");
 }
 
 Future<void> main() async {
-  print("Start of main");
+  printAndLog("Start of main");
   try {
     await setup();
 
@@ -106,10 +106,10 @@ Future<void> main() async {
     Locale? localeOverride = await LocaleOverride.getLocaleOverride();
     if (localeOverride != null) {
       locale = localeOverride;
-      print("Using locale override: $locale");
+      printAndLog("Using locale override: $locale");
     } else {
       locale = systemLocale;
-      print("Using system locale: $locale");
+      printAndLog("Using system locale: $locale");
     }
     runApp(RootApp(startingLocale: locale));
   } catch (error, stackTrace) {
@@ -121,13 +121,16 @@ Future<void> main() async {
 }
 
 Future<void> updateWordsData() async {
+  print("Trying to load data from the internet...");
   bool thereWasNewData = await getNewData(false);
   if (thereWasNewData) {
-    print("There was new data");
-    entriesGlobal = await loadEntries();
+    printAndLog(
+        "There was new data from the internet, loading it into memory...");
+    entriesGlobal = await loadEntriesFromCache();
     updateKeyedEntriesGlobal();
-    print("Updated entriesGlobal");
+    printAndLog("Updated entriesGlobal!");
   } else {
-    print("There was no new words data, not updating entriesGlobal");
+    printAndLog(
+        "There was no new words data from the internet, not updating entriesGlobal");
   }
 }

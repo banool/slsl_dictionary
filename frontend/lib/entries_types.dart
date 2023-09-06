@@ -14,11 +14,11 @@ enum EntryType {
 String getEntryTypePretty(BuildContext context, EntryType entryType) {
   switch (entryType) {
     case EntryType.WORD:
-      return AppLocalizations.of(context).entryTypeWords;
+      return AppLocalizations.of(context)!.entryTypeWords;
     case EntryType.PHRASE:
-      return AppLocalizations.of(context).entryTypePhrases;
+      return AppLocalizations.of(context)!.entryTypePhrases;
     case EntryType.FINGERSPELLING:
-      return AppLocalizations.of(context).entryTypeFingerspelling;
+      return AppLocalizations.of(context)!.entryTypeFingerspelling;
   }
 }
 
@@ -257,9 +257,9 @@ extension PrintRegion on Region {
   String getPretty(BuildContext context) {
     switch (this) {
       case Region.ALL:
-        return AppLocalizations.of(context).flashcardsAllOfSriLanka;
+        return AppLocalizations.of(context)!.flashcardsAllOfSriLanka;
       case Region.NORTH_EAST:
-        return AppLocalizations.of(context).flashcardsNorthEast;
+        return AppLocalizations.of(context)!.flashcardsNorthEast;
     }
   }
 }

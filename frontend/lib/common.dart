@@ -238,3 +238,37 @@ extension StripString on String {
     return this.replaceFirst(new RegExp(pattern + r'*$'), '');
   }
 }
+
+// For logging of things that occur in the background, particularly errors.
+void printAndLog(Object? obj) {
+  print(obj);
+  backgroundLogs.enqueue("$obj");
+}
+
+// This is a queue that has a maximum length. When you add an item to the queue
+// and it is already at maximum length, the oldest item is removed.
+class MaxLengthQueue<T> {
+  final int _maxLength;
+  final List<T> _items = [];
+
+  MaxLengthQueue(this._maxLength);
+
+  void enqueue(T item) {
+    if (_items.length >= _maxLength) {
+      _items.removeAt(0);
+    }
+    _items.add(item);
+  }
+
+  T? dequeue() {
+    if (_items.isEmpty) {
+      return null;
+    }
+    return _items.removeAt(0);
+  }
+
+  List<T> get items => _items;
+
+  @override
+  String toString() => _items.toString();
+}

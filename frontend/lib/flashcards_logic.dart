@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
+import 'package:slsl_dictionary/common.dart';
 
 import 'entries_types.dart';
 import 'globals.dart';
@@ -87,7 +88,7 @@ Map<Entry, List<SubEntry>> filterSubEntries(
 // You should provide this function the filtered list of SubEntries.
 List<Master> getMasters(Locale revisionLocale,
     Map<Entry, List<SubEntry>> subEntries, bool entryToSign, bool signToEntry) {
-  print("Making masters from ${subEntries.length} entries");
+  printAndLog("Making masters from ${subEntries.length} entries");
   List<Master> masters = [];
   Set<String> keys = {};
   for (MapEntry<Entry, List<SubEntry>> e in subEntries.entries) {
@@ -96,7 +97,7 @@ List<Master> getMasters(Locale revisionLocale,
     // language don't use the entry.
     String? phrase = entry.getPhrase(revisionLocale);
     if (phrase == null) {
-      print(
+      printAndLog(
           "Skipping entry that doesn't have a phrase in the requested language");
       continue;
     }
@@ -117,13 +118,13 @@ List<Master> getMasters(Locale revisionLocale,
       if (!keys.contains(masterKey)) {
         masters.add(m);
       } else {
-        print("Skipping master $m with duplicate key: $masterKey");
+        printAndLog("Skipping master $m with duplicate key: $masterKey");
       }
       keys.add(masterKey);
     }
   }
   masters.shuffle();
-  print("Built ${masters.length} masters");
+  printAndLog("Built ${masters.length} masters");
   return masters;
 }
 
@@ -182,18 +183,18 @@ DolphinInformation getDolphinInformation(
   for (Review r in reviews) {
     Master? m = masterLookup[r.master!];
     if (m == null) {
-      print(
+      printAndLog(
           "Filtered out review for ${r.master!} because the master wasn't present");
       continue;
     }
     if (!m.combinations!.contains(r.combination!)) {
-      print(
+      printAndLog(
           "Filtered out review for ${r.master!} because the master was present but not with the needed combination");
       continue;
     }
     filteredReviews.add(r);
   }
-  print(
+  printAndLog(
       "Added ${filteredReviews.length} total reviews to Dolphin (excluding seed reviews)");
   dolphin.addReviews(filteredReviews);
   return DolphinInformation(
@@ -239,7 +240,7 @@ List<Review> readReviews() {
 Future<void> writeReviews(List<Review> existing, List<Review> additional,
     {bool force = false}) async {
   if (!force && additional.isEmpty) {
-    print("No reviews to write and force = $force");
+    printAndLog("No reviews to write and force = $force");
     return;
   }
   List<Review> toWrite = existing + additional;
@@ -249,7 +250,7 @@ Future<void> writeReviews(List<Review> existing, List<Review> additional,
       )
       .toList();
   await sharedPreferences.setStringList(KEY_STORED_REVIEWS, encoded);
-  print(
+  printAndLog(
       "Wrote ${additional.length} new reviews (making ${toWrite.length} in total) to storage");
 }
 
@@ -274,7 +275,7 @@ Future<void> bumpRandomReviewCounter(int bumpAmount) async {
   int current = sharedPreferences.getInt(KEY_RANDOM_REVIEWS_COUNTER) ?? 0;
   int updated = current + bumpAmount;
   await sharedPreferences.setInt(KEY_RANDOM_REVIEWS_COUNTER, updated);
-  print(
+  printAndLog(
       "Incremented random review counter by $bumpAmount ($current to $updated)");
   int? firstUnixtime = sharedPreferences.getInt(KEY_FIRST_RANDOM_REVIEW);
   if (firstUnixtime == null) {

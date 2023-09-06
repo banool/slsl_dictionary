@@ -134,7 +134,7 @@ class _EntryListsOverviewPageState extends State<EntryListsOverviewPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context).listsTitle,
+        title: AppLocalizations.of(context)!.listsTitle,
         actions: actions,
         floatingActionButton: floatingActionButton);
   }
@@ -152,7 +152,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     TextField(
       controller: controller,
       decoration: InputDecoration(
-        hintText: AppLocalizations.of(context).listEnterNewName,
+        hintText: AppLocalizations.of(context)!.listEnterNewName,
       ),
       autofocus: true,
       inputFormatters: [
@@ -169,7 +169,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     mainAxisSize: MainAxisSize.min,
   );
   bool confirmed = await confirmAlert(context, body,
-      title: AppLocalizations.of(context).listNewList);
+      title: AppLocalizations.of(context)!.listNewList);
   if (confirmed) {
     String name = controller.text;
     try {
@@ -178,7 +178,7 @@ Future<bool> applyCreateListDialog(BuildContext context) async {
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content:
-              Text("${AppLocalizations.of(context).listFailedToMake}: $e."),
+              Text("${AppLocalizations.of(context)!.listFailedToMake}: $e."),
           backgroundColor: Colors.red));
       confirmed = false;
     }

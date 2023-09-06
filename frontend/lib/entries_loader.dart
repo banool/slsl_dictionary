@@ -18,7 +18,8 @@ Future<File> get _dictionaryDataFilePath async {
   return File('$path/downloaded_entries.json');
 }
 
-Future<Set<Entry>> loadEntries() async {
+// Try to load data from the local cache.
+Future<Set<Entry>> loadEntriesFromCache() async {
   String? data;
 
   // First try to read the data from local storage.
@@ -34,19 +35,20 @@ Future<Set<Entry>> loadEntries() async {
       data = await path.readAsString();
     }
   } catch (e) {
-    print("Failed to entries data from local storage: $e");
+    printAndLog("Failed to load cached entries data from local storage: $e");
   }
 
   if (data == null) {
-    print("No data was found");
+    printAndLog("No cached data was found");
     return {};
   }
 
   try {
-    print("Loaded entries from local storage downloaded from the internet");
+    printAndLog(
+        "Loaded entries from local storage (the data cached locally after downloading it from from the internet)");
     return loadEntriesInner(data);
   } catch (e) {
-    print("Failed to deserialize data from local storage: $e");
+    printAndLog("Failed to deserialize data from local storage: $e");
     return {};
   }
 }
@@ -69,7 +71,7 @@ Set<MyEntry> loadEntriesInner(String data) {
   for (dynamic entryData in entriesJson["data"]) {
     entries.add(MyEntry.fromJson(entryData));
   }
-  print("Loaded ${entries.length} entries");
+  printAndLog("Loaded ${entries.length} entries");
   return entries;
 }
 
@@ -102,7 +104,8 @@ Future<bool> getNewData(bool forceCheck) async {
       now - DATA_CHECK_INTERVAL > lastCheckTime ||
       forceCheck)) {
     // No need to check again so soon.
-    print("Not checking for new dictionary data, it hasn't been long enough");
+    printAndLog(
+        "Not checking for new dictionary data, it hasn't been long enough");
     // todo undo this TODO. uncomment this once testing is done.
     //return false;
   }
@@ -117,7 +120,7 @@ Future<bool> getNewData(bool forceCheck) async {
 
   // Exit out if the latest version is not newer than the current version.
   if (latestVersion <= currentVersion) {
-    print(
+    printAndLog(
         "Current version ($currentVersion) is >= latest version ($latestVersion), not downloading new data");
     // Record that we made this check so we don't check again too soon.
     await sharedPreferences.setInt(KEY_LAST_DICTIONARY_DATA_CHECK_TIME, now);
@@ -138,7 +141,7 @@ Future<bool> getNewData(bool forceCheck) async {
   // Now, record the new version that we downloaded.
   await sharedPreferences.setInt(
       KEY_DICTIONARY_DATA_CURRENT_VERSION, latestVersion);
-  print(
+  printAndLog(
       "Set KEY_LAST_DICTIONARY_DATA_CHECK_TIME to $now and KEY_DICTIONARY_DATA_CURRENT_VERSION to $latestVersion. Done!");
 
   return true;

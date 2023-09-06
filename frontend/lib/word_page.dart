@@ -72,10 +72,10 @@ class _EntryPageState extends State<EntryPage> {
     Icon starIcon;
     if (isFavourited) {
       starIcon = Icon(Icons.star,
-          semanticLabel: AppLocalizations.of(context).wordAlreadyFavourited);
+          semanticLabel: AppLocalizations.of(context)!.wordAlreadyFavourited);
     } else {
       starIcon = Icon(Icons.star_outline,
-          semanticLabel: AppLocalizations.of(context).wordFavouriteThisWord);
+          semanticLabel: AppLocalizations.of(context)!.wordFavouriteThisWord);
     }
 
     List<Widget> actions = [];
@@ -113,7 +113,7 @@ class _EntryPageState extends State<EntryPage> {
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
-                  "${AppLocalizations.of(context).setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
+                  "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
               backgroundColor: MAIN_COLOR,
               duration: Duration(milliseconds: 1000)));
         },
@@ -130,7 +130,7 @@ class _EntryPageState extends State<EntryPage> {
             locale: locale,
             child: Builder(builder: (context) {
               var phrase = entry.getPhrase(locale) ??
-                  AppLocalizations.of(context).wordDataMissing;
+                  AppLocalizations.of(context)!.wordDataMissing;
               return Scaffold(
                   appBar: AppBar(
                       title: Text(phrase),
@@ -202,7 +202,7 @@ Widget? getRelatedEntriesWidget(
   }
 
   var initial = TextSpan(
-      text: "${AppLocalizations.of(context).relatedWords}: ",
+      text: "${AppLocalizations.of(context)!.relatedWords}: ",
       style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
   textSpans = [initial] + textSpans;
   var richText = RichText(
@@ -340,7 +340,7 @@ Widget Definitions(BuildContext context, List<Definition> definitions) {
   if (definitions.isEmpty) {
     return Center(
         child: Text(
-      AppLocalizations.of(context).wordNoDefinitions,
+      AppLocalizations.of(context)!.wordNoDefinitions,
       textAlign: TextAlign.center,
     ));
   }

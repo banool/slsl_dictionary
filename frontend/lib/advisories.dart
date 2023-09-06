@@ -105,7 +105,7 @@ void showAdvisoryDialog() {
   showDialog(
       context: rootNavigatorKey.currentContext!,
       builder: (context) => AlertDialog(
-          title: Text(AppLocalizations.of(context).newsTitle),
+          title: Text(AppLocalizations.of(context)!.newsTitle),
           content: getAdvisoriesInner()));
 }
 

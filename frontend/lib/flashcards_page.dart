@@ -159,7 +159,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     Color textColor;
     Color borderColor;
     if (rating == Rating.Easy && isNext) {
-      textData = AppLocalizations.of(context).flashcardsNext;
+      textData = AppLocalizations.of(context)!.flashcardsNext;
       overlayColor = Color.fromARGB(92, 30, 143, 250);
       backgroundColor = Color.fromARGB(0, 255, 255, 255);
       borderColor = Color.fromARGB(255, 116, 116, 116);
@@ -167,11 +167,11 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     } else {
       switch (rating) {
         case Rating.Hard:
-          textData = AppLocalizations.of(context).flashcardsForgot;
+          textData = AppLocalizations.of(context)!.flashcardsForgot;
           overlayColor = Color.fromARGB(90, 211, 88, 79);
           break;
         case Rating.Good:
-          textData = AppLocalizations.of(context).flashcardsGotIt;
+          textData = AppLocalizations.of(context)!.flashcardsGotIt;
           overlayColor = Color.fromARGB(90, 72, 167, 77);
           break;
         default:
@@ -250,7 +250,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
         topWidget = Container(
             padding: EdgeInsets.only(top: top, bottom: 70),
             child: Text(
-                AppLocalizations.of(context).flashcardsWhatIsSignForWord,
+                AppLocalizations.of(context)!.flashcardsWhatIsSignForWord,
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 20)));
       }
@@ -265,7 +265,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
     } else {
       if (!revealed) {
         bottomWidget = Text(
-            AppLocalizations.of(context).flashcardsWhatDoesSignMean,
+            AppLocalizations.of(context)!.flashcardsWhatDoesSignMean,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 20));
       } else {
@@ -309,7 +309,7 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
       Padding(padding: EdgeInsets.only(top: 30)),
       TextButton(
           child: Text(
-            AppLocalizations.of(context).flashcardsOpenDictionaryEntry,
+            AppLocalizations.of(context)!.flashcardsOpenDictionaryEntry,
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14),
           ),
@@ -483,15 +483,15 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
           ),
           Column(
             children: [
-              getText("${AppLocalizations.of(context).flashcardsSuccessRate}:",
+              getText("${AppLocalizations.of(context)!.flashcardsSuccessRate}:",
                   bold: true),
-              getText("${AppLocalizations.of(context).flashcardsTotalCards}:",
-                  bold: true),
-              getText(
-                  "${AppLocalizations.of(context).flashcardsSuccessfulCards}:",
+              getText("${AppLocalizations.of(context)!.flashcardsTotalCards}:",
                   bold: true),
               getText(
-                  "${AppLocalizations.of(context).flashcardsIncorrectCards}:",
+                  "${AppLocalizations.of(context)!.flashcardsSuccessfulCards}:",
+                  bold: true),
+              getText(
+                  "${AppLocalizations.of(context)!.flashcardsIncorrectCards}:",
                   bold: true)
             ],
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -553,13 +553,14 @@ class _FlashcardsPageState extends State<FlashcardsPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-                "${AppLocalizations.of(context).setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}"),
+                "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}"),
             backgroundColor: MAIN_COLOR,
             duration: Duration(milliseconds: 1000)));
       }, enabled: videoIsShowing));
     } else {
       body = buildSummaryWidget();
-      appBarTitle = AppLocalizations.of(context).flashcardsRevisionSummaryTitle;
+      appBarTitle =
+          AppLocalizations.of(context)!.flashcardsRevisionSummaryTitle;
     }
 
     // Disable swipe back with WillPopScope.

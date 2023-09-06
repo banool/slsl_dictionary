@@ -12,6 +12,9 @@ late Map<String, Entry> keyedByEnglishEntriesGlobal = {};
 late Map<String, Entry> keyedByTamilEntriesGlobal = {};
 late Map<String, Entry> keyedBySinhalaEntriesGlobal = {};
 
+// For logging of things that occur in the background.
+MaxLengthQueue<String> backgroundLogs = MaxLengthQueue(200);
+
 Map<String, Entry> getEntriesGlobal(Locale locale) {
   if (locale == LOCALE_ENGLISH) {
     return keyedByEnglishEntriesGlobal;

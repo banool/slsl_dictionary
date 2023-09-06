@@ -74,7 +74,7 @@ class _SearchPageState extends State<SearchPage> {
     if (navigateToFirstMatch ?? false) {
       if (entriesSearched.length > 0) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          print(
+          printAndLog(
               "Navigating to first match because navigateToFirstMatch was set");
           navigateToEntryPage(context, entriesSearched[0]!);
         });
@@ -100,7 +100,7 @@ class _SearchPageState extends State<SearchPage> {
                           controller: _searchFieldController,
                           decoration: InputDecoration(
                             hintText:
-                                AppLocalizations.of(context).searchHintText,
+                                AppLocalizations.of(context)!.searchHintText,
                             suffixIcon: IconButton(
                               onPressed: () {
                                 clearSearch();
@@ -177,7 +177,7 @@ class _SearchPageState extends State<SearchPage> {
 
     return TopLevelScaffold(
         body: body,
-        title: AppLocalizations.of(context).searchTitle,
+        title: AppLocalizations.of(context)!.searchTitle,
         actions: actions);
   }
 }
@@ -229,7 +229,7 @@ class EntryTypeMultiPopUpMenuState extends State<EntryTypeMultiPopUpMenu> {
           return StatefulBuilder(
               builder: (BuildContext context, StateSetter setState) {
             return AlertDialog(
-              title: Text(AppLocalizations.of(context).entrySelectEntryTypes),
+              title: Text(AppLocalizations.of(context)!.entrySelectEntryTypes),
               content: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: EntryType.values

@@ -152,11 +152,14 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       bool shouldDownloadDirectly = !shouldCache || kIsWeb;
       if (shouldCache) {
         try {
-          printAndLog("Attempting to pull video $mediaLink from the cache");
+          printAndLog(
+              "Attempting to pull video $mediaLink from the cache / internet");
           File file = await myCacheManager.getSingleFile(mediaLink);
           controller = VideoPlayerController.file(file,
               videoPlayerOptions: videoPlayerOptions);
         } catch (e) {
+          // I believe this never triggers now, getSingleFile internally handles
+          // either pulling from the cache or the internet.
           printAndLog(
               "Failed to use cache for $mediaLink despite caching being enabled, just trying to download directly: $e");
           shouldDownloadDirectly = true;

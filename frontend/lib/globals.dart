@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import 'advisories.dart';
 import 'common.dart';
@@ -47,6 +49,13 @@ late Color settingsBackgroundColor;
 // Advisory if there is a new one.
 AdvisoriesResponse? advisoriesResponse;
 bool advisoryShownOnce = false;
+
+// Device info.
+AndroidDeviceInfo? androidDeviceInfo;
+IosDeviceInfo? iosDeviceInfo;
+
+// Package info.
+PackageInfo? packageInfo;
 
 class MyCacheManager extends CacheManager with ImageCacheManager {
   static const key = 'mySignLanguageCacheManager';

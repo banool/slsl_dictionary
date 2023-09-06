@@ -7,6 +7,9 @@ import 'package:slsl_dictionary/entries_loader.dart';
 import 'package:system_proxy/system_proxy.dart';
 import 'package:intl/intl_standalone.dart';
 
+import 'package:device_info_plus/device_info_plus.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+
 import 'advisories.dart';
 import 'common.dart';
 import 'entries_types.dart';
@@ -24,6 +27,29 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
 
   // Preserve the splash screen while the app initializes.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
+
+  // Load device info once at startup.
+  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  try {
+    if (Platform.isAndroid) {
+      androidDeviceInfo = await deviceInfo.androidInfo;
+    } else if (Platform.isIOS) {
+      iosDeviceInfo = await deviceInfo.iosInfo;
+    }
+    printAndLog("Successfully loaded device info");
+  } catch (e) {
+    printAndLog(
+        "Failed to get device info: $e (continuing without raising any error)");
+  }
+
+  // Load package info once at startup.
+  try {
+    packageInfo = await PackageInfo.fromPlatform();
+    printAndLog("Successfully loaded package info");
+  } catch (e) {
+    printAndLog(
+        "Failed to get package info: $e (continuing without raising any error)");
+  }
 
   // Load shared preferences. We do this first because the later futures,
   // such as loadFavourites and the knobs, depend on it being initialized.

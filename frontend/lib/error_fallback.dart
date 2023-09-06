@@ -37,6 +37,14 @@ class ErrorFallback extends StatelessWidget {
       Text(
         "$stackTrace",
       ),
+      Padding(padding: EdgeInsets.only(top: 20)),
+      Text(
+        "Background logs",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ),
+      Padding(padding: EdgeInsets.only(top: 20)),
+      Text(backgroundLogs.items.join("\n"))
     ];
     try {
       String s = "";

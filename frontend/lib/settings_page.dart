@@ -190,7 +190,7 @@ class SettingsPageState extends State<SettingsPage> {
                     to: ['d@dport.me'],
                     subject: 'Issue with SLSL Dictionary',
                     body:
-                        'Please tell me what device you are using and describe the issue in detail. Thanks!');
+                        'Please describe the issue in detail.\n\n--> Replace with description of issue <--\n\n${getBugInfo()}\nBackground logs:\n${backgroundLogs.items.join("\n")}\n');
                 String url = "$mailto";
                 if (await canLaunch(url)) {
                   await launch(url);
@@ -266,6 +266,27 @@ class SettingsPageState extends State<SettingsPage> {
         title: AppLocalizations.of(context)!.settingsTitle,
         actions: actions);
   }
+}
+
+String getBugInfo() {
+  String info = "Package and device info:\n";
+  if (packageInfo != null) {
+    info += "App version: ${packageInfo!.version}\n";
+    info += "Build number: ${packageInfo!.buildNumber}\n";
+  }
+  if (iosDeviceInfo != null) {
+    info += "Device: ${iosDeviceInfo!.name}\n";
+    info += "Model: ${iosDeviceInfo!.model}\n";
+    info += "System name: ${iosDeviceInfo!.systemName}\n";
+    info += "System version: ${iosDeviceInfo!.systemVersion}\n";
+  }
+  if (androidDeviceInfo != null) {
+    info += "Device: ${androidDeviceInfo!.device}\n";
+    info += "Model: ${androidDeviceInfo!.model}\n";
+    info += "System name: ${androidDeviceInfo!.version.release}\n";
+    info += "System version: ${androidDeviceInfo!.version.sdkInt}\n";
+  }
+  return info;
 }
 
 Text getText(String s, {bool larger = false, Color? color}) {

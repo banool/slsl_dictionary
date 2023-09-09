@@ -1,6 +1,7 @@
 import 'dart:io' show HttpClient, HttpOverrides, SecurityContext;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:slsl_dictionary/advisories.dart';
 
 import 'common.dart';
@@ -15,6 +16,9 @@ class ErrorFallback extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Remove the splash screen.
+    FlutterNativeSplash.remove();
+
     Widget advisoryWidget;
     if (advisoriesResponse == null) {
       advisoryWidget = Container();
@@ -22,6 +26,7 @@ class ErrorFallback extends StatelessWidget {
       advisoryWidget = getAdvisoriesInner();
     }
     List<Widget> children = [
+      Padding(padding: EdgeInsets.only(top: 50)),
       Text(
         // AppLocalizations.of(context).startupFailureMessage,
         "Failed to start the app correctly. First, please confirm you are using the latest version of the app. If you are, please email daniel@dport.me with a screenshot showing this error.",
@@ -44,13 +49,19 @@ class ErrorFallback extends StatelessWidget {
         style: TextStyle(fontWeight: FontWeight.bold),
       ),
       Padding(padding: EdgeInsets.only(top: 20)),
-      Text(backgroundLogs.items.join("\n"))
+      Text(backgroundLogs.items.join("\n")),
+      Padding(padding: EdgeInsets.only(top: 20)),
     ];
     try {
       String s = "";
       for (String key in sharedPreferences.getKeys()) {
         s += "$key: ${sharedPreferences.get(key).toString()}\n";
       }
+      children.add(Text(
+        "Shared Preferences",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontWeight: FontWeight.bold),
+      ));
       children.add(Text(
         s,
         textAlign: TextAlign.left,
@@ -64,7 +75,15 @@ class ErrorFallback extends StatelessWidget {
         home: Scaffold(
             body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: children,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: children,
+                ),
+              ),
+            ),
+          ],
         )));
   }
 }

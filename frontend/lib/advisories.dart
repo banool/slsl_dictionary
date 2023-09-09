@@ -35,6 +35,8 @@ class AdvisoriesResponse {
 // in order from old to new. If we failed to lookup the advisories we return
 // null.
 Future<AdvisoriesResponse?> getAdvisories() async {
+  printAndLog("Fetching advisories");
+
   // Pull the number of advisories we've seen in the past from storage.
   int numKnownAdvisories = sharedPreferences.getInt(KEY_ADVISORY_VERSION) ?? 0;
 
@@ -46,7 +48,7 @@ Future<AdvisoriesResponse?> getAdvisories() async {
     var result = await http.get(Uri.parse(url)).timeout(Duration(seconds: 3));
     rawData = result.body;
   } catch (e) {
-    print("Failed to get advisory: $e");
+    printAndLog("Failed to get advisory: $e");
     return null;
   }
 
@@ -96,6 +98,8 @@ Future<AdvisoriesResponse?> getAdvisories() async {
 
   // Write back the new latest advisories version we'v seen.
   await sharedPreferences.setInt(KEY_ADVISORY_VERSION, advisories.length);
+
+  printAndLog("Fetched ${advisories.length} advisories");
 
   return new AdvisoriesResponse(
       advisories: advisories, newAdvisories: newAdvisories);

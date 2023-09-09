@@ -20,6 +20,9 @@ import 'root.dart';
 import 'word_list_logic.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
+// TODO: More elegantly handle startup when there is no local data cache
+// and loading data from the internet fails.
+
 // Setup the app. Be careful when reordering things here, later functions
 // implicitly depend on the side effects of earlier functions.
 Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
@@ -88,21 +91,15 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
 
   if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
     if (entriesGlobal.isEmpty) {
-      // If there is no entry data, wait for it before starting.
-      printAndLog("No entry data, waiting for it before starting...");
-      entriesGlobal = await loadEntriesFromCache();
-      await updateWordsData();
+      printAndLog(
+          "Local entry data cache found, fetching updates from the internet in the background...");
+      updateWordsData();
     } else {
       printAndLog(
-          "Local entry data cache found, updating it in the background...");
-      // Otherwise, let it happen in the background.
-      updateWordsData();
+          "No local entry data cache found, fetching updates from the internet and waiting for them before proceeeding...");
+      await updateWordsData();
     }
   }
-
-  // Build the word list manager. This will wait for entriesGlobal to be
-  // populated.
-  fromStartupWaitForEntries();
 
   // Resolve values based on knobs.
   showFlashcards = getShowFlashcards();
@@ -161,5 +158,10 @@ Future<void> updateWordsData() async {
     printAndLog(
         "There was no new words data from the internet, not updating entriesGlobal");
   }
+
   updateKeyedEntriesGlobal();
+
+  printAndLog("Loading entry lists...");
+  entryListManager = EntryListManager.fromStartup();
+  printAndLog("Loaded ${entryListManager.entryLists.length} 1 lists");
 }

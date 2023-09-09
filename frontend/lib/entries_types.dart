@@ -202,8 +202,6 @@ class MySubEntry implements SubEntry {
   List<Definition> getDefinitions(Locale locale) {
     List<Definition> out = [];
     for (Definition definition in definitions ?? []) {
-      print(definition.language);
-      print(locale.languageCode);
       if (definition.language.toLowerCase() == locale.languageCode) {
         out.add(definition);
       }

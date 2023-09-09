@@ -90,7 +90,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   ]);
 
   if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
-    if (entriesGlobal.isEmpty) {
+    if (!entriesGlobal.isEmpty) {
       printAndLog(
           "Local entry data cache found, fetching updates from the internet in the background...");
       updateWordsData();

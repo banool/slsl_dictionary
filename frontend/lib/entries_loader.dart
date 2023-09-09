@@ -8,6 +8,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'common.dart';
 import 'globals.dart';
+import 'word_list_logic.dart';
 
 const String DATA_URL =
     "https://storage.googleapis.com/slsl-media-bucket-d7f91f9/dump/dump.json";
@@ -53,6 +54,19 @@ Future<Set<Entry>> loadEntriesFromCache() async {
   }
 }
 
+// Set entriesGlobal and all the stuff that depends on it.
+setEntiresGlobal(Set<Entry> entries) {
+  entriesGlobal = entries;
+
+  // Update the global entries variants keyed by each language.
+  updateKeyedEntriesGlobal();
+
+  // Update the list manager.
+  entryListManager = EntryListManager.fromStartup();
+
+  printAndLog("Updated entriesGlobal and all its downstream variables!");
+}
+
 Future<void> writeEntries(String newData) async {
   if (kIsWeb) {
     // If we're on web use local storage. Currently the dump file is around
@@ -76,6 +90,7 @@ Set<MyEntry> loadEntriesInner(String data) {
 }
 
 void updateKeyedEntriesGlobal() {
+  printAndLog("Updating keyed entriesGlobal variants");
   for (Entry e in entriesGlobal) {
     // The key is the word in English, which is always present.
     keyedByEnglishEntriesGlobal[e.getKey()] = e;
@@ -88,6 +103,7 @@ void updateKeyedEntriesGlobal() {
       keyedBySinhalaEntriesGlobal[keySinhala] = e;
     }
   }
+  printAndLog("Updated keyed entriesGlobal variants");
 }
 
 // Run this at startup.

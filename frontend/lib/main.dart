@@ -78,9 +78,9 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // We do this first because loadFavourites depends on it later.
     (() async {
       if (entriesGlobalReplacement == null) {
-        entriesGlobal = await loadEntriesFromCache();
+        setEntiresGlobal(await loadEntriesFromCache());
       } else {
-        entriesGlobal = entriesGlobalReplacement;
+        setEntiresGlobal(entriesGlobalReplacement);
       }
     })(),
 
@@ -152,16 +152,10 @@ Future<void> updateWordsData() async {
   if (thereWasNewData) {
     printAndLog(
         "There was new data from the internet, loading it into memory...");
-    entriesGlobal = await loadEntriesFromCache();
-    printAndLog("Updated entriesGlobal!");
+    var entries = await loadEntriesFromCache();
+    setEntiresGlobal(entries);
   } else {
     printAndLog(
         "There was no new words data from the internet, not updating entriesGlobal");
   }
-
-  updateKeyedEntriesGlobal();
-
-  printAndLog("Loading entry lists...");
-  entryListManager = EntryListManager.fromStartup();
-  printAndLog("Loaded ${entryListManager.entryLists.length} 1 lists");
 }

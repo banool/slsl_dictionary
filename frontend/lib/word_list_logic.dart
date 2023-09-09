@@ -37,7 +37,7 @@ class EntryList {
   static LinkedHashSet<Entry> loadEntryList(String key) {
     LinkedHashSet<Entry> entries = LinkedHashSet();
     List<String> entriesRaw = sharedPreferences.getStringList(key) ?? [];
-    printAndLog("Loaded entries in list (key: $key): $entriesRaw");
+    printAndLog("Loaded ${entriesRaw.length} entries in list $key");
     for (String s in entriesRaw) {
       // We use the one keyed by English because for this app the value returned
       // by getKey is the word / phrase in English, since that field is required
@@ -119,6 +119,7 @@ class EntryListManager {
   EntryListManager(this.entryLists);
 
   factory EntryListManager.fromStartup() {
+    printAndLog("Loading entry lists...");
     List<String> entryListKeys =
         sharedPreferences.getStringList(KEY_ENTRY_LIST_KEYS) ??
             [KEY_FAVOURITES_ENTRIES];
@@ -126,6 +127,7 @@ class EntryListManager {
     for (String key in entryListKeys) {
       entryLists[key] = EntryList.fromRaw(key);
     }
+    printAndLog("Loaded ${entryLists.length} 1 lists");
     return EntryListManager(entryLists);
   }
 

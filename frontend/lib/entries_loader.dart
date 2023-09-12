@@ -122,8 +122,11 @@ Future<bool> getNewData(bool forceCheck) async {
     // No need to check again so soon.
     printAndLog(
         "Not checking for new dictionary data, it hasn't been long enough");
-    // todo undo this TODO. uncomment this once testing is done.
-    //return false;
+    return false;
+  }
+
+  if (forceCheck) {
+    printAndLog("Forcing a check for new dictionary data");
   }
 
   // Check for new dictionary data. The versions here are just unixtimes.
@@ -145,7 +148,7 @@ Future<bool> getNewData(bool forceCheck) async {
 
   // At this point, we know we need to download the new data. Let's do that.
   String newData =
-      (await http.get(Uri.parse(DATA_URL)).timeout(Duration(seconds: 4))).body;
+      (await http.get(Uri.parse(DATA_URL)).timeout(Duration(seconds: 15))).body;
 
   // Assert that the data is valid. This will throw if it's not.
   loadEntriesInner(newData);

@@ -17,7 +17,6 @@ import 'error_fallback.dart';
 import 'globals.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
-import 'word_list_logic.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 // TODO: More elegantly handle startup when there is no local data cache
@@ -93,11 +92,11 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     if (!entriesGlobal.isEmpty) {
       printAndLog(
           "Local entry data cache found, fetching updates from the internet in the background...");
-      updateWordsData();
+      updateWordsData(false);
     } else {
       printAndLog(
           "No local entry data cache found, fetching updates from the internet and waiting for them before proceeeding...");
-      await updateWordsData();
+      await updateWordsData(true);
     }
   }
 
@@ -146,9 +145,9 @@ Future<void> main() async {
   }
 }
 
-Future<void> updateWordsData() async {
+Future<void> updateWordsData(bool forceCheck) async {
   print("Trying to load data from the internet...");
-  bool thereWasNewData = await getNewData(false);
+  bool thereWasNewData = await getNewData(forceCheck);
   if (thereWasNewData) {
     printAndLog(
         "There was new data from the internet, loading it into memory...");

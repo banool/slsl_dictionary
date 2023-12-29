@@ -7,3 +7,5 @@ export const ADMIN_LOCATION = "us-east1";
 export const MEDIA_LOCATION = "asia-south1";
 
 export const RUN_EVERY_N_MINUTES = 30;
+
+export const SITE = "srilankansignlanguage.org";

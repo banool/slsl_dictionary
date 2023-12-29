@@ -1,11 +1,11 @@
 import * as gcp from "@pulumi/gcp";
-import { ADMIN_LOCATION, RUN_EVERY_N_MINUTES } from "./common";
+import { ADMIN_LOCATION, RUN_EVERY_N_MINUTES, SLSL } from "./common";
 import { func } from "./functions";
 import { appServiceAccount, role4 } from "./iam";
 
 // Create a Cloud Scheduler job to call the DB dump function every 5 minutes.
-const job = new gcp.cloudscheduler.Job(
-  "job",
+new gcp.cloudscheduler.Job(
+  `${SLSL}-dump-job`,
   {
     region: ADMIN_LOCATION,
     httpTarget: {

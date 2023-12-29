@@ -1,7 +1,7 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 import { ADMIN_LOCATION, SLSL } from "./common";
-import { envVars } from "./config";
+import { envVars } from "./admin-site-config";
 import { database, databaseInstance, databaseUser } from "./db";
 import { gcpServices } from "./project";
 import { adminBucket } from "./storage";
@@ -18,10 +18,10 @@ const port = "8080";
 const env = "prod";
 const runArgs = [port, env];
 
-export const adminService = new gcp.cloudrun.Service(
-  SLSL,
+export const adminSite = new gcp.cloudrun.Service(
+  `${SLSL}-admin-site`,
   {
-    name: SLSL,
+    name: `${SLSL}-admin-site`,
     autogenerateRevisionName: true,
     metadata: {
       annotations: {
@@ -63,7 +63,7 @@ export const adminService = new gcp.cloudrun.Service(
             ],
             resources: {
               limits: {
-                cpu: "4",
+                cpu: "2",
                 memory: "4Gi",
               },
               requests: {
@@ -111,9 +111,9 @@ new gcp.cloudrun.IamMember(
   {
     member: "allUsers",
     role: "roles/run.invoker",
-    service: adminService.name,
+    service: adminSite.name,
     project: projectId,
-    location: adminService.location,
+    location: adminSite.location,
   },
-  { dependsOn: [adminService] }
+  { dependsOn: [adminSite] }
 );

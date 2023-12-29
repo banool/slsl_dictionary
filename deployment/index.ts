@@ -1,4 +1,4 @@
-import "./app";
+import "./admin-site-cloud-run";
 import "./functions";
 import "./db";
 import "./iam";

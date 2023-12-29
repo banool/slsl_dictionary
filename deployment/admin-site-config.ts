@@ -1,6 +1,5 @@
 import * as pulumi from "@pulumi/pulumi";
 import { buildEnvObject } from "./utils";
-import * as fs from "fs";
 import { database, databaseInstance } from "./db";
 import { adminBucket, mediaBucket } from "./storage";
 
@@ -32,11 +31,9 @@ const envSecrets = SECRET_KEYS.map((key) =>
 
 // Add to that the random number. This is just used to force a redeploy if we want,
 // since you can't just make cloud run services restart manually otherwise.
-const randomNumber = fs.readFileSync(`${__dirname}/random_number.txt`, {
-  encoding: "utf-8",
-});
+const randomNumber = 8;
 
-const envRandom = [buildEnvObject("random_number", randomNumber)];
+const envRandom = [buildEnvObject("random_number", `${randomNumber}`)];
 
 // Add the database name, which we only know after making the DB in db.ts
 const envDbName = [buildEnvObject("sql_database", database.name)];

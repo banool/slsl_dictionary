@@ -6,7 +6,7 @@ import { ADMIN_LOCATION, SLSL } from "./common";
 import * as fs from "fs";
 import * as archiver from "archiver";
 import { appServiceAccount } from "./iam";
-import { adminService } from "./app";
+import { adminSite } from "./admin-site-cloud-run";
 import { RUN_EVERY_N_MINUTES } from "./common";
 
 const ZIP_LOCATION = "/tmp/code.zip";
@@ -51,7 +51,7 @@ export const func = new gcp.cloudfunctions.Function(
   {
     description:
       "Function to read the DB and dump it to a file in the media bucket",
-    runtime: "python310",
+    runtime: "python311",
     serviceAccountEmail: appServiceAccount.email,
     minInstances: 0,
     maxInstances: 1,
@@ -67,7 +67,7 @@ export const func = new gcp.cloudfunctions.Function(
       // to the media bucket, which is located near the users of the app.
       bucket_name: mediaBucket.name,
       dump_auth_token: config.requireSecret("dump_auth_token"),
-      cloud_run_instance_url: adminService.statuses[0].url,
+      cloud_run_instance_url: adminSite.statuses[0].url,
       cache_duration_secs: RUN_EVERY_N_MINUTES * 60,
     },
   },

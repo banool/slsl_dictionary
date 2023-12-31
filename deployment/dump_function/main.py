@@ -1,7 +1,7 @@
-import datetime
 import json
 import os
 import requests
+import time
 from google.cloud import storage
 
 
@@ -12,10 +12,19 @@ CACHE_DURATION_SECS = int(os.environ["cache_duration_secs"])
 
 
 def main(_request):
+    # Fetch the data from the admin service.
     data = fetch_data()
     num_entries = len(data["data"])
+
+    # Upload the data to GCS.
     upload_data(data)
-    return f"Uploaded dump containing {num_entries} entries to {BUCKET_NAME}"
+
+    time.sleep(2)
+
+    # Request the data through the CDN.
+    requests.get("https://cdn.srilankansignlanguage.org/dump/dump.json")
+
+    return f"Uploaded dump containing {num_entries} entries to {BUCKET_NAME} and loaded it again through the CDN"
 
 
 def fetch_data():
@@ -26,28 +35,19 @@ def fetch_data():
     return data
 
 
+# Make sure the cache on the file expires in sync with the function running. We
+# prefer to use Cache-Control with max-age rather than Expires because GCS always
+# adds a Cache-Control header to responses served to Cloud CDN, making the Expires
+# header not do anything. This means if no one requests this file early in the
+# CACHE_DURATION_SECS window (e.g. 30 mins), then it might only get filled into the
+# cache like 15 mins through that window and therefore it'll be served for 15 mins
+# into the next window, even though there is newer content.
+#
+# To prevent this issue from occuring, we read the file through the CDN right after
+# uploading it to ensure it is cached right then.
 def upload_data(data):
-    dest = "dump/dump.json"
-
     storage_client = storage.Client()
     bucket = storage_client.get_bucket(BUCKET_NAME)
-    blob = bucket.blob(dest)
-
-    # Calculate the expiration time.
-    expiration_time = datetime.datetime.utcnow() + datetime.timedelta(
-        seconds=CACHE_DURATION_SECS
-    )
-    formatted_expiration = expiration_time.strftime("%a, %d %b %Y %H:%M:%S GMT")
-
-    # Set the Expires header to make sure the cache on the file expires in
-    # sync with the function running. We set Expires rather than max-age
-    # because `age` is only tracked from when the file is filled into the
-    # cache, which might not be right when the file is made. This means if
-    # the file is loaded into the cache near the end of the 30 minute "window",
-    # the cache will continue to serve that for 30 minutes even though there
-    # is a newer file soon after.
-    blob.metadata = {"Expires": formatted_expiration}
-
-    print(f"Uploading file to {dest} with this metadata: {blob.metadata}")
-
+    blob = bucket.blob("dump/dump.json")
+    blob.cache_control = f"public, max-age={CACHE_DURATION_SECS}"
     blob.upload_from_string(json.dumps(data), content_type="application/json")

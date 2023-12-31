@@ -23,6 +23,8 @@ class SettingsPage extends StatefulWidget {
 }
 
 class SettingsPageState extends State<SettingsPage> {
+  bool checkingForNewData = false;
+
   void onChangeShouldCache(bool newValue) {
     setState(() {
       sharedPreferences.setBool(KEY_SHOULD_CACHE, newValue);
@@ -122,10 +124,20 @@ class SettingsPageState extends State<SettingsPage> {
         title: Text(AppLocalizations.of(context)!.settingsData),
         tiles: [
           SettingsTile.navigation(
-            title: getText(AppLocalizations.of(context)!.settingsCheckNewData),
+            title: checkingForNewData
+                ? Center(
+                    child: CircularProgressIndicator(),
+                  )
+                : getText(AppLocalizations.of(context)!.settingsCheckNewData),
             trailing: Container(),
             onPressed: (BuildContext context) async {
+              setState(() {
+                checkingForNewData = true;
+              });
               bool thereWasNewData = await updateWordsData(true);
+              setState(() {
+                checkingForNewData = false;
+              });
               String message;
               if (thereWasNewData) {
                 message = AppLocalizations.of(context)!.settingsDataUpdated;

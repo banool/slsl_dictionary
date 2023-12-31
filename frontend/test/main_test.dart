@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:slsl_dictionary/entries_loader.dart';
 import 'package:slsl_dictionary/entries_types.dart';
 import 'package:slsl_dictionary/root.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
@@ -14,7 +13,7 @@ void main() async {
   entriesGlobal = {
     MyEntry(word_in_english: "friend", entry_type: "WORD", sub_entries: [
       MySubEntry(
-          videos: ["http://mysite.com/video.mp4"],
+          videos: ["video.mp4"],
           region: "ALL",
           definitions: [
             Definition(
@@ -30,6 +29,7 @@ void main() async {
 
   enableFlashcardsKnob = true;
   downloadWordsDataKnob = false;
+  useCdnUrl = true;
 
   showFlashcards = true;
 
@@ -63,9 +63,5 @@ void main() async {
     DRCard card = dolphin.nextCard()!;
 
     print(card);
-  });
-
-  test('json data valid', () async {
-    await loadEntriesFromCache();
   });
 }

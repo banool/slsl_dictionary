@@ -107,7 +107,7 @@ export const adminSite = new gcp.cloudrun.Service(
 
 // Make service accessible to the public internet.
 new gcp.cloudrun.IamMember(
-  "public-access",
+  `${SLSL}-admin-site-public-access`,
   {
     member: "allUsers",
     role: "roles/run.invoker",

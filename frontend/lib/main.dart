@@ -77,26 +77,29 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // We do this first because loadFavourites depends on it later.
     (() async {
       if (entriesGlobalReplacement == null) {
-        setEntiresGlobal(await loadEntriesFromCache());
+        setEntriesGlobal(await loadEntriesFromCache());
       } else {
-        setEntiresGlobal(entriesGlobalReplacement);
+        setEntriesGlobal(entriesGlobalReplacement);
       }
     })(),
 
     // Get knob values.
     (() async =>
         enableFlashcardsKnob = await readKnob("enable_flashcards", true))(),
+    (() async => useCdnUrl = await readKnob("useCdnUrl", true))(),
   ]);
 
+  // This depends on the knob values above being set (useCdnUrl) so it is
+  // important that this appears after that block above.
   if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
-    if (!entriesGlobal.isEmpty) {
-      printAndLog(
-          "Local entry data cache found, fetching updates from the internet in the background...");
-      updateWordsData(false);
-    } else {
+    if (entriesGlobal.isEmpty) {
       printAndLog(
           "No local entry data cache found, fetching updates from the internet and waiting for them before proceeeding...");
       await updateWordsData(true);
+    } else {
+      printAndLog(
+          "Local entry data cache found, fetching updates from the internet in the background...");
+      updateWordsData(false);
     }
   }
 
@@ -152,7 +155,7 @@ Future<void> updateWordsData(bool forceCheck) async {
     printAndLog(
         "There was new data from the internet, loading it into memory...");
     var entries = await loadEntriesFromCache();
-    setEntiresGlobal(entries);
+    setEntriesGlobal(entries);
   } else {
     printAndLog(
         "There was no new words data from the internet, not updating entriesGlobal");

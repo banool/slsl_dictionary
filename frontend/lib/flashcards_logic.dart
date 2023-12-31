@@ -1,8 +1,8 @@
 import 'dart:ui';
 
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
-import 'package:slsl_dictionary/common.dart';
 
+import 'common.dart';
 import 'entries_types.dart';
 import 'globals.dart';
 import 'types.dart';

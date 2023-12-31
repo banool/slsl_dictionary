@@ -16,5 +16,5 @@ new gcp.cloudrun.DomainMapping("slsl-admin-domain-mapping", {
   spec: {
     routeName: adminSite.name,
   },
-  name: `admin${SITE}`,
+  name: `admin.${SITE}`,
 });

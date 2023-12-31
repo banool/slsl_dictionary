@@ -2,8 +2,8 @@ import 'dart:io' show HttpClient, HttpOverrides, SecurityContext;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:slsl_dictionary/advisories.dart';
 
+import 'advisories.dart';
 import 'common.dart';
 import 'globals.dart';
 

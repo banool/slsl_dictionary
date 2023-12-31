@@ -8,5 +8,7 @@ import "./scheduler";
 import "./storage";
 
 import { func } from "./functions";
+import { mediaCdnIp } from "./storage";
 
 export const functionName = func.name;
+export const mediaCdnIpAddress = mediaCdnIp.address;

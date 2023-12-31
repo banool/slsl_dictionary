@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:slsl_dictionary/common.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+
+import 'common.dart';
+import 'entries_loader.dart';
 
 part 'entries_types.g.dart';
 
@@ -145,7 +147,7 @@ class MySubEntry implements SubEntry {
   // Even though the backend allows sub entries without videos (against which
   // I should add validation), the dump function skips sub entries that don't
   // have them, so we can assume that there will be a list of videos here and
-  // that it will be non empty.
+  // that it will be non empty. Don't access this directly, use getMedia.
   final List<String> videos;
   final List<Definition>? definitions;
   final String region;
@@ -195,7 +197,10 @@ class MySubEntry implements SubEntry {
 
   @override
   List<String> getMedia() {
-    return videos;
+    // The dump only contains the final filename + ext, we have to build the
+    // full URL. We do it here. buildUrl depends on the useCdnUrl knob having
+    // a value.
+    return videos.map((e) => buildUrl("media/${e}")).toList();
   }
 
   @override

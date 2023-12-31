@@ -85,3 +85,9 @@ poetry run python manage.py generate_csv ~/out.csv
 ```
 
 For the text of the app itself try just sharing the arb files as txt files.
+
+## Dumping the data
+After running the service, run this:
+```
+curl http://127.0.0.1:8080/dump > ~/dump.json
+```

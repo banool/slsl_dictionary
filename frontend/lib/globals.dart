@@ -38,6 +38,7 @@ late MyCacheManager myCacheManager;
 
 // Values of the knobs.
 late bool enableFlashcardsKnob;
+late bool useCdnUrl;
 bool downloadWordsDataKnob = true;
 
 // This is whether to show the flashcard stuff as a result of the knob + switch.

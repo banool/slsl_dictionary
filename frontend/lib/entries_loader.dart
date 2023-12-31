@@ -2,16 +2,26 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:http/http.dart' as http;
+import 'package:http/http.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:slsl_dictionary/entries_types.dart';
 import 'package:flutter/foundation.dart' show kIsWeb;
 
 import 'common.dart';
+import 'entries_types.dart';
 import 'globals.dart';
 import 'word_list_logic.dart';
 
-const String DATA_URL =
-    "https://storage.googleapis.com/slsl-media-bucket-d7f91f9/dump/dump.json";
+const String DATA_URL_PREFIX_DIRECT =
+    "https://storage.googleapis.com/slsl-media-bucket-d7f91f9";
+const String DATA_URL_PREFIX_CDN = "https://cdn.srilankansignlanguage.org";
+
+String buildUrl(String path) {
+  if (useCdnUrl) {
+    return "$DATA_URL_PREFIX_CDN/$path";
+  } else {
+    return "$DATA_URL_PREFIX_DIRECT/$path";
+  }
+}
 
 // Returns the local path where we store the dictionary data we download.
 Future<File> get _dictionaryDataFilePath async {
@@ -55,7 +65,7 @@ Future<Set<Entry>> loadEntriesFromCache() async {
 }
 
 // Set entriesGlobal and all the stuff that depends on it.
-setEntiresGlobal(Set<Entry> entries) {
+setEntriesGlobal(Set<Entry> entries) {
   entriesGlobal = entries;
 
   // Update the global entries variants keyed by each language.
@@ -129,26 +139,53 @@ Future<bool> getNewData(bool forceCheck) async {
     printAndLog("Forcing a check for new dictionary data");
   }
 
-  // Check for new dictionary data. The versions here are just unixtimes.
+  Uri dump_file_url = Uri.parse(buildUrl("dump/dump.json"));
+
+  // Uncomment this to get the dump from a server running locally.
+  // dump_file_url = Uri.parse("http://127.0.0.1:8080/dump");
+
+  printAndLog("Fetching dump file at $dump_file_url");
+
   int currentVersion =
       sharedPreferences.getInt(KEY_DICTIONARY_DATA_CURRENT_VERSION) ?? 0;
-  var head = await http.head(Uri.parse(DATA_URL)).timeout(Duration(seconds: 3));
-  var latestVersion =
-      HttpDate.parse(head.headers['last-modified']!).millisecondsSinceEpoch ~/
-          1000;
 
-  // Exit out if the latest version is not newer than the current version.
-  if (latestVersion <= currentVersion) {
-    printAndLog(
-        "Current version ($currentVersion) is >= latest version ($latestVersion), not downloading new data");
+  // Previously we used to check if we needed to download the data again by
+  // making two requests. First we'd make one request for just the headers, in
+  // which we check the value of the Last-Modified header. If that time was
+  // newer than the time we last downloaded the data, we'd make a second
+  // request to actually download the data. This is not necessary if you're
+  // downloading the data from a server that supports the If-Modified-Since
+  // header. With this, we can just make a single request in which we say the
+  // the data must be newer than the given time. If it is, we'll get a 200
+  // containing the data. If not, we'll get a 304 with no body.
+  var headers = {
+    "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion)
+  };
+  Response response = (await http
+      .get(dump_file_url, headers: headers)
+      .timeout(Duration(seconds: 15)));
+
+  if (response.statusCode == 304) {
+    printAndLog("Current version ($currentVersion) is the newest data");
     // Record that we made this check so we don't check again too soon.
     await sharedPreferences.setInt(KEY_LAST_DICTIONARY_DATA_CHECK_TIME, now);
     return false;
   }
 
-  // At this point, we know we need to download the new data. Let's do that.
-  String newData =
-      (await http.get(Uri.parse(DATA_URL)).timeout(Duration(seconds: 15))).body;
+  if (response.statusCode != 200) {
+    throw "Failed to download dictionary data: ${response.statusCode}: ${response.body}";
+  }
+
+  // At this point we know we got a 200, we can look at the body of the response.
+  String newData = response.body;
+
+  // Take note of when this data was last modified. If the header isn't set,
+  // use the latest unix time. This should only happen when developing locally
+  // where you pull the dump file from a local server.
+  int newVersion = HttpDate.parse(response.headers['last-modified'] ??
+              DateTime.now().millisecondsSinceEpoch.toString())
+          .millisecondsSinceEpoch ~/
+      1000;
 
   // Assert that the data is valid. This will throw if it's not.
   loadEntriesInner(newData);
@@ -159,9 +196,21 @@ Future<bool> getNewData(bool forceCheck) async {
 
   // Now, record the new version that we downloaded.
   await sharedPreferences.setInt(
-      KEY_DICTIONARY_DATA_CURRENT_VERSION, latestVersion);
+      KEY_DICTIONARY_DATA_CURRENT_VERSION, newVersion);
   printAndLog(
-      "Set KEY_LAST_DICTIONARY_DATA_CHECK_TIME to $now and KEY_DICTIONARY_DATA_CURRENT_VERSION to $latestVersion. Done!");
+      "Set KEY_LAST_DICTIONARY_DATA_CHECK_TIME to $now and KEY_DICTIONARY_DATA_CURRENT_VERSION to $newVersion. Done!");
 
   return true;
+}
+
+String convertUnixTimeToHttpDate(int unixTime) {
+  print("blah $unixTime");
+  // Convert the Unix time to a DateTime object
+  DateTime dateTime =
+      DateTime.fromMillisecondsSinceEpoch(unixTime * 1000, isUtc: true);
+
+  // Use the HttpDate class to format the DateTime object to an HTTP date
+  String httpDate = HttpDate.format(dateTime);
+
+  return httpDate;
 }

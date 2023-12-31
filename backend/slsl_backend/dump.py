@@ -49,7 +49,7 @@ def build_dump_models():
         entry = id_to_entry[entry_id]
         sub_entries = entry["sub_entries"]
         sub_entry = sub_entries.setdefault(video.sub_entry_id, {})
-        sub_entry.setdefault("videos", []).append(video.media.url)
+        sub_entry.setdefault("videos", []).append(video.media.name)
 
     # Attach definitions information to the sub-entry data.
     definitions = models.Definition.objects.all()

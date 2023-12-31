@@ -1,6 +1,6 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
-import { ADMIN_LOCATION, MEDIA_LOCATION, SITE } from "./common";
+import { ADMIN_LOCATION, MEDIA_LOCATION, SITE, SLSL } from "./common";
 import { createLoadBalancer } from "./utils";
 
 // Create a bucket that we'll use for the admin site (static content and cloud functions).
@@ -53,14 +53,13 @@ new gcp.storage.BucketIAMMember(
 // Set up Cloud CDN, which is really just a fancy LB in front of the bucket. This
 // returns the IP for the CDN.
 export const createCloudCdn = (
+  namePrefix: string,
   bucket: gcp.storage.Bucket,
   options?: pulumi.ComponentResourceOptions
 ) => {
-  const prefix = `slsl-media`;
-
   // Enable the storage bucket as a CDN.
   const backendBucket = new gcp.compute.BackendBucket(
-    `${prefix};-backend-bucket`,
+    `${namePrefix}-backend-bucket`,
     {
       bucketName: bucket.name,
       enableCdn: true,
@@ -69,11 +68,11 @@ export const createCloudCdn = (
   );
 
   // Provision a global IP address for the CDN.
-  const ip = new gcp.compute.GlobalAddress(`${prefix}-ip`, {});
+  const ip = new gcp.compute.GlobalAddress(`${namePrefix}-ip`, {});
 
   // Create the load balancer for the bucket.
   createLoadBalancer({
-    prefixName: `${prefix}-cdn`,
+    prefixName: `${namePrefix}-cdn`,
     ip: ip.address,
     backendName: backendBucket.selfLink,
     domains: [`cdn.${SITE}`],
@@ -82,4 +81,4 @@ export const createCloudCdn = (
   return ip;
 };
 
-export const mediaCdnIp = createCloudCdn(mediaBucket);
+export const mediaCdnIp = createCloudCdn(`${SLSL}-media`, mediaBucket);

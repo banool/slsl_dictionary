@@ -21,3 +21,10 @@ DATE===2023-05-28
 
 We're so happy you're using the app, enjoy!
 END===
+
+START===
+DATE===2024-01-01
+## Happy 2024!!
+
+Exciting times coming, thanks everyone for testing the app! Happy New Year!!
+END===

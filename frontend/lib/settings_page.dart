@@ -316,10 +316,7 @@ class LegalInformationPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                      "The Auslan information (including videos) displayed in this app is taken from Auslan Signbank (Johnston, T., & Cassidy, S. (2008). Auslan Signbank (auslan.org.au) Sydney: Macquarie University & Trevor Johnston).\n",
-                      textAlign: TextAlign.center),
-                  Text(
-                      "Only some of the information relating to each sign that is found on Auslan Signbank is displayed here in this app. Please consult Auslan Signbank to see the information displayed as originally intended and endorsed by the author. There is a link to Auslan Signbank on each definition.",
+                      "The Sri Lankan Sign Language data displayed in this app is provided by Nishani Shamila McCluskey and team.\n",
                       textAlign: TextAlign.center),
                   Container(
                     padding: EdgeInsets.only(top: 10),

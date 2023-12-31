@@ -110,20 +110,27 @@ void showAdvisoryDialog() {
       context: rootNavigatorKey.currentContext!,
       builder: (context) => AlertDialog(
           title: Text(AppLocalizations.of(context)!.newsTitle),
-          content: getAdvisoriesInner()));
+          content: SingleChildScrollView(child: getAdvisoriesInner())));
 }
 
 Widget getAdvisoriesInner() {
+  var advisories = advisoriesResponse!.advisories.reversed.toList();
+
+  List<Widget> children = [];
+  for (var advisory in advisories) {
+    children.add(Padding(
+        child: Text(
+          advisory.date,
+          textAlign: TextAlign.start,
+        ),
+        padding: EdgeInsets.only(left: 0)));
+    children.add(advisory.asMarkdown());
+    // Add padding between after each item. We remove the last padding later.
+    children.add(SizedBox(height: 50));
+  }
+
   return Column(
       mainAxisSize: MainAxisSize.min,
-      children: advisoriesResponse!.advisories
-          .map((e) =>
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(
-                  e.date,
-                  textAlign: TextAlign.start,
-                ),
-                e.asMarkdown()
-              ]))
-          .toList());
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: children.sublist(0, children.length - 1));
 }

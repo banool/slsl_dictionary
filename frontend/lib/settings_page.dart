@@ -125,11 +125,9 @@ class SettingsPageState extends State<SettingsPage> {
             title: getText(AppLocalizations.of(context)!.settingsCheckNewData),
             trailing: Container(),
             onPressed: (BuildContext context) async {
-              bool updated = await getNewData(true);
+              bool thereWasNewData = await updateWordsData(true);
               String message;
-              if (updated) {
-                entriesGlobal = await loadEntriesFromCache();
-                updateKeyedEntriesGlobal();
+              if (thereWasNewData) {
                 message = AppLocalizations.of(context)!.settingsDataUpdated;
               } else {
                 message = AppLocalizations.of(context)!.settingsDataUpToDate;

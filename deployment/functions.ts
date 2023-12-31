@@ -68,7 +68,8 @@ export const func = new gcp.cloudfunctions.Function(
       bucket_name: mediaBucket.name,
       dump_auth_token: config.requireSecret("dump_auth_token"),
       cloud_run_instance_url: adminSite.statuses[0].url,
-      cache_duration_secs: RUN_EVERY_N_MINUTES * 60,
+      // Cache the file slightly longer than how often we run the function.
+      cache_duration_secs: RUN_EVERY_N_MINUTES * 60 + 10,
     },
   },
   { dependsOn: [gcpServices.cloudfunctions], replaceOnChanges: ["*"] }

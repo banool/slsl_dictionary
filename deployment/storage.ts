@@ -63,6 +63,24 @@ export const createCloudCdn = (
     {
       bucketName: bucket.name,
       enableCdn: true,
+      // The default mode is CACHE_ALL_STATIC. In this mode, all static content is
+      // cached. If Expires is present or max-age is present in Cache-Control, that
+      // value will be used to determine freshness. If not, the default TTL is used.
+      // Normally JSON is not considered a static file, but all files served from GCS
+      // have the Cache-Control header attached, so they're all cached with the
+      // CACHE_ALL_STATIC mode, meaning USE_ORIGIN_HEADERS and CACHE_ALL_STATIC are
+      // mostly functionally equivalent, so we just use CACHE_ALL_STATIC. This way the
+      // default TTL we set here will be used rather than the default coming from GCS.
+      // See more here: https://cloud.google.com/cdn/docs/caching#static
+      cdnPolicy: {
+        cacheMode: "CACHE_ALL_STATIC",
+        // We don't expect a single video file to ever change so we set a really long
+        // TTL for the default. The dump file has its own TTL set explicitly.
+        defaultTtl: 604800,
+        maxTtl: 604800,
+        // This is true by default, we're just being explicit.
+        requestCoalescing: true,
+      },
     },
     options
   );

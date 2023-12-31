@@ -203,6 +203,21 @@ Future<bool> getNewData(bool forceCheck) async {
   return true;
 }
 
+Future<bool> updateWordsData(bool forceCheck) async {
+  print("Trying to load data from the internet...");
+  bool thereWasNewData = await getNewData(forceCheck);
+  if (thereWasNewData) {
+    printAndLog(
+        "There was new data from the internet, loading it into memory...");
+    var entries = await loadEntriesFromCache();
+    setEntriesGlobal(entries);
+  } else {
+    printAndLog(
+        "There was no new words data from the internet, not updating entriesGlobal");
+  }
+  return thereWasNewData;
+}
+
 String convertUnixTimeToHttpDate(int unixTime) {
   print("blah $unixTime");
   // Convert the Unix time to a DateTime object

@@ -77,7 +77,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // We do this first because loadFavourites depends on it later.
     (() async {
       if (entriesGlobalReplacement == null) {
-        setEntriesGlobal(await loadEntriesFromCache());
+        setEntriesGlobal(await loadEntriesFromLocalStorage());
       } else {
         setEntriesGlobal(entriesGlobalReplacement);
       }

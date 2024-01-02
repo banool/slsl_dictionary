@@ -326,19 +326,33 @@ class LegalInformationPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                      "The Sri Lankan Sign Language data displayed in this app is provided by Nishani Shamila McCluskey and team.\n",
+                      "The Sri Lankan Sign Language data, including videos, images, and dictionary data, used in this app is provided by Nishani Shamila McCluskey and team.\n",
                       textAlign: TextAlign.center),
                   Container(
                     padding: EdgeInsets.only(top: 10),
                   ),
                   TextButton(
                     child: Text(
-                        "This content is licensed under\nCreative Commons BY-NC-ND 4.0.",
+                        "This data is licensed under\nCreative Commons BY-NC-ND 4.0.",
                         textAlign: TextAlign.center,
                         style: TextStyle(color: MAIN_COLOR)),
                     onPressed: () async {
                       const url =
                           'https://creativecommons.org/licenses/by-nc-nd/4.0/';
+                      await launch(url, forceSafariVC: false);
+                    },
+                  ),
+                  Container(
+                    padding: EdgeInsets.only(top: 10),
+                  ),
+                  TextButton(
+                    child: Text(
+                        "The code for the app is licensed under Apache 2.0.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: MAIN_COLOR)),
+                    onPressed: () async {
+                      const url =
+                          'https://github.com/banool/slsl_dictionary/blob/main/LICENSE.md';
                       await launch(url, forceSafariVC: false);
                     },
                   ),

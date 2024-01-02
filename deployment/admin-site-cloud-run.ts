@@ -12,7 +12,8 @@ const projectId = new pulumi.Config("gcp").require("project");
 const GIT_SHA = "c906676d8b86972c88a601079d2452d8898364f8";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
-const imageName = `banool/slsl-backend:${IMAGE_TAG}`;
+// TODO: Set up image retention policy.
+const imageName = `banool/slsl-admin-site:${IMAGE_TAG}`;
 
 const port = "8080";
 const env = "prod";

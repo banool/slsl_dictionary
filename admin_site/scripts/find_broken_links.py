@@ -1,5 +1,5 @@
 # This script finds entries where there is a video link that doesn't point to an actual
-# video in the bucket. Run this from backend/ with this command:
+# video in the bucket. Run this from admin_site/ with this command:
 # poetry run python manage.py shell < scripts/find_broken_links.py
 
 from slsl_backend.models import Video

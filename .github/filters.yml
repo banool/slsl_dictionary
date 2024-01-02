@@ -6,10 +6,10 @@ ci: &ci
   - *force
   - ".github/**/*"
 
-backend:
+admin_site:
   - *force
   - *ci
-  - 'backend/**'
+  - 'admin_site/**'
 
 frontend:
   - *force

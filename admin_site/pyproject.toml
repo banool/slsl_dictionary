@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "backend"
+name = "admin-site"
 version = "0.1.0"
-description = "Admin backend for SLSL Dictionary"
+description = "Admin site for SLSL Dictionary"
 authors = ["Daniel Porteous <danielporteous1@gmail.com>"]
 packages = [{ include = "slsl_backend" }]
 readme = "README.md"

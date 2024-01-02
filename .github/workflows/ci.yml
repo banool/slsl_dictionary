@@ -12,7 +12,7 @@ jobs:
   # We use this to inform whether we should run later jobs.
   changes:
     outputs:
-      backend: ${{ steps.filter.outputs.backend }}
+      admin_site: ${{ steps.filter.outputs.admin_site }}
       frontend: ${{ steps.filter.outputs.frontend }}
     runs-on: ubuntu-latest
     steps:
@@ -22,20 +22,19 @@ jobs:
       with:
         filters: '.github/filters.yml'
     - name: Print changes
-      run: printf "Backend changed $BACKEND\nFrontend changed $FRONTEND\n"
+      run: printf "Admin site changed $ADMIN_SITE\nFrontend changed $FRONTEND\n"
       env:
-        BACKEND: ${{ steps.filter.outputs.backend }}
+        ADMIN_SITE: ${{ steps.filter.outputs.admin_site }}
         FRONTEND: ${{ steps.filter.outputs.frontend }}
 
-
-  # Build the backend image and publish to Docker Hub.
-  build_push_backend:
+  # Build the admin site image and publish to Docker Hub.
+  build_push_admin_site:
     needs: [changes]
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.admin_site == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./admin_site
     steps:
     - uses: actions/checkout@v3
     - name: Log in to Docker Hub
@@ -47,7 +46,7 @@ jobs:
       id: meta
       uses: docker/metadata-action@98669ae865ea3cffbcbaa878cf57c20bbf1c6c38
       with:
-        images: banool/slsl-backend
+        images: banool/slsl-admin-site
         # 1. Tag the image with the branch name on push
         # 2. Tag the image with the commit hash
         tags: |
@@ -56,7 +55,7 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@ad44023a93711e3deb337508980b4b5e9bcdc5dc
       with:
-        context: backend
+        context: admin_site
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
@@ -64,11 +63,11 @@ jobs:
   # Build static and push it to the bucket
   build_push_static_files:
     needs: [changes]
-    if: needs.changes.outputs.backend == 'true'
+    if: needs.changes.outputs.admin_site == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./backend
+        working-directory: ./admin_site
     permissions:
       contents: 'read'
       id-token: 'write'
@@ -82,7 +81,7 @@ jobs:
 
     - run: poetry install
       shell: bash
-      working-directory: ./backend
+      working-directory: ./admin_site
 
     - id: 'auth'
       uses: 'google-github-actions/auth@v1'

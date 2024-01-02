@@ -80,7 +80,6 @@ poetry run poe black
 ## Generating csvs for translators
 For entries:
 ```
-cd backend
 poetry run python manage.py generate_csv ~/out.csv
 ```
 

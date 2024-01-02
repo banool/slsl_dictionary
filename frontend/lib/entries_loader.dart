@@ -30,7 +30,7 @@ Future<File> get _dictionaryDataFilePath async {
 }
 
 // Try to load data from the local cache.
-Future<Set<Entry>> loadEntriesFromCache() async {
+Future<Set<Entry>> loadEntriesFromLocalStorage() async {
   String? data;
 
   // First try to read the data from local storage.
@@ -192,7 +192,7 @@ Future<bool> getNewData(bool forceCheck) async {
 
   // Write the data to file, which we read again afterwards to load it into
   // memory.
-  writeEntries(newData);
+  await writeEntries(newData);
 
   // Now, record the new version that we downloaded.
   await sharedPreferences.setInt(
@@ -209,7 +209,7 @@ Future<bool> updateWordsData(bool forceCheck) async {
   if (thereWasNewData) {
     printAndLog(
         "There was new data from the internet, loading it into memory...");
-    var entries = await loadEntriesFromCache();
+    var entries = await loadEntriesFromLocalStorage();
     setEntriesGlobal(entries);
   } else {
     printAndLog(

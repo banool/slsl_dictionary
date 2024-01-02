@@ -18,3 +18,6 @@ frontend:
   - 'frontend/ios/**'
   - 'frontend/android/**'
   - 'frontend/web/**'
+  - 'frontend/assets/**'
+  - 'frontend/pubspec.yaml'
+  - 'frontend/pubspec.lock'

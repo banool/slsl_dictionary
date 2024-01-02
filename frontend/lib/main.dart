@@ -86,7 +86,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
     // Get knob values.
     (() async =>
         enableFlashcardsKnob = await readKnob("enable_flashcards", true))(),
-    (() async => useCdnUrl = await readKnob("useCdnUrl", true))(),
+    (() async => useCdnUrl = await readKnob("use_cdn_url", true))(),
   ]);
 
   // This depends on the knob values above being set (useCdnUrl) so it is

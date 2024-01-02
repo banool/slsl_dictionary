@@ -208,7 +208,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       out = Column(
         children: [
           Text(
-            "Failed to load video. Please confirm your device is connected to the internet. If it is, the Auslan Signbank servers may be having issues. This is not an issue with the app itself.",
+            "Failed to load video. Please confirm your device is connected to the internet. If it is, the servers may be having issues. This is not an issue with the app itself.",
             textAlign: TextAlign.center,
             style: TextStyle(fontSize: 14),
           ),

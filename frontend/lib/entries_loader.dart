@@ -219,7 +219,6 @@ Future<bool> updateWordsData(bool forceCheck) async {
 }
 
 String convertUnixTimeToHttpDate(int unixTime) {
-  print("blah $unixTime");
   // Convert the Unix time to a DateTime object
   DateTime dateTime =
       DateTime.fromMillisecondsSinceEpoch(unixTime * 1000, isUtc: true);

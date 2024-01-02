@@ -127,7 +127,7 @@ class EntryListManager {
     for (String key in entryListKeys) {
       entryLists[key] = EntryList.fromRaw(key);
     }
-    printAndLog("Loaded ${entryLists.length} 1 lists");
+    printAndLog("Loaded ${entryLists.length} lists");
     return EntryListManager(entryLists);
   }
 

@@ -28,7 +28,7 @@ Widget getFlashcardsHelpPageEn(BuildContext context) {
       "If two lists contain the same word, we will still only show the word once."
     ],
     "What do all these sign selection options mean?": [
-      "Within a single dictionary entry in Auslan Dictionary there may be "
+      "Within a single dictionary entry in SLSL Dictionary there may be "
           "multiple \"sub-entries\", for example showing signs from different regions. "
           "By default we automatically opt you in to signs that are known to be "
           "used throughout the whole country, but you may also opt in to seeing "

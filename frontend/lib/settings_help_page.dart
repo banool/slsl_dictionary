@@ -9,7 +9,7 @@ Widget getSettingsHelpPage() {
       "If you have this setting enabled, when you view a word and the app downloads a video, "
           "it saves the video locally. The next time you look at the word, you don't need to download the "
           "video from the internet again because you already have a copy. This helps save your mobile data "
-          "and reduces load on the Auslan Signbank servers.",
+          "and reduces load on the SLSL servers.",
       "Note that the caching is best effort. If loading a video from cache "
           "fails, the app will just download the video directly from the internet. ",
       "Videos are only cached for $NUM_DAYS_TO_CACHE days, after that the app will "
@@ -33,12 +33,10 @@ Widget getSettingsHelpPage() {
           "specifically a distinction between an issue with the data the app uses and an "
           "issue with the app itself.",
       "An example of a data issue would be an inaccurate definition, an incorrect sign, a missing word, etc. "
-          "If a video doesn't load, this is generally also an issue with the data, or the Auslan Signbank servers themselves.",
+          "If a video doesn't load, this is generally also an issue with the data, or the SLSL servers themselves.",
       "An example of an issue with the app would be when you use a feature and it doesn't work, the app crashes, "
           "something doesn't look right visually, etc.",
-      "If you encounter an issue, I appreciate you using the appropriate option for getting help. "
-          "I only maintain the app itself, I'm not involved with the Auslan Signbank data, so it helps "
-          "everyone out when you use the most appropriate help option. Thanks a lot!"
+      "If you encounter an issue, I appreciate you using the appropriate option for getting help. ",
     ],
   });
 }

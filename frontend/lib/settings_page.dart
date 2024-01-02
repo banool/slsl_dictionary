@@ -215,7 +215,9 @@ class SettingsPageState extends State<SettingsPage> {
                     trailing: Container(),
                     onPressed: (BuildContext context) async {
                       await LaunchReview.launch(
-                          iOSAppId: "6445848879", writeReview: true);
+                          iOSAppId: "6445848879",
+                          androidAppId: "com.banool.slsl_dictionary",
+                          writeReview: true);
                     },
                   )
                 : null,
@@ -326,7 +328,7 @@ class LegalInformationPage extends StatelessWidget {
                 mainAxisSize: MainAxisSize.max,
                 children: [
                   Text(
-                      "The Sri Lankan Sign Language data, including videos, images, and dictionary data, used in this app is provided by Nishani Shamila McCluskey and team.\n",
+                      "The Sri Lankan Sign Language data, including videos, images, and definitions, used in this app is provided by Nishani Shamila McCluskey and team.\n",
                       textAlign: TextAlign.center),
                   Container(
                     padding: EdgeInsets.only(top: 10),
@@ -346,8 +348,7 @@ class LegalInformationPage extends StatelessWidget {
                     padding: EdgeInsets.only(top: 10),
                   ),
                   TextButton(
-                    child: Text(
-                        "The code for the app is licensed under Apache 2.0.",
+                    child: Text("All app code is licensed under\nApache 2.0.",
                         textAlign: TextAlign.center,
                         style: TextStyle(color: MAIN_COLOR)),
                     onPressed: () async {

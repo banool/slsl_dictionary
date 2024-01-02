@@ -3,10 +3,11 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 1.0.18+82
+version: 1.0.20+84
 
 environment:
-  sdk: '>=2.18.0 <3.0.0'
+  sdk: '>=3.2.3 <4.0.0'
+  flutter: ">=1.17.0"
 
 dependencies:
   cached_network_image: ^3.2.3

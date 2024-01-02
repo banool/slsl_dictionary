@@ -126,7 +126,6 @@ jobs:
         channel: stable
 
     - run: flutter pub get
-    - run: flutter gen-l10n
 
     - run: flutter test
 
@@ -154,12 +153,11 @@ jobs:
 
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '3.10.5'
+        flutter-version: '3.16.5'
         channel: stable
 
     # Test and build
     - run: flutter pub get
-    - run: flutter gen-l10n
     - run: flutter test
     - run: flutter build web
 

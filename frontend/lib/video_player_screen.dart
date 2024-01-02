@@ -2,13 +2,12 @@ import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 import 'package:video_player/video_player.dart';
-
-import 'common.dart';
-import 'globals.dart';
 
 enum PlaybackSpeed {
   PointFiveZero,
@@ -52,7 +51,8 @@ Widget getPlaybackSpeedDropdownWidget(void Function(PlaybackSpeed?) onChanged,
     {bool enabled = true}) {
   Color? color;
   if (!enabled) {
-    color = APP_BAR_DISABLED_COLOR;
+    // TODO: Use something different.
+    color = DEFAULT_APP_BAR_DISABLED_COLOR;
   }
   return Container(
       child: Align(

@@ -1,6 +1,6 @@
+import 'package:dictionarylib/common.dart';
 import 'package:flutter/material.dart';
 
-import 'common.dart';
 import 'help_page_common.dart';
 
 Widget getSettingsHelpPage() {

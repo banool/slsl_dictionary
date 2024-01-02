@@ -1,11 +1,12 @@
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 
 import 'common.dart';
-import 'entries_types.dart';
-import 'globals.dart';
 import 'word_list_help_page_en.dart';
-import 'word_list_logic.dart';
 
 class EntryListPage extends StatefulWidget {
   final EntryList entryList;

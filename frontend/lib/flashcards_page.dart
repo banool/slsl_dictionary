@@ -1,14 +1,15 @@
 import 'dart:async';
 
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/flashcards_logic.dart';
+import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/revision.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 
 import 'common.dart';
-import 'entries_types.dart';
-import 'flashcards_logic.dart';
-import 'globals.dart';
-import 'types.dart';
 import 'video_player_screen.dart';
 import 'word_page.dart';
 

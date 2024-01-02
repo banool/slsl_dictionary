@@ -1,22 +1,25 @@
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/flashcards_logic.dart';
+import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/revision.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 
 import 'common.dart';
 import 'entries_types.dart';
 import 'flashcards_help_page_en.dart';
 import 'flashcards_logic.dart';
 import 'flashcards_page.dart';
-import 'globals.dart';
 import 'language_dropdown.dart';
 import 'revision_history_page.dart';
 import 'settings_page.dart';
 import 'top_level_scaffold.dart';
-import 'types.dart';
-import 'word_list_logic.dart';
 
 const String KEY_SIGN_TO_WORD = "sign_to_word";
 const String KEY_WORD_TO_SIGN = "word_to_sign";
@@ -195,7 +198,7 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
         AppLocalizations.of(context)!.flashcardsAllOfSriLanka;
 
     String additionalRegionsValuesString = additionalRegionsValues
-        .map((i) => Region.values[i].getPretty(context))
+        .map((i) => getRegionPretty(context, Region.values[i]))
         .toList()
         .join(", ");
 
@@ -367,8 +370,8 @@ class _FlashcardsLandingPageState extends State<FlashcardsLandingPage> {
                     title:
                         Text(AppLocalizations.of(context)!.flashcardsRegions),
                     items: Region.values
-                        .map((e) =>
-                            MultiSelectItem(e.index, e.getPretty(context)))
+                        .map((e) => MultiSelectItem(
+                            e.index, getRegionPretty(context, e)))
                         .toList(),
                     initialValue: additionalRegionsValues,
                     onConfirm: (values) {

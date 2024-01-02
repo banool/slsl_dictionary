@@ -1,18 +1,18 @@
 import 'dart:io' show Platform;
 
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/flashcards_logic.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:launch_review/launch_review.dart';
 import 'package:mailto/mailto.dart';
 import 'package:settings_ui/settings_ui.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'common.dart';
-import 'entries_loader.dart';
-import 'flashcards_logic.dart';
-import 'globals.dart';
 import 'language_dropdown.dart';
 import 'settings_help_page.dart';
 import 'top_level_scaffold.dart';
@@ -134,7 +134,7 @@ class SettingsPageState extends State<SettingsPage> {
               setState(() {
                 checkingForNewData = true;
               });
-              bool thereWasNewData = await updateWordsData(true);
+              bool thereWasNewData = await entryLoader.updateWordsData(true);
               setState(() {
                 checkingForNewData = false;
               });

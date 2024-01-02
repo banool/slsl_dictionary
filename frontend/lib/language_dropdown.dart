@@ -1,10 +1,10 @@
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 import 'package:slsl_dictionary/root.dart';
 
-import 'common.dart';
 import 'entries_types.dart';
-import 'globals.dart';
 
 const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
 

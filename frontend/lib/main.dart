@@ -1,26 +1,21 @@
-import 'dart:io' show HttpOverrides, Platform;
-
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:slsl_dictionary/entries_loader.dart';
-import 'package:system_proxy/system_proxy.dart';
 import 'package:intl/intl_standalone.dart';
 
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:package_info_plus/package_info_plus.dart';
-
-import 'advisories.dart';
-import 'common.dart';
-import 'entries_types.dart';
 import 'error_fallback.dart';
 import 'globals.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 // TODO: More elegantly handle startup when there is no local data cache
 // and loading data from the internet fails.
+
+const String KNOB_URL_BASE =
+    "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/";
 
 // Setup the app. Be careful when reordering things here, later functions
 // implicitly depend on the side effects of earlier functions.
@@ -30,92 +25,26 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   // Preserve the splash screen while the app initializes.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
-  // Load device info once at startup.
-  DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-  try {
-    if (Platform.isAndroid) {
-      androidDeviceInfo = await deviceInfo.androidInfo;
-    } else if (Platform.isIOS) {
-      iosDeviceInfo = await deviceInfo.iosInfo;
-    }
-    printAndLog("Successfully loaded device info");
-  } catch (e) {
-    printAndLog(
-        "Failed to get device info: $e (continuing without raising any error)");
-  }
-
-  // Load package info once at startup.
-  try {
-    packageInfo = await PackageInfo.fromPlatform();
-    printAndLog("Successfully loaded package info");
-  } catch (e) {
-    printAndLog(
-        "Failed to get package info: $e (continuing without raising any error)");
-  }
-
-  // Load shared preferences. We do this first because the later futures,
-  // such as loadFavourites and the knobs, depend on it being initialized.
-  sharedPreferences = await SharedPreferences.getInstance();
-
-  // Set the HTTP proxy if necessary.
-  if (!kIsWeb) {
-    Map<String, String> proxy = await SystemProxy.getProxySettings() ?? {};
-    HttpOverrides.global =
-        new ProxiedHttpOverrides(proxy["host"], proxy["port"]);
-    printAndLog("Set HTTP proxy overrides to $proxy");
-  }
-
-  // Load up the advisories before doing anything else so it can be displayed
-  // in the error page.
-  advisoriesResponse = await getAdvisories();
-
-  // Build the cache manager.
-  myCacheManager = MyCacheManager();
+  // Do common setup stuff defined in dictionarylib.
+  await setupPhaseOne();
 
   await Future.wait<void>([
-    // Load up the words information once at startup from disk.
-    // We do this first because loadFavourites depends on it later.
-    (() async {
-      if (entriesGlobalReplacement == null) {
-        setEntriesGlobal(await loadEntriesFromLocalStorage());
-      } else {
-        setEntriesGlobal(entriesGlobalReplacement);
-      }
-    })(),
-
     // Get knob values.
     (() async =>
-        enableFlashcardsKnob = await readKnob("enable_flashcards", true))(),
-    (() async => useCdnUrl = await readKnob("use_cdn_url", true))(),
+        useCdnUrl = await readKnob(KNOB_URL_BASE, "use_cdn_url", true))(),
   ]);
 
-  // This depends on the knob values above being set (useCdnUrl) so it is
-  // important that this appears after that block above.
-  if (downloadWordsDataKnob && entriesGlobalReplacement == null) {
-    if (entriesGlobal.isEmpty) {
-      printAndLog(
-          "No local entry data cache found, fetching updates from the internet and waiting for them before proceeeding...");
-      await updateWordsData(true);
-    } else {
-      printAndLog(
-          "Local entry data cache found, fetching updates from the internet in the background...");
-      updateWordsData(false);
-    }
-  }
+  MyEntryLoader myEntryLoader = MyEntryLoader(
+    dumpFileUrl: Uri.parse(buildUrl("dump/dump.json")),
+  );
 
-  // Resolve values based on knobs.
-  showFlashcards = getShowFlashcards();
-
-  // Get background color of settings pages.
-  if (kIsWeb) {
-    settingsBackgroundColor = Color.fromRGBO(240, 240, 240, 1);
-  } else if (Platform.isAndroid) {
-    settingsBackgroundColor = Color.fromRGBO(240, 240, 240, 1);
-  } else if (Platform.isIOS) {
-    settingsBackgroundColor = Color.fromRGBO(242, 242, 247, 1);
-  } else {
-    settingsBackgroundColor = Color.fromRGBO(240, 240, 240, 1);
-  }
+  // Do the rest of the common stuff defined in dictionarylib. This will set
+  // the entryLoader global value with what we pass in so we don't have to do
+  // it ourselves.
+  await setupPhaseTwo(
+      paramEntryLoader: myEntryLoader,
+      knobUrlBase: KNOB_URL_BASE,
+      entriesGlobalReplacement: entriesGlobalReplacement);
 
   // Remove the splash screen.
   FlutterNativeSplash.remove();

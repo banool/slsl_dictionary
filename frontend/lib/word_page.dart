@@ -1,6 +1,9 @@
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/gestures.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/language_dropdown.dart';
 
@@ -225,7 +228,7 @@ Widget getRegionalInformationWidget(
     BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay,
     {bool hide = false}) {
   String regionsStr =
-      subEntry.getRegions().map((r) => r.getPretty(context)).join(", ");
+      subEntry.getRegions().map((r) => getRegionPretty(context, r)).join(", ");
   if (hide) {
     regionsStr = "";
   }

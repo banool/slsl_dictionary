@@ -1,6 +1,10 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/revision.dart';
 import 'package:slsl_dictionary/root.dart';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
@@ -9,12 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:integration_test/src/channel.dart';
 
-import 'package:slsl_dictionary/common.dart';
 import 'package:slsl_dictionary/flashcards_landing_page.dart';
-import 'package:slsl_dictionary/globals.dart';
 import 'package:slsl_dictionary/main.dart';
-import 'package:slsl_dictionary/types.dart';
-import 'package:slsl_dictionary/word_list_logic.dart';
 
 // Note, sometimes the test will crash at the end, but the screenshots do
 // actually still get taken.

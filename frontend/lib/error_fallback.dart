@@ -1,11 +1,11 @@
 import 'dart:io' show HttpClient, HttpOverrides, SecurityContext;
 
+import 'package:dictionarylib/advisories.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'advisories.dart';
 import 'common.dart';
-import 'globals.dart';
 
 // When the app fails to load we show this widget instead.
 class ErrorFallback extends StatelessWidget {

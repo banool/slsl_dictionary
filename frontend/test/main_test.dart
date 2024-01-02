@@ -1,3 +1,5 @@
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/entries_types.dart';
 import 'package:slsl_dictionary/root.dart';

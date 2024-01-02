@@ -257,6 +257,15 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "7.0.0"
+  dictionarylib:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: main
+      resolved-ref: df7b44e8afff65f88c1be1b28123784ae491c56e
+      url: "https://github.com/banool/dictionarylib.git"
+    source: git
+    version: "0.0.1"
   dolphinsr_dart:
     dependency: "direct main"
     description:
@@ -1163,5 +1172,5 @@ packages:
     source: hosted
     version: "3.1.2"
 sdks:
-  dart: ">=3.2.0 <4.0.0"
+  dart: ">=3.2.3 <4.0.0"
   flutter: ">=3.16.0"

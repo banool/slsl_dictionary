@@ -1,11 +1,11 @@
+import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 
-import 'common.dart';
-import 'globals.dart';
 import 'top_level_scaffold.dart';
-import 'word_list_logic.dart';
 import 'word_list_overview_help_page_en.dart';
 import 'word_list_page.dart';
 

@@ -1,21 +1,10 @@
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:device_info_plus/device_info_plus.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:slsl_dictionary/entries_types.dart';
 
-import 'advisories.dart';
-import 'common.dart';
-import 'entries_types.dart';
-import 'word_list_logic.dart';
-
-Set<Entry> entriesGlobal = {};
-Map<String, Entry> keyedByEnglishEntriesGlobal = {};
 Map<String, Entry> keyedByTamilEntriesGlobal = {};
 Map<String, Entry> keyedBySinhalaEntriesGlobal = {};
-
-// For logging of things that occur in the background.
-MaxLengthQueue<String> backgroundLogs = MaxLengthQueue(200);
 
 Map<String, Entry> getEntriesGlobal(Locale locale) {
   if (locale == LOCALE_ENGLISH) {
@@ -29,47 +18,4 @@ Map<String, Entry> getEntriesGlobal(Locale locale) {
   }
 }
 
-late Set<Entry> favouritesGlobal;
-
-late EntryListManager entryListManager;
-
-late SharedPreferences sharedPreferences;
-late MyCacheManager myCacheManager;
-
-// Values of the knobs.
-late bool enableFlashcardsKnob;
 late bool useCdnUrl;
-bool downloadWordsDataKnob = true;
-
-// This is whether to show the flashcard stuff as a result of the knob + switch.
-late bool showFlashcards;
-
-// The settings page background color.
-late Color settingsBackgroundColor;
-
-// Advisory if there is a new one.
-AdvisoriesResponse? advisoriesResponse;
-bool advisoryShownOnce = false;
-
-// Device info.
-AndroidDeviceInfo? androidDeviceInfo;
-IosDeviceInfo? iosDeviceInfo;
-
-// Package info.
-PackageInfo? packageInfo;
-
-class MyCacheManager extends CacheManager with ImageCacheManager {
-  static const key = 'mySignLanguageCacheManager';
-
-  static final MyCacheManager _instance = MyCacheManager._();
-  factory MyCacheManager() {
-    return _instance;
-  }
-
-  MyCacheManager._()
-      : super(Config(
-          key,
-          stalePeriod: const Duration(days: NUM_DAYS_TO_CACHE),
-          maxNrOfCacheObjects: 500,
-        ));
-}

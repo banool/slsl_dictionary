@@ -9,7 +9,6 @@ import 'package:flutter/material.dart';
 import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
 
 import 'common.dart';
-import 'flashcards_logic.dart';
 
 class RevisionHistoryPage extends StatefulWidget {
   RevisionHistoryPage({Key? key}) : super(key: key);

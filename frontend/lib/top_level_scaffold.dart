@@ -12,8 +12,8 @@ class TopLevelScaffold extends StatelessWidget {
     required this.title,
     this.actions,
     this.floatingActionButton,
-    Key? key,
-  }) : super(key: key);
+    super.key,
+  });
 
   /// The widget to display in the body of the Scaffold.
   final Widget body;
@@ -31,11 +31,11 @@ class TopLevelScaffold extends StatelessWidget {
   Widget build(BuildContext context) {
     var items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
-        icon: Icon(Icons.search),
+        icon: const Icon(Icons.search),
         label: AppLocalizations.of(context)!.searchTitle,
       ),
       BottomNavigationBarItem(
-        icon: Icon(Icons.view_list),
+        icon: const Icon(Icons.view_list),
         label: AppLocalizations.of(context)!.listsTitle,
       ),
     ];
@@ -43,14 +43,14 @@ class TopLevelScaffold extends StatelessWidget {
     if (getShowFlashcards()) {
       items.add(
         BottomNavigationBarItem(
-          icon: Icon(Icons.style),
+          icon: const Icon(Icons.style),
           label: AppLocalizations.of(context)!.revisionTitle,
         ),
       );
     }
 
     items.add(BottomNavigationBarItem(
-      icon: Icon(Icons.settings),
+      icon: const Icon(Icons.settings),
       label: AppLocalizations.of(context)!.settingsTitle,
     ));
 

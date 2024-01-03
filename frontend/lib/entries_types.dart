@@ -8,27 +8,6 @@ import 'entries_loader.dart';
 
 part 'entries_types.g.dart';
 
-const LANGUAGE_CODE_ENGLISH = "en";
-const LANGUAGE_CODE_SINHALA = "si";
-const LANGUAGE_CODE_TAMIL = "ta";
-
-const LANGUAGE_ENGLISH = "English";
-const LANGUAGE_SINHALA = "සිංහල";
-const LANGUAGE_TAMIL = "தமிழ்";
-
-const Map<String, String> LANGUAGE_CODE_TO_PRETTY = {
-  LANGUAGE_CODE_ENGLISH: LANGUAGE_ENGLISH,
-  LANGUAGE_CODE_SINHALA: LANGUAGE_SINHALA,
-  LANGUAGE_CODE_TAMIL: LANGUAGE_TAMIL,
-};
-
-Map<String, Locale> LANGUAGE_CODE_TO_LOCALE = Map.fromEntries(
-    LANGUAGE_CODE_TO_PRETTY.keys.map((e) => MapEntry(e, Locale(e))));
-
-Locale LOCALE_ENGLISH = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_ENGLISH]!;
-Locale LOCALE_SINHALA = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_SINHALA]!;
-Locale LOCALE_TAMIL = LANGUAGE_CODE_TO_LOCALE[LANGUAGE_CODE_TAMIL]!;
-
 @JsonSerializable()
 class MyEntry implements Entry {
   final String word_in_english;
@@ -78,7 +57,7 @@ class MyEntry implements Entry {
 
   @override
   int compareTo(Entry other) {
-    return this.getKey().compareTo(other.getKey());
+    return getKey().compareTo(other.getKey());
   }
 
   @override
@@ -127,7 +106,7 @@ class MySubEntry implements SubEntry {
   // might use the same video).
   @override
   String getKey(Entry parentEntry) {
-    var videoLinks = List.from(this.videos);
+    var videoLinks = List.from(videos);
     videoLinks.sort();
     return videoLinks[0] + parentEntry.getKey();
   }
@@ -153,7 +132,7 @@ class MySubEntry implements SubEntry {
     // The dump only contains the final filename + ext, we have to build the
     // full URL. We do it here. buildUrl depends on the useCdnUrl knob having
     // a value.
-    return videos.map((e) => buildUrl("media/${e}")).toList();
+    return videos.map((e) => buildUrl("media/$e")).toList();
   }
 
   @override
@@ -180,6 +159,26 @@ class MySubEntry implements SubEntry {
   List<Region> getRegions() {
     return [region].map((e) => regionFromString(e)).toList();
   }
+}
+
+@JsonSerializable()
+class Definition {
+  final String language;
+  final String category;
+  final String definition;
+
+  String get categoryPretty {
+    return getCategoryPretty(category);
+  }
+
+  Definition(
+      {required this.language,
+      required this.category,
+      required this.definition});
+  factory Definition.fromJson(Map<String, dynamic> json) =>
+      _$DefinitionFromJson(json);
+
+  Map<String, dynamic> toJson() => _$DefinitionToJson(this);
 }
 
 // IMPORTANT:

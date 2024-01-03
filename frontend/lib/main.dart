@@ -1,12 +1,13 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/error_fallback.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:slsl_dictionary/common.dart';
 import 'package:slsl_dictionary/entries_loader.dart';
 import 'package:intl/intl_standalone.dart';
 
-import 'error_fallback.dart';
 import 'globals.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
@@ -26,7 +27,8 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
 
   // Do common setup stuff defined in dictionarylib.
-  await setupPhaseOne();
+  await setupPhaseOne(Uri.parse(
+      "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md"));
 
   await Future.wait<void>([
     // Get knob values.
@@ -44,6 +46,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   await setupPhaseTwo(
       paramEntryLoader: myEntryLoader,
       knobUrlBase: KNOB_URL_BASE,
+      downloadWordsData: true,
       entriesGlobalReplacement: entriesGlobalReplacement);
 
   // Remove the splash screen.
@@ -71,6 +74,7 @@ Future<void> main() async {
     runApp(RootApp(startingLocale: locale));
   } catch (error, stackTrace) {
     runApp(ErrorFallback(
+      appName: APP_NAME,
       error: error,
       stackTrace: stackTrace,
     ));

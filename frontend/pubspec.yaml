@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 1.0.20+84
+version: 1.0.21+85
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -58,6 +58,7 @@ dev_dependencies:
     sdk: flutter
   integration_test:
     sdk: flutter
+  flutter_lints:
 
 flutter_icons:
   android: true

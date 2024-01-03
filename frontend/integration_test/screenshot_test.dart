@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/revision.dart';
 import 'package:slsl_dictionary/root.dart';
@@ -13,7 +14,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:integration_test/src/channel.dart';
 
-import 'package:slsl_dictionary/flashcards_landing_page.dart';
 import 'package:slsl_dictionary/main.dart';
 
 // Note, sometimes the test will crash at the end, but the screenshots do
@@ -166,13 +166,13 @@ void main() async {
     await sharedPreferences.setInt(
         KEY_REVISION_STRATEGY, RevisionStrategy.SpacedRepetition.index);
 
-    await tester.pumpWidget(RootApp(startingLocale: Locale("en")));
-    await tester.pumpAndSettle(Duration(seconds: 10));
+    await tester.pumpWidget(const RootApp(startingLocale: Locale("en")));
+    await tester.pumpAndSettle(const Duration(seconds: 10));
     var screenshotNameInfo = await ScreenshotNameInfo.buildScreenshotNameInfo();
 
     await takeScreenshot(tester, binding, screenshotNameInfo, "search");
 
-    final Finder searchField = find.byKey(ValueKey("searchPage.searchForm"));
+    final Finder searchField = find.byKey(const ValueKey("searchPage.searchForm"));
     await tester.tap(searchField);
     await tester.pumpAndSettle();
     await tester.enterText(searchField, "hey");
@@ -188,7 +188,7 @@ void main() async {
     await tester.pumpAndSettle();
     await takeScreenshot(tester, binding, screenshotNameInfo, "insideList");
 
-    final Finder dogButton = find.byKey(ValueKey("bear"));
+    final Finder dogButton = find.byKey(const ValueKey("bear"));
     await tester.tap(dogButton);
     await tester.pumpAndSettle();
     await Future.delayed(const Duration(seconds: 5));
@@ -216,7 +216,7 @@ void main() async {
     await tester.pageBack();
     await tester.pumpAndSettle();
 
-    final Finder startAppBarButton = find.byKey(ValueKey("startButton"));
+    final Finder startAppBarButton = find.byKey(const ValueKey("startButton"));
     await tester.tap(startAppBarButton);
     await tester.pumpAndSettle();
     await Future.delayed(const Duration(seconds: 4));
@@ -224,7 +224,7 @@ void main() async {
 
     await Future.delayed(const Duration(seconds: 1));
     await tester.pumpAndSettle();
-    final Finder revealTapArea = find.byKey(ValueKey("revealTapArea"));
+    final Finder revealTapArea = find.byKey(const ValueKey("revealTapArea"));
     await tester.tap(revealTapArea);
     await tester.pumpAndSettle();
     await Future.delayed(const Duration(seconds: 4));

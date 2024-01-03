@@ -1,7 +1,6 @@
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:slsl_dictionary/entries_types.dart';
 
 Map<String, Entry> keyedByTamilEntriesGlobal = {};
 Map<String, Entry> keyedBySinhalaEntriesGlobal = {};

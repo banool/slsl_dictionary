@@ -1,14 +1,18 @@
 import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/page_entry_list_overview.dart';
+import 'package:dictionarylib/page_flashcards_landing.dart';
+import 'package:dictionarylib/page_search.dart';
+import 'package:dictionarylib/page_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
-import 'package:slsl_dictionary/entries_types.dart';
 
 import 'common.dart';
 import 'flashcards_landing_page.dart';
-import 'search_page.dart';
-import 'settings_page.dart';
-import 'word_list_overview_page.dart';
+import 'language_dropdown.dart';
+import 'legal_information.dart';
+import 'word_list_page.dart';
 
 const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
@@ -18,7 +22,7 @@ const SETTINGS_ROUTE = "/settings";
 late Locale systemLocale;
 
 class RootApp extends StatefulWidget {
-  RootApp({required this.startingLocale});
+  const RootApp({super.key, required this.startingLocale});
 
   final Locale startingLocale;
 
@@ -65,24 +69,72 @@ class _RootAppState extends State<RootApp> {
                   // https://stackoverflow.com/a/73458529/3846032
                   key: UniqueKey(),
                   child: SearchPage(
+                    mainColor: MAIN_COLOR,
+                    appBarDisabledColor: APP_BAR_DISABLED_COLOR,
+                    navigateToEntryPage: navigateToEntryPage,
                     initialQuery: initialQuery,
                     navigateToFirstMatch: navigateToFirstMatch,
+                    includeEntryTypeButton: true,
                   ));
             }),
         GoRoute(
             path: LISTS_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              return NoTransitionPage(child: EntryListsOverviewPage());
+              return NoTransitionPage(
+                child: EntryListsOverviewPage(
+                  mainColor: MAIN_COLOR,
+                  appBarDisabledColor: APP_BAR_DISABLED_COLOR,
+                  buildEntryListWidgetCallback: (entryList) =>
+                      EntryListPage(entryList: entryList),
+                ),
+              );
             }),
         GoRoute(
             path: REVISION_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              return NoTransitionPage(child: FlashcardsLandingPage());
+              var controller = MyFlashcardsLandingPageController();
+              return NoTransitionPage(
+                  child: FlashcardsLandingPage(
+                controller: controller,
+                mainColor: MAIN_COLOR,
+                appBarDisabledColor: APP_BAR_DISABLED_COLOR,
+              ));
             }),
         GoRoute(
             path: SETTINGS_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              return NoTransitionPage(child: SettingsPage());
+              return NoTransitionPage(
+                  child: SettingsPage(
+                      appName: APP_NAME,
+                      mainColor: MAIN_COLOR,
+                      appBarDisabledColor: APP_BAR_DISABLED_COLOR,
+                      additionalTopWidgets: [
+                        Padding(
+                          padding: const EdgeInsets.only(left: 35, top: 15),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  AppLocalizations.of(context)!
+                                      .settingsLanguage,
+                                  style: const TextStyle(
+                                      fontSize: 13,
+                                      color:
+                                          Color.fromARGB(255, 100, 100, 100)),
+                                  textAlign: TextAlign.start,
+                                ),
+                                const Center(child: LanguageDropdown()),
+                              ]),
+                        ),
+                      ],
+                      buildLegalInformationChildren:
+                          buildLegalInformationChildren,
+                      reportDataProblemUrl:
+                          'https://github.com/banool/slsl_dictionary/issues/new/choose',
+                      reportAppProblemUrl:
+                          'https://github.com/banool/slsl_dictionary/issues',
+                      iOSAppId: "6445848879",
+                      androidAppId: "com.banool.slsl_dictionary"));
             }),
       ]);
 
@@ -104,7 +156,7 @@ class _RootAppState extends State<RootApp> {
           locale: locale,
           debugShowCheckedModeBanner: false,
           theme: ThemeData(
-              appBarTheme: AppBarTheme(
+              appBarTheme: const AppBarTheme(
                 backgroundColor: MAIN_COLOR,
                 foregroundColor: Colors.white,
                 actionsIconTheme: IconThemeData(color: Colors.white),
@@ -113,7 +165,7 @@ class _RootAppState extends State<RootApp> {
               primarySwatch: MAIN_COLOR,
               visualDensity: VisualDensity.adaptivePlatformDensity,
               // Make swiping to pop back the navigation work.
-              pageTransitionsTheme: PageTransitionsTheme(builders: {
+              pageTransitionsTheme: const PageTransitionsTheme(builders: {
                 TargetPlatform.android: CupertinoPageTransitionsBuilder(),
                 TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
               })),

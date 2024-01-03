@@ -30,14 +30,13 @@ void main() async {
   sharedPreferences = await SharedPreferences.getInstance();
 
   enableFlashcardsKnob = true;
-  downloadWordsDataKnob = false;
   useCdnUrl = true;
 
   showFlashcards = true;
 
   testWidgets('Pump app test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(RootApp(
+    await tester.pumpWidget(const RootApp(
       startingLocale: Locale("en"),
     ));
     print("Pump successful!");
@@ -52,7 +51,7 @@ void main() async {
         var m = Master(id: se.getKey(e), fields: [
           e.getKey(),
           se.getMedia().join("=====")
-        ], combinations: [
+        ], combinations: const [
           Combination(front: [0], back: [1]),
           Combination(front: [1], back: [0]),
         ]);

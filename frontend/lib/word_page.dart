@@ -13,8 +13,8 @@ import 'globals.dart';
 import 'video_player_screen.dart';
 
 class EntryPage extends StatefulWidget {
-  EntryPage({Key? key, required this.entry, required this.showFavouritesButton})
-      : super(key: key);
+  const EntryPage(
+      {super.key, required this.entry, required this.showFavouritesButton});
 
   final Entry entry;
   final bool showFavouritesButton;
@@ -96,6 +96,7 @@ class _EntryPageState extends State<EntryPage> {
             await removeEntryFromFavourites(entry);
           }
         },
+        APP_BAR_DISABLED_COLOR,
       ));
     }
 
@@ -118,7 +119,7 @@ class _EntryPageState extends State<EntryPage> {
               content: Text(
                   "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
               backgroundColor: MAIN_COLOR,
-              duration: Duration(milliseconds: 1000)));
+              duration: const Duration(milliseconds: 1000)));
         },
       )
     ];
@@ -139,11 +140,11 @@ class _EntryPageState extends State<EntryPage> {
                       title: Text(phrase),
                       actions: buildActionButtons(actions)),
                   bottomNavigationBar: Padding(
-                    padding: EdgeInsets.only(top: 5, bottom: 10),
+                    padding: const EdgeInsets.only(top: 5, bottom: 10),
                     child: DotsIndicator(
                       dotsCount: entry.getSubEntries().length,
                       position: currentPage,
-                      decorator: DotsDecorator(
+                      decorator: const DotsDecorator(
                         color: Colors.black, // Inactive color
                         activeColor: MAIN_COLOR,
                       ),
@@ -185,7 +186,7 @@ Widget? getRelatedEntriesWidget(
 
     if (relatedEntry != null) {
       color = MAIN_COLOR;
-      navFunction = () => navigateToEntryPage(context, relatedEntry!);
+      navFunction = () => navigateToEntryPage(context, relatedEntry!, true);
     } else {
       color = Colors.black;
       navFunction = null;
@@ -206,7 +207,7 @@ Widget? getRelatedEntriesWidget(
 
   var initial = TextSpan(
       text: "${AppLocalizations.of(context)!.relatedWords}: ",
-      style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
+      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
   textSpans = [initial] + textSpans;
   var richText = RichText(
     text: TextSpan(children: textSpans),
@@ -215,11 +216,11 @@ Widget? getRelatedEntriesWidget(
 
   if (shouldUseHorizontalDisplay) {
     return Padding(
-        padding: EdgeInsets.only(left: 10.0, right: 20.0, top: 5.0),
+        padding: const EdgeInsets.only(left: 10.0, right: 20.0, top: 5.0),
         child: richText);
   } else {
     return Padding(
-        padding: EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
+        padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
         child: richText);
   }
 }
@@ -234,7 +235,7 @@ Widget getRegionalInformationWidget(
   }
   if (shouldUseHorizontalDisplay) {
     return Padding(
-        padding: EdgeInsets.only(top: 15.0),
+        padding: const EdgeInsets.only(top: 15.0),
         child: Text(
           regionsStr,
           textAlign: TextAlign.center,
@@ -243,7 +244,7 @@ Widget getRegionalInformationWidget(
     return Align(
         alignment: Alignment.bottomCenter,
         child: Padding(
-            padding: EdgeInsets.only(top: 15.0),
+            padding: const EdgeInsets.only(top: 15.0),
             child: Text(
               regionsStr,
               textAlign: TextAlign.center,
@@ -252,11 +253,11 @@ Widget getRegionalInformationWidget(
 }
 
 class SubEntryPage extends StatefulWidget {
-  SubEntryPage({
-    Key? key,
+  const SubEntryPage({
+    super.key,
     required this.entry,
     required this.subEntry,
-  }) : super(key: key);
+  });
 
   final Entry entry;
   final SubEntry subEntry;
@@ -295,7 +296,8 @@ class _SubEntryPageState extends State<SubEntryPage> {
         children.add(Center(child: relatedWordsWidget));
       }
       children.add(Expanded(
-        child: Definitions(context, subEntry.getDefinitions(locale)),
+        child: Definitions(
+            context, subEntry.getDefinitions(locale) as List<Definition>),
       ));
       children.add(regionalInformationWidget);
       return Column(
@@ -315,7 +317,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
             videoPlayerScreen,
             regionalInformationWidget,
           ]),
-          new LayoutBuilder(
+          LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
             // TODO Make this less janky and hardcoded.
             // The issue is the parent has infinite width and height
@@ -325,7 +327,8 @@ class _SubEntryPageState extends State<SubEntryPage> {
               children.add(relatedWordsWidget);
             }
             children.add(Expanded(
-                child: Definitions(context, subEntry.getDefinitions(locale))));
+                child: Definitions(context,
+                    subEntry.getDefinitions(locale) as List<Definition>)));
             return ConstrainedBox(
                 constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.4, maxHeight: screenHeight * 0.7),
@@ -357,14 +360,14 @@ Widget Definitions(BuildContext context, List<Definition> definitions) {
 
 Widget definition(BuildContext context, Definition definition) {
   return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
           definition.categoryPretty,
-          style: TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Padding(
-            padding: EdgeInsets.only(left: 10.0, top: 8.0),
+            padding: const EdgeInsets.only(left: 10.0, top: 8.0),
             child: Text(definition.definition))
       ]));
 }

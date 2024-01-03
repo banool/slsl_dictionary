@@ -1,9 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_loader.dart';
 import 'package:dictionarylib/entry_types.dart';
-import 'package:dictionarylib/globals.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
 
@@ -23,13 +23,12 @@ String buildUrl(String path) {
 }
 
 class MyEntryLoader extends EntryLoader {
-  MyEntryLoader({required super.dumpFileUrl});
+  final Uri dumpFileUrl;
+
+  MyEntryLoader({required this.dumpFileUrl});
 
   @override
   Future<NewData?> downloadNewData(int currentVersion) async {
-    int currentVersion =
-        sharedPreferences.getInt(KEY_DICTIONARY_DATA_CURRENT_VERSION) ?? 0;
-
     // Previously we used to check if we needed to download the data again by
     // making two requests. First we'd make one request for just the headers, in
     // which we check the value of the Last-Modified header. If that time was
@@ -44,7 +43,7 @@ class MyEntryLoader extends EntryLoader {
     };
     Response response = (await http
         .get(dumpFileUrl, headers: headers)
-        .timeout(Duration(seconds: 15)));
+        .timeout(const Duration(seconds: 15)));
 
     if (response.statusCode == 304) {
       return null;
@@ -69,7 +68,13 @@ class MyEntryLoader extends EntryLoader {
   }
 
   @override
-  Entry entryFromDataFn(dynamic data) {
-    return MyEntry.fromJson(data);
+  Set<Entry> loadEntriesInner(String data) {
+    dynamic entriesJson = json.decode(data);
+    Set<Entry> entries = {};
+    for (dynamic entryData in entriesJson["data"]) {
+      entries.add(MyEntry.fromJson(entryData));
+    }
+    printAndLog("Loaded ${entries.length} entries");
+    return entries;
   }
 }

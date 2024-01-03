@@ -1,21 +1,21 @@
 import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart'
+    show AppLocalizations, LANGUAGE_CODE_TO_LOCALE;
 import 'package:slsl_dictionary/root.dart';
 
-import 'entries_types.dart';
 
 const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
 
 class LanguageDropdown extends StatefulWidget {
-  LanguageDropdown(
-      {Key? key,
+  const LanguageDropdown(
+      {super.key,
       this.asPopUpMenu = false,
       this.includeDeviceDefaultOption = true,
       this.initialLanguageCode,
-      this.onChanged})
-      : super(key: key);
+      this.onChanged});
 
   final bool asPopUpMenu;
   final bool includeDeviceDefaultOption;
@@ -89,7 +89,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
   Widget buildPopUpMenu(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: Icon(
+      icon: const Icon(
         Icons.language,
       ),
       itemBuilder: (BuildContext context) {
@@ -143,8 +143,8 @@ class LanguageDropdownState extends State<LanguageDropdown> {
         future: initStateAsyncFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
-            return new Center(
-              child: new CircularProgressIndicator(),
+            return const Center(
+              child: CircularProgressIndicator(),
             );
           }
 

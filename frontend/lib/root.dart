@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
-import 'l10n/app_localizations.dart' show AppLocalizations;
+// import 'l10n/app_localizations.dart' show AppLocalizations;
 import 'common.dart';
 import 'flashcards_landing_page.dart';
 import 'language_dropdown.dart';
@@ -151,11 +151,15 @@ class _RootAppState extends State<RootApp> {
         },
         child: MaterialApp.router(
           title: APP_NAME,
-          onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            DictLibLocalizations.delegate,
-          ],
+          // I set appTitle manually for now due to this issue:
+          // https://stackoverflow.com/q/77759180/3846032
+          // AppLocalizations.delegate,
+          onGenerateTitle: (context) => getAppTitle(locale),
+          localizationsDelegates: DictLibLocalizations.localizationsDelegates,
+          //
+          // localizationsDelegates: const [
+          //   DictLibLocalizations.delegate,
+          // ],
           supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
           locale: locale,
           debugShowCheckedModeBanner: false,
@@ -175,5 +179,18 @@ class _RootAppState extends State<RootApp> {
               })),
           routerConfig: router,
         ));
+  }
+}
+
+// See comment above onGenerateTitle for an explanation for why we have this.
+String getAppTitle(Locale locale) {
+  if (locale.languageCode.startsWith("en")) {
+    return "SLSL Dictionary";
+  } else if (locale.languageCode.startsWith("si")) {
+    return "සිංහල ශබ්දකෝෂය";
+  } else if (locale.languageCode.startsWith("ta")) {
+    return "இலங்கை சைகை மொழி அகராதி";
+  } else {
+    throw Exception("Unsupported locale for title: $locale");
   }
 }

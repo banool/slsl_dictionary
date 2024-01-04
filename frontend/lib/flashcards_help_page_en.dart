@@ -1,6 +1,6 @@
 import 'package:dictionarylib/help_common.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 // This would be too much too annoying to localize the normal way so instead
 // I have different files for each of these in each language.
@@ -33,7 +33,7 @@ Widget getFlashcardsHelpPageEn(BuildContext context) {
           "used throughout the whole country, but you may also opt in to seeing "
           "signs from specific regions (e.g. Northern, VIC, WA, etc). ",
     ],
-    "What does \"${AppLocalizations.of(context)!.flashcardsOnlyOneCard}\" mean?":
+    "What does \"${DictLibLocalizations.of(context)!.flashcardsOnlyOneCard}\" mean?":
         const [
       "Based on the other filtering options you have set, there may be "
           "situations where there are multiple sub-entries for a single entry. "

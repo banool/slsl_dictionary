@@ -6,7 +6,7 @@ import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:slsl_dictionary/common.dart';
 import 'package:video_player/video_player.dart';
 
@@ -225,7 +225,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
     } else {
       out = Column(children: [
         Text(
-          "${AppLocalizations.of(context)!.unexpectedErrorLoadingVideo} $mediaLink: $error",
+          "${DictLibLocalizations.of(context)!.unexpectedErrorLoadingVideo} $mediaLink: $error",
           textAlign: TextAlign.center,
           style: const TextStyle(fontSize: 12),
         )
@@ -345,8 +345,8 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
               }
 
               var player = VideoPlayer(controller);
-              var videoContainer =
-                  Container(padding: const EdgeInsets.only(top: 15), child: player);
+              var videoContainer = Container(
+                  padding: const EdgeInsets.only(top: 15), child: player);
               return videoContainer;
             });
       }

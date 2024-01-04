@@ -8,7 +8,7 @@ import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
 import 'package:multi_select_flutter/multi_select_flutter.dart';
 import 'package:settings_ui/settings_ui.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'entries_types.dart';
 import 'flashcards_help_page_en.dart';
@@ -85,7 +85,7 @@ class MyFlashcardsLandingPageController
         padding: const EdgeInsets.only(left: 35, top: 15),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-            AppLocalizations.of(context)!.flashcardsRevisionLanguage,
+            DictLibLocalizations.of(context)!.flashcardsRevisionLanguage,
             style: const TextStyle(
                 fontSize: 16, color: Color.fromARGB(255, 100, 100, 100)),
             textAlign: TextAlign.start,
@@ -120,8 +120,8 @@ class MyFlashcardsLandingPageController
             .toList();
     return [
       SettingsTile.navigation(
-        title:
-            getText(AppLocalizations.of(context)!.flashcardsSelectSignRegions),
+        title: getText(
+            DictLibLocalizations.of(context)!.flashcardsSelectSignRegions),
         trailing: Container(),
         onPressed: (BuildContext context) async {
           await showDialog(
@@ -129,7 +129,8 @@ class MyFlashcardsLandingPageController
             builder: (ctx) {
               return MultiSelectDialog(
                 listType: MultiSelectListType.CHIP,
-                title: Text(AppLocalizations.of(context)!.flashcardsRegions),
+                title:
+                    Text(DictLibLocalizations.of(context)!.flashcardsRegions),
                 items: Region.values
                     .map((e) =>
                         MultiSelectItem(e.index, getRegionPretty(context, e)))

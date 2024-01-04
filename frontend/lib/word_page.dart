@@ -3,7 +3,7 @@ import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/gestures.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/language_dropdown.dart';
 
@@ -75,10 +75,12 @@ class _EntryPageState extends State<EntryPage> {
     Icon starIcon;
     if (isFavourited) {
       starIcon = Icon(Icons.star,
-          semanticLabel: AppLocalizations.of(context)!.wordAlreadyFavourited);
+          semanticLabel:
+              DictLibLocalizations.of(context)!.wordAlreadyFavourited);
     } else {
       starIcon = Icon(Icons.star_outline,
-          semanticLabel: AppLocalizations.of(context)!.wordFavouriteThisWord);
+          semanticLabel:
+              DictLibLocalizations.of(context)!.wordFavouriteThisWord);
     }
 
     List<Widget> actions = [];
@@ -117,7 +119,7 @@ class _EntryPageState extends State<EntryPage> {
           });
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
-                  "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
+                  "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
               backgroundColor: MAIN_COLOR,
               duration: const Duration(milliseconds: 1000)));
         },
@@ -134,7 +136,7 @@ class _EntryPageState extends State<EntryPage> {
             locale: locale,
             child: Builder(builder: (context) {
               var phrase = entry.getPhrase(locale) ??
-                  AppLocalizations.of(context)!.wordDataMissing;
+                  DictLibLocalizations.of(context)!.wordDataMissing;
               return Scaffold(
                   appBar: AppBar(
                       title: Text(phrase),
@@ -206,7 +208,7 @@ Widget? getRelatedEntriesWidget(
   }
 
   var initial = TextSpan(
-      text: "${AppLocalizations.of(context)!.relatedWords}: ",
+      text: "${DictLibLocalizations.of(context)!.relatedWords}: ",
       style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
   textSpans = [initial] + textSpans;
   var richText = RichText(
@@ -346,7 +348,7 @@ Widget Definitions(BuildContext context, List<Definition> definitions) {
   if (definitions.isEmpty) {
     return Center(
         child: Text(
-      AppLocalizations.of(context)!.wordNoDefinitions,
+      DictLibLocalizations.of(context)!.wordNoDefinitions,
       textAlign: TextAlign.center,
     ));
   }

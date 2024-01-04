@@ -71,6 +71,7 @@ git add pubspec.yaml
 Run this when you change any of the files in lib/l10n:
 ```
 flutter gen-l10n
+dart fix --apply
 ```
 
 ## Generating entries (de)serialization code

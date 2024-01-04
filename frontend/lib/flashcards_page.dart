@@ -7,7 +7,7 @@ import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/revision.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'common.dart';
 import 'video_player_screen.dart';
@@ -154,7 +154,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     Color textColor;
     Color borderColor;
     if (rating == Rating.Easy && isNext) {
-      textData = AppLocalizations.of(context)!.flashcardsNext;
+      textData = DictLibLocalizations.of(context)!.flashcardsNext;
       overlayColor = const Color.fromARGB(92, 30, 143, 250);
       backgroundColor = const Color.fromARGB(0, 255, 255, 255);
       borderColor = const Color.fromARGB(255, 116, 116, 116);
@@ -162,11 +162,11 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     } else {
       switch (rating) {
         case Rating.Hard:
-          textData = AppLocalizations.of(context)!.flashcardsForgot;
+          textData = DictLibLocalizations.of(context)!.flashcardsForgot;
           overlayColor = const Color.fromARGB(90, 211, 88, 79);
           break;
         case Rating.Good:
-          textData = AppLocalizations.of(context)!.flashcardsGotIt;
+          textData = DictLibLocalizations.of(context)!.flashcardsGotIt;
           overlayColor = const Color.fromARGB(90, 72, 167, 77);
           break;
         default:
@@ -245,7 +245,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         topWidget = Container(
             padding: EdgeInsets.only(top: top, bottom: 70),
             child: Text(
-                AppLocalizations.of(context)!.flashcardsWhatIsSignForWord,
+                DictLibLocalizations.of(context)!.flashcardsWhatIsSignForWord,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20)));
       }
@@ -260,7 +260,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     } else {
       if (!revealed) {
         bottomWidget = Text(
-            AppLocalizations.of(context)!.flashcardsWhatDoesSignMean,
+            DictLibLocalizations.of(context)!.flashcardsWhatDoesSignMean,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 20));
       } else {
@@ -328,7 +328,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
                         )));
           },
           child: Text(
-            AppLocalizations.of(context)!.flashcardsOpenDictionaryEntry,
+            DictLibLocalizations.of(context)!.flashcardsOpenDictionaryEntry,
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 14),
           ))
@@ -481,15 +481,17 @@ class FlashcardsPageState extends State<FlashcardsPage> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              getText("${AppLocalizations.of(context)!.flashcardsSuccessRate}:",
-                  bold: true),
-              getText("${AppLocalizations.of(context)!.flashcardsTotalCards}:",
+              getText(
+                  "${DictLibLocalizations.of(context)!.flashcardsSuccessRate}:",
                   bold: true),
               getText(
-                  "${AppLocalizations.of(context)!.flashcardsSuccessfulCards}:",
+                  "${DictLibLocalizations.of(context)!.flashcardsTotalCards}:",
                   bold: true),
               getText(
-                  "${AppLocalizations.of(context)!.flashcardsIncorrectCards}:",
+                  "${DictLibLocalizations.of(context)!.flashcardsSuccessfulCards}:",
+                  bold: true),
+              getText(
+                  "${DictLibLocalizations.of(context)!.flashcardsIncorrectCards}:",
                   bold: true)
             ],
           ),
@@ -549,14 +551,14 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         });
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text(
-                "${AppLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}"),
+                "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}"),
             backgroundColor: MAIN_COLOR,
             duration: const Duration(milliseconds: 1000)));
       }, enabled: videoIsShowing));
     } else {
       body = buildSummaryWidget();
       appBarTitle =
-          AppLocalizations.of(context)!.flashcardsRevisionSummaryTitle;
+          DictLibLocalizations.of(context)!.flashcardsRevisionSummaryTitle;
     }
 
     // Disable swipe back with PopScope.

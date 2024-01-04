@@ -3,9 +3,8 @@ import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:dictionarylib/dictionarylib.dart'
-    show AppLocalizations, LANGUAGE_CODE_TO_LOCALE;
+    show DictLibLocalizations, LANGUAGE_CODE_TO_LOCALE;
 import 'package:slsl_dictionary/root.dart';
-
 
 const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
 
@@ -100,7 +99,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
         if (includeDeviceDefaultOption) {
           languageOptions.add(PopupMenuItem<String>(
               value: NO_OVERRIDE_KEY,
-              child: Text(AppLocalizations.of(context)!.deviceDefault)));
+              child: Text(DictLibLocalizations.of(context)!.deviceDefault)));
         }
 
         // Add the rest of the language options.
@@ -128,7 +127,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
     if (includeDeviceDefaultOption) {
       languageOptions.add(DropdownMenuItem<String>(
           value: NO_OVERRIDE_KEY,
-          child: Text(AppLocalizations.of(context)!.deviceDefault)));
+          child: Text(DictLibLocalizations.of(context)!.deviceDefault)));
     }
 
     // Add the rest of the language options.

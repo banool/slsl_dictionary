@@ -4,7 +4,7 @@ import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_entry_list_help_en.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'common.dart';
 
@@ -153,7 +153,7 @@ class _EntryListPageState extends State<EntryListPage> {
 
     String hintText;
     if (inEditMode) {
-      hintText = AppLocalizations.of(context)!.listSearchAdd;
+      hintText = DictLibLocalizations.of(context)!.listSearchAdd;
       bool keyboardIsShowing = MediaQuery.of(context).viewInsets.bottom > 0;
       if (currentSearchTerm.isNotEmpty || keyboardIsShowing) {
         floatingActionButton = null;
@@ -166,7 +166,8 @@ class _EntryListPageState extends State<EntryListPage> {
             child: const Icon(Icons.add));
       }
     } else {
-      hintText = "${AppLocalizations.of(context)!.listSearchPrefix} $listName";
+      hintText =
+          "${DictLibLocalizations.of(context)!.listSearchPrefix} $listName";
     }
 
     return Scaffold(

@@ -2,7 +2,7 @@ import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'entries_loader.dart';
 
@@ -191,9 +191,9 @@ enum Region {
 String getRegionPretty(BuildContext context, Region region) {
   switch (region) {
     case Region.ALL:
-      return AppLocalizations.of(context)!.flashcardsAllOfSriLanka;
+      return DictLibLocalizations.of(context)!.flashcardsAllOfSriLanka;
     case Region.NORTH_EAST:
-      return AppLocalizations.of(context)!.flashcardsNorthEast;
+      return DictLibLocalizations.of(context)!.flashcardsNorthEast;
   }
 }
 

@@ -1,7 +1,7 @@
 import 'package:dictionarylib/common.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:dictionarylib/dictionarylib.dart' show AppLocalizations;
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'common.dart';
 import 'root.dart';
@@ -32,11 +32,11 @@ class TopLevelScaffold extends StatelessWidget {
     var items = <BottomNavigationBarItem>[
       BottomNavigationBarItem(
         icon: const Icon(Icons.search),
-        label: AppLocalizations.of(context)!.searchTitle,
+        label: DictLibLocalizations.of(context)!.searchTitle,
       ),
       BottomNavigationBarItem(
         icon: const Icon(Icons.view_list),
-        label: AppLocalizations.of(context)!.listsTitle,
+        label: DictLibLocalizations.of(context)!.listsTitle,
       ),
     ];
 
@@ -44,14 +44,14 @@ class TopLevelScaffold extends StatelessWidget {
       items.add(
         BottomNavigationBarItem(
           icon: const Icon(Icons.style),
-          label: AppLocalizations.of(context)!.revisionTitle,
+          label: DictLibLocalizations.of(context)!.revisionTitle,
         ),
       );
     }
 
     items.add(BottomNavigationBarItem(
       icon: const Icon(Icons.settings),
-      label: AppLocalizations.of(context)!.settingsTitle,
+      label: DictLibLocalizations.of(context)!.settingsTitle,
     ));
 
     return Scaffold(

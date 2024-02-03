@@ -84,7 +84,7 @@ class _EntryPageState extends State<EntryPage> {
     }
 
     List<Widget> actions = [];
-    if (showFavouritesButton) {
+    if (showFavouritesButton && getShowLists()) {
       actions.add(buildActionButton(
         context,
         starIcon,

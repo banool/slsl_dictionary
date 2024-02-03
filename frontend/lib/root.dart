@@ -1,5 +1,6 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/page_entry_list.dart';
 import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
 import 'package:dictionarylib/page_search.dart';
@@ -13,7 +14,6 @@ import 'common.dart';
 import 'flashcards_landing_page.dart';
 import 'language_dropdown.dart';
 import 'legal_information.dart';
-import 'word_list_page.dart';
 
 const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
@@ -85,8 +85,10 @@ class _RootAppState extends State<RootApp> {
                 child: EntryListsOverviewPage(
                   mainColor: MAIN_COLOR,
                   appBarDisabledColor: APP_BAR_DISABLED_COLOR,
-                  buildEntryListWidgetCallback: (entryList) =>
-                      EntryListPage(entryList: entryList),
+                  buildEntryListWidgetCallback: (entryList) => EntryListPage(
+                      entryList: entryList,
+                      mainColor: MAIN_COLOR,
+                      appBarDisabledColor: APP_BAR_DISABLED_COLOR),
                 ),
               );
             }),

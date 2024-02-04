@@ -6,6 +6,8 @@ import 'package:dictionarylib/dictionarylib.dart'
     show DictLibLocalizations, LANGUAGE_CODE_TO_LOCALE;
 import 'package:slsl_dictionary/root.dart';
 
+import 'common.dart';
+
 const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
 
 class LanguageDropdown extends StatefulWidget {
@@ -18,20 +20,6 @@ class LanguageDropdown extends StatefulWidget {
 
   final bool asPopUpMenu;
   final bool includeDeviceDefaultOption;
-  final String? initialLanguageCode;
-  final Locale Function(String)? onChanged;
-
-  @override
-  LanguageDropdownState createState() => LanguageDropdownState(
-      asPopUpMenu: asPopUpMenu,
-      includeDeviceDefaultOption: includeDeviceDefaultOption,
-      initialLanguageCode: initialLanguageCode,
-      onChanged: onChanged);
-}
-
-class LanguageDropdownState extends State<LanguageDropdown> {
-  final bool asPopUpMenu;
-  final bool includeDeviceDefaultOption;
 
   // If given, this will be used as the initial value for the dropdown rather
   // than the device locale.
@@ -42,12 +30,11 @@ class LanguageDropdownState extends State<LanguageDropdown> {
   // string and return a locale.
   final Locale Function(String)? onChanged;
 
-  LanguageDropdownState(
-      {required this.asPopUpMenu,
-      required this.includeDeviceDefaultOption,
-      this.initialLanguageCode,
-      this.onChanged});
+  @override
+  LanguageDropdownState createState() => LanguageDropdownState();
+}
 
+class LanguageDropdownState extends State<LanguageDropdown> {
   Locale? widgetLocaleOverride;
   late Future<void> initStateAsyncFuture;
 
@@ -79,7 +66,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    if (asPopUpMenu) {
+    if (widget.asPopUpMenu) {
       return buildPopUpMenu(context);
     } else {
       return buildDropdown(context);
@@ -96,7 +83,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
         List<PopupMenuItem<String>> languageOptions = [];
 
         // Add system locale.
-        if (includeDeviceDefaultOption) {
+        if (widget.includeDeviceDefaultOption) {
           languageOptions.add(PopupMenuItem<String>(
               value: NO_OVERRIDE_KEY,
               child: Text(DictLibLocalizations.of(context)!.deviceDefault)));
@@ -113,7 +100,7 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
         return languageOptions;
       },
-      onSelected: onChanged,
+      onSelected: widget.onChanged,
     );
   }
 
@@ -123,7 +110,12 @@ class LanguageDropdownState extends State<LanguageDropdown> {
     // Build list of possible languages.
     List<DropdownMenuItem<String>> languageOptions = [];
 
-    // Add system locale.
+    bool systemLocaleIsSupported = localeIsSupported(systemLocale);
+    bool includeDeviceDefaultOption =
+        widget.includeDeviceDefaultOption && systemLocaleIsSupported;
+
+    // Add system locale. We don't add it even if includeDeviceDefaultOption is
+    // set if the system locale is not one of the supported languages.
     if (includeDeviceDefaultOption) {
       languageOptions.add(DropdownMenuItem<String>(
           value: NO_OVERRIDE_KEY,
@@ -150,14 +142,17 @@ class LanguageDropdownState extends State<LanguageDropdown> {
           // Determine which option should be selected. Either a language code
           // or NO_OVERRIDE_KEY.
           String selectedLanguageCode;
-          if (initialLanguageCode != null) {
-            selectedLanguageCode = initialLanguageCode!;
+          if (widget.initialLanguageCode != null) {
+            selectedLanguageCode =
+                normalizeLanguageCode(widget.initialLanguageCode!);
           } else if (widgetLocaleOverride != null) {
-            selectedLanguageCode = widgetLocaleOverride!.languageCode;
+            selectedLanguageCode =
+                normalizeLanguageCode(widgetLocaleOverride!.languageCode);
           } else if (includeDeviceDefaultOption) {
             selectedLanguageCode = NO_OVERRIDE_KEY;
           } else {
-            selectedLanguageCode = currentLocale.languageCode;
+            selectedLanguageCode =
+                normalizeLanguageCode(currentLocale.languageCode);
           }
 
           return DropdownButton<String>(
@@ -165,8 +160,8 @@ class LanguageDropdownState extends State<LanguageDropdown> {
             items: languageOptions,
             onChanged: (String? newValue) async {
               Locale? newLocale;
-              if (onChanged != null) {
-                newLocale = onChanged!(newValue!);
+              if (widget.onChanged != null) {
+                newLocale = widget.onChanged!(newValue!);
               } else {
                 newLocale = await setLocale(newValue!);
               }

@@ -138,8 +138,9 @@ class MySubEntry implements SubEntry {
   @override
   List<Definition> getDefinitions(Locale locale) {
     List<Definition> out = [];
+    var lang = locale.languageCode.split("_")[0];
     for (Definition definition in definitions ?? []) {
-      if (definition.language.toLowerCase() == locale.languageCode) {
+      if (definition.language.toLowerCase() == lang) {
         out.add(definition);
       }
     }

@@ -68,8 +68,14 @@ Future<void> main() async {
       locale = localeOverride;
       printAndLog("Using locale override: $locale");
     } else {
+      printAndLog("Using system locale: $systemLocale");
       locale = systemLocale;
-      printAndLog("Using system locale: $locale");
+    }
+    // We can only handle these 3 locales, if the system locale is something
+    // else we fall back to English.
+    if (!localeIsSupported(locale)) {
+      locale = LOCALE_ENGLISH;
+      printAndLog("Locale not supported, falling back to English: $locale");
     }
     runApp(RootApp(startingLocale: locale));
   } catch (error, stackTrace) {

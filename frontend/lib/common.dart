@@ -32,3 +32,16 @@ Future<void> navigateToEntryPage(
             entry: entry, showFavouritesButton: showFavouritesButton)),
   );
 }
+
+// For example, en_US -> en. I'm pretty sure this isn't necessary because the
+// languageCode is already just en but let's do this just in case.
+String normalizeLanguageCode(String languageCode) {
+  return languageCode.split("_")[0];
+}
+
+bool localeIsSupported(Locale locale) {
+  var lang = normalizeLanguageCode(locale.languageCode);
+  return lang == LANGUAGE_CODE_ENGLISH ||
+      lang == LANGUAGE_CODE_SINHALA ||
+      lang == LANGUAGE_CODE_TAMIL;
+}

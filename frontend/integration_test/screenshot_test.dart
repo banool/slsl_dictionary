@@ -146,18 +146,24 @@ void main() async {
 
     String listName = "Animals";
     String listKey = EntryList.getKeyFromName(listName);
-    await entryListManager.createEntryList(listKey);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager.createEntryList(listKey);
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["bear"]!);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["fish"]!);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["rabbit"]!);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["elephant"]!);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["tiger"]!);
-    await entryListManager.entryLists[listKey]!
+    await userEntryListManager
+        .getEntryLists()[listKey]!
         .addEntry(keyedByEnglishEntriesGlobal["wolf"]!);
 
     await sharedPreferences
@@ -172,7 +178,8 @@ void main() async {
 
     await takeScreenshot(tester, binding, screenshotNameInfo, "search");
 
-    final Finder searchField = find.byKey(const ValueKey("searchPage.searchForm"));
+    final Finder searchField =
+        find.byKey(const ValueKey("searchPage.searchForm"));
     await tester.tap(searchField);
     await tester.pumpAndSettle();
     await tester.enterText(searchField, "hey");

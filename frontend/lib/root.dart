@@ -1,5 +1,6 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_entry_list.dart';
 import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
@@ -19,6 +20,8 @@ const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
 const REVISION_ROUTE = "/revision";
 const SETTINGS_ROUTE = "/settings";
+
+const bool APP_HAS_COMMUNITY_LISTS = true;
 
 late Locale systemLocale;
 
@@ -91,6 +94,7 @@ class _RootAppState extends State<RootApp> {
                     appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                     navigateToEntryPage: navigateToEntryPage,
                   ),
+                  appHasCommunityLists: APP_HAS_COMMUNITY_LISTS,
                 ),
               );
             }),
@@ -110,36 +114,35 @@ class _RootAppState extends State<RootApp> {
             pageBuilder: (BuildContext context, GoRouterState state) {
               return NoTransitionPage(
                   child: SettingsPage(
-                      appName: APP_NAME,
-                      mainColor: MAIN_COLOR,
-                      appBarDisabledColor: APP_BAR_DISABLED_COLOR,
-                      additionalTopWidgets: [
-                        Padding(
-                          padding: const EdgeInsets.only(left: 35, top: 15),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  DictLibLocalizations.of(context)!
-                                      .settingsLanguage,
-                                  style: const TextStyle(
-                                      fontSize: 13,
-                                      color:
-                                          Color.fromARGB(255, 100, 100, 100)),
-                                  textAlign: TextAlign.start,
-                                ),
-                                const Center(child: LanguageDropdown()),
-                              ]),
-                        ),
-                      ],
-                      buildLegalInformationChildren:
-                          buildLegalInformationChildren,
-                      reportDataProblemUrl:
-                          'https://github.com/banool/slsl_dictionary/issues/new/choose',
-                      reportAppProblemUrl:
-                          'https://github.com/banool/slsl_dictionary/issues',
-                      iOSAppId: "6445848879",
-                      androidAppId: "com.banool.slsl_dictionary"));
+                appName: APP_NAME,
+                mainColor: MAIN_COLOR,
+                appBarDisabledColor: APP_BAR_DISABLED_COLOR,
+                additionalTopWidgets: [
+                  Padding(
+                    padding: const EdgeInsets.only(left: 35, top: 15),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            DictLibLocalizations.of(context)!.settingsLanguage,
+                            style: const TextStyle(
+                                fontSize: 13,
+                                color: Color.fromARGB(255, 100, 100, 100)),
+                            textAlign: TextAlign.start,
+                          ),
+                          const Center(child: LanguageDropdown()),
+                        ]),
+                  ),
+                ],
+                buildLegalInformationChildren: buildLegalInformationChildren,
+                reportDataProblemUrl:
+                    'https://github.com/banool/slsl_dictionary/issues/new/choose',
+                reportAppProblemUrl:
+                    'https://github.com/banool/slsl_dictionary/issues',
+                iOSAppId: "6445848879",
+                androidAppId: "com.banool.slsl_dictionary",
+                appHasCommunityLists: APP_HAS_COMMUNITY_LISTS,
+              ));
             }),
       ]);
 

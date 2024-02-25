@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_loader.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
+import 'package:slsl_dictionary/entry_list.dart';
 
 import 'entries_types.dart';
 import 'globals.dart';
@@ -76,5 +78,29 @@ class MyEntryLoader extends EntryLoader {
     }
     printAndLog("Loaded ${entries.length} entries");
     return entries;
+  }
+
+  @override
+  setEntriesGlobal(Set<Entry> entries) {
+    super.setEntriesGlobal(entries);
+
+    // The super function handled updating the global entries keyed by English
+    // but we have to update the Sinhala and Tamil entries ourselves.
+    printAndLog("Updating keyed entriesGlobal variants");
+    for (Entry e in entriesGlobal) {
+      var phrase = e.getPhrase(LOCALE_SINHALA);
+      if (phrase != null) {
+        keyedBySinhalaEntriesGlobal[phrase] = e;
+      }
+      var phraseTamil = e.getPhrase(LOCALE_TAMIL);
+      if (phraseTamil != null) {
+        keyedByTamilEntriesGlobal[phraseTamil] = e;
+      }
+    }
+    printAndLog("Updated keyed entriesGlobal for Sinhala and Tamil");
+
+    // Update the entry list manager that is based on category.
+    communityEntryListManager = CategoryEntryListManager.fromStartup();
+    printAndLog("Built community entry list manager");
   }
 }

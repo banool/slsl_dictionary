@@ -1,6 +1,5 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
-import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_entry_list.dart';
 import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
@@ -20,8 +19,6 @@ const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
 const REVISION_ROUTE = "/revision";
 const SETTINGS_ROUTE = "/settings";
-
-const bool APP_HAS_COMMUNITY_LISTS = true;
 
 late Locale systemLocale;
 
@@ -94,7 +91,6 @@ class _RootAppState extends State<RootApp> {
                     appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                     navigateToEntryPage: navigateToEntryPage,
                   ),
-                  appHasCommunityLists: APP_HAS_COMMUNITY_LISTS,
                 ),
               );
             }),
@@ -141,7 +137,6 @@ class _RootAppState extends State<RootApp> {
                     'https://github.com/banool/slsl_dictionary/issues',
                 iOSAppId: "6445848879",
                 androidAppId: "com.banool.slsl_dictionary",
-                appHasCommunityLists: APP_HAS_COMMUNITY_LISTS,
               ));
             }),
       ]);

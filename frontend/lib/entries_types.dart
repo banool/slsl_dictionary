@@ -14,7 +14,7 @@ class MyEntry implements Entry {
   final String? word_in_sinhala;
   final String? word_in_tamil;
 
-  final String? category;
+  final List<String> categories;
   final String entry_type;
 
   final List<MySubEntry> sub_entries;
@@ -23,7 +23,7 @@ class MyEntry implements Entry {
       {required this.word_in_english,
       this.word_in_sinhala,
       this.word_in_tamil,
-      this.category,
+      required this.categories,
       required this.entry_type,
       required this.sub_entries});
 

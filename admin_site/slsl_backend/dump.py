@@ -44,14 +44,14 @@ def build_dump_models():
         category_id = entry_category.category_id
         entry_id_to_category_ids.setdefault(entry_id, []).append(category_id)
 
-    # Set categories on the entries. We only set the category names.
-    for entry_id, category_ids in entry_id_to_category_ids.items():
-        entry = entry_id_to_entry[entry_id]
+    # Set categories on the entries. We only set the category names. If there are no
+    # relations, set an empty list.
+    for entry_id, entry in entry_id_to_entry.items():
         entry["categories"] = [
-            category_id_to_category[category_id].name for category_id in category_ids
+            category_id_to_category[category_id].name
+            for category_id in entry_id_to_category_ids.get(entry_id, [])
         ]
         # For backwards compatibility, set the first category as the "category" field.
-        # TODO: We will remove this later.
         if entry["categories"]:
             entry["category"] = entry["categories"][0]
 

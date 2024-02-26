@@ -26,7 +26,10 @@ class SubEntryAdmin(NestedStackedInline):
 
 class EntryAdmin(NestedModelAdmin):
     search_fields = ["word_in_english", "word_in_tamil", "word_in_sinhala"]
-    list_filter = ["entry_type", "category"]
+    # This introduces a nicer UI for selecting categories on the entry edit page.
+    filter_horizontal = ("categories",)
+    # This lets the user filter entries by entry type and category.
+    list_filter = ["entry_type", "categories"]
     inlines = [
         SubEntryAdmin,
     ]
@@ -34,3 +37,4 @@ class EntryAdmin(NestedModelAdmin):
 
 # Register relevant models.
 admin.site.register(models.Entry, EntryAdmin)
+admin.site.register(models.Category)

@@ -10,6 +10,19 @@ COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)([\w|\s]+(?:,\s*\w(\w|\s)*)*)
 # at least one video.
 
 
+class Category(models.Model):
+    class Meta:
+        verbose_name_plural = "categories"
+        ordering = ["name"]
+
+    name = models.CharField(
+        max_length=128, unique=True, help_text='Please use title case, e.g. "Animals"'
+    )
+
+    def __str__(self):
+        return self.name
+
+
 class EntryType(models.TextChoices):
     WORD = "WORD", _("Word")
     PHRASE = "PHRASE", _("Phrase")
@@ -36,14 +49,7 @@ class Entry(models.Model):
         max_length=256, null=True, blank=True, verbose_name="Word in Tamil"
     )
 
-    # This is an optional field that we might use down the line for some kind of
-    # predefined word list feature.
-    category = models.CharField(
-        max_length=128,
-        null=True,
-        blank=True,
-        help_text="This is a field we might use down the line for some kind of predefined word list feature.",
-    )
+    categories = models.ManyToManyField(Category, blank=True)
 
     # This field defines whether the entry is, for now, a word or phrase.
     entry_type = models.CharField(

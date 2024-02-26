@@ -72,6 +72,11 @@ class MyEntry implements Entry {
       throw Exception("Unknown entry type $entry_type");
     }
   }
+
+  @override
+  List<String> getCategories() {
+    return categories;
+  }
 }
 
 @JsonSerializable()

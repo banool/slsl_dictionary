@@ -13,17 +13,21 @@ void main() async {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   entriesGlobal = {
-    MyEntry(word_in_english: "friend", entry_type: "WORD", sub_entries: [
-      MySubEntry(
-          videos: ["video.mp4"],
-          region: "ALL",
-          definitions: [
-            Definition(
-                language: "en",
-                category: "Relationships",
-                definition: "Someone you love :)")
-          ])
-    ])
+    MyEntry(
+        word_in_english: "friend",
+        entry_type: "WORD",
+        categories: [],
+        sub_entries: [
+          MySubEntry(
+              videos: ["video.mp4"],
+              region: "ALL",
+              definitions: [
+                Definition(
+                    language: "en",
+                    category: "Relationships",
+                    definition: "Someone you love :)")
+              ])
+        ])
   };
 
   SharedPreferences.setMockInitialValues({});

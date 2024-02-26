@@ -17,26 +17,25 @@ class CategoryEntryListManager implements EntryListManager {
   factory CategoryEntryListManager.fromStartup() {
     SplayTreeMap<String, List<MyEntry>> categoryToEntries = SplayTreeMap();
 
-    // Build up the entryies keyed by category.
+    // Build up the entryies keyed by category. Because an entry can have
+    // multiple categories, a single entry can appear in multiple entry lists.
     for (MyEntry e in entriesGlobal.cast<MyEntry>()) {
-      if (e.category == null) {
-        continue;
+      for (var category in e.getCategories()) {
+        var cleanCategory = removeNonMatchingCharacters(
+            category, EntryList.validNameCharacters);
+
+        if (cleanCategory == "") {
+          continue;
+        }
+
+        // Suffix lengths must equal 6, so this is a short form of "_category".
+        var key = EntryList.getKeyFromName(cleanCategory, suffix: "_categ");
+
+        if (!categoryToEntries.containsKey(key)) {
+          categoryToEntries[key] = [];
+        }
+        categoryToEntries[key]!.add(e);
       }
-
-      var cleanCategory = removeNonMatchingCharacters(
-          e.category!, EntryList.validNameCharacters);
-
-      if (cleanCategory == "") {
-        continue;
-      }
-
-      // Suffix lengths must equal 6, so this is a short form of "_category".
-      var key = EntryList.getKeyFromName(cleanCategory, suffix: "_categ");
-
-      if (!categoryToEntries.containsKey(key)) {
-        categoryToEntries[key] = [];
-      }
-      categoryToEntries[key]!.add(e);
     }
 
     // Build EntryLists from the previous map.

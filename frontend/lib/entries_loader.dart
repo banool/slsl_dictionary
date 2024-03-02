@@ -4,10 +4,10 @@ import 'dart:io';
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_loader.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/entry_list_categories.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:http/http.dart' as http;
 import 'package:http/http.dart';
-import 'package:slsl_dictionary/entry_list.dart';
 
 import 'entries_types.dart';
 import 'globals.dart';

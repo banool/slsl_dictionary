@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 1.1.7+110
+version: 1.1.8+111
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -15,10 +15,10 @@ dependencies:
   collection:
   cupertino_icons:
   dictionarylib:
-    # path: ../../dictionarylib
-    git:
-      url: https://github.com/banool/dictionarylib.git
-      ref: main
+    path: ../../dictionarylib
+    # git:
+    #   url: https://github.com/banool/dictionarylib.git
+    #   ref: main
   dolphinsr_dart:
     git:
       url: https://github.com/banool/dolphhinsr_dart.git

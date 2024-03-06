@@ -44,7 +44,7 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
       // If the user needs to upgrade, this will throw a specific error that
       // main() can catch to show the ForceUpgradePage.
       await GitHubYankedVersionChecker(
-              "https://raw.githubusercontent.com/banool/slsl_dictionary/main/assets/yanked_versions")
+              "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions")
           .throwIfShouldUpgrade();
     })(),
     // Get knob values.

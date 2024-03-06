@@ -135,8 +135,8 @@ class _RootAppState extends State<RootApp> {
                     'https://github.com/banool/slsl_dictionary/issues/new/choose',
                 reportAppProblemUrl:
                     'https://github.com/banool/slsl_dictionary/issues',
-                iOSAppId: "6445848879",
-                androidAppId: "com.banool.slsl_dictionary",
+                iOSAppId: IOS_APP_ID,
+                androidAppId: ANDROID_APP_ID,
               ));
             }),
       ]);

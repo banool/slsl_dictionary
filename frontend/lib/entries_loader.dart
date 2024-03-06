@@ -30,7 +30,8 @@ class MyEntryLoader extends EntryLoader {
   MyEntryLoader({required this.dumpFileUrl});
 
   @override
-  Future<NewData?> downloadNewData(int currentVersion) async {
+  Future<NewData?> downloadNewData(
+      int currentVersion, bool forceDownload) async {
     // Previously we used to check if we needed to download the data again by
     // making two requests. First we'd make one request for just the headers, in
     // which we check the value of the Last-Modified header. If that time was
@@ -40,9 +41,14 @@ class MyEntryLoader extends EntryLoader {
     // header. With this, we can just make a single request in which we say the
     // the data must be newer than the given time. If it is, we'll get a 200
     // containing the data. If not, we'll get a 304 with no body.
-    var headers = {
-      "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion)
-    };
+    Map<String, String> headers = {};
+    // If forceDownload is true we don't include the header so we'll download
+    // the new data unconditionally.
+    if (!forceDownload) {
+      headers = {
+        "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion)
+      };
+    }
     Response response = (await http
         .get(dumpFileUrl, headers: headers)
         .timeout(const Duration(seconds: 15)));
@@ -66,7 +72,7 @@ class MyEntryLoader extends EntryLoader {
             .millisecondsSinceEpoch ~/
         1000;
 
-    return NewData(newData, newVersion);
+    return NewData(newData, currentVersion, newVersion);
   }
 
   @override

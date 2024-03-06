@@ -23,6 +23,9 @@ const MaterialColor MAIN_COLOR = MaterialColor(
 
 const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 
+const String IOS_APP_ID = "6445848879";
+const String ANDROID_APP_ID = "com.banool.slsl_dictionary";
+
 Future<void> navigateToEntryPage(
     BuildContext context, Entry entry, bool showFavouritesButton) {
   return Navigator.push(

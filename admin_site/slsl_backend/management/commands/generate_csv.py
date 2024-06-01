@@ -10,6 +10,7 @@ from slsl_backend import models
 class Command(BaseCommand):
     def add_arguments(self, parser):
         parser.add_argument("out_file")
+        parser.add_argument("--only-no-translations", action="store_true")
 
     def handle(self, *args, **options):
         entries = models.Entry.objects.all()
@@ -18,6 +19,9 @@ class Command(BaseCommand):
             "word_in_tamil",
             "word_in_sinhala",
         )
+
+        if options["only_no_translations"]:
+            entry_data = [e for e in entry_data if not e["word_in_tamil"] or not e["word_in_sinhala"]]
 
         with open(
             options["out_file"],

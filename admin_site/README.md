@@ -90,3 +90,5 @@ After running the service, run this:
 ```
 curl http://127.0.0.1:8080/dump > ~/dump.json
 ```
+## Other stuff
+Note: It seems like the `unique` constraint on `word_in_english` didn't actually apply a unique constraint in the DB. I did it manually.

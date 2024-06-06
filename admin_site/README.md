@@ -80,7 +80,7 @@ poetry run poe black
 ## Generating csvs for translators
 For entries:
 ```
-poetry run python manage.py generate_csv ~/out.csv
+poetry run python manage.py generate_csv entries ~/out.csv
 ```
 
 For the text of the app itself try just sharing the arb files as txt files.

@@ -1,5 +1,6 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_entry_list.dart';
 import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
@@ -52,6 +53,14 @@ class _RootAppState extends State<RootApp> {
 
   Locale locale;
 
+  @override
+  void initState() {
+    super.initState();
+    locale = widget.startingLocale;
+    themeNotifier.value = ThemeMode.values[
+        sharedPreferences.getInt(KEY_THEME_MODE) ?? ThemeMode.light.index];
+  }
+
   final GoRouter router = GoRouter(
       navigatorKey: rootNavigatorKey,
       initialLocation: SEARCH_ROUTE,
@@ -63,15 +72,14 @@ class _RootAppState extends State<RootApp> {
         GoRoute(
             path: SEARCH_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              String? initialQuery = state.queryParams["query"];
+              String? initialQuery = state.uri.queryParameters["query"];
               bool navigateToFirstMatch =
-                  state.queryParams["navigate_to_first_match"] == "true";
+                  state.uri.queryParameters["navigate_to_first_match"] ==
+                      "true";
               return NoTransitionPage(
                   // https://stackoverflow.com/a/73458529/3846032
                   key: UniqueKey(),
                   child: SearchPage(
-                    mainColor: MAIN_COLOR,
-                    appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                     navigateToEntryPage: navigateToEntryPage,
                     initialQuery: initialQuery,
                     navigateToFirstMatch: navigateToFirstMatch,
@@ -83,12 +91,8 @@ class _RootAppState extends State<RootApp> {
             pageBuilder: (BuildContext context, GoRouterState state) {
               return NoTransitionPage(
                 child: EntryListsOverviewPage(
-                  mainColor: MAIN_COLOR,
-                  appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                   buildEntryListWidgetCallback: (entryList) => EntryListPage(
                     entryList: entryList,
-                    mainColor: MAIN_COLOR,
-                    appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                     navigateToEntryPage: navigateToEntryPage,
                   ),
                 ),
@@ -101,8 +105,6 @@ class _RootAppState extends State<RootApp> {
               return NoTransitionPage(
                   child: FlashcardsLandingPage(
                 controller: controller,
-                mainColor: MAIN_COLOR,
-                appBarDisabledColor: APP_BAR_DISABLED_COLOR,
               ));
             }),
         GoRoute(
@@ -111,8 +113,6 @@ class _RootAppState extends State<RootApp> {
               return NoTransitionPage(
                   child: SettingsPage(
                 appName: APP_NAME,
-                mainColor: MAIN_COLOR,
-                appBarDisabledColor: APP_BAR_DISABLED_COLOR,
                 additionalTopWidgets: [
                   Padding(
                     padding: const EdgeInsets.only(left: 35, top: 15),
@@ -143,44 +143,187 @@ class _RootAppState extends State<RootApp> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-        onTap: () {
-          FocusScopeNode currentFocus = FocusScope.of(context);
-          if (!currentFocus.hasPrimaryFocus &&
-              currentFocus.focusedChild != null) {
-            FocusManager.instance.primaryFocus!.unfocus();
-          }
-        },
-        child: MaterialApp.router(
-          title: APP_NAME,
-          // I set appTitle manually for now due to this issue:
-          // https://stackoverflow.com/q/77759180/3846032
-          // AppLocalizations.delegate,
-          onGenerateTitle: (context) => getAppTitle(locale),
-          localizationsDelegates: DictLibLocalizations.localizationsDelegates,
-          //
-          // localizationsDelegates: const [
-          //   DictLibLocalizations.delegate,
-          // ],
-          supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
-          locale: locale,
-          debugShowCheckedModeBanner: false,
-          theme: ThemeData(
-              appBarTheme: const AppBarTheme(
-                backgroundColor: MAIN_COLOR,
-                foregroundColor: Colors.white,
-                actionsIconTheme: IconThemeData(color: Colors.white),
-                iconTheme: IconThemeData(color: Colors.white),
-              ),
-              primarySwatch: MAIN_COLOR,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-              // Make swiping to pop back the navigation work.
-              pageTransitionsTheme: const PageTransitionsTheme(builders: {
-                TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-                TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-              })),
-          routerConfig: router,
-        ));
+    return ValueListenableBuilder<ThemeMode>(
+        valueListenable: themeNotifier,
+        builder: (context, themeMode, child) {
+          return GestureDetector(
+              onTap: () {
+                FocusScopeNode currentFocus = FocusScope.of(context);
+                if (!currentFocus.hasPrimaryFocus &&
+                    currentFocus.focusedChild != null) {
+                  FocusManager.instance.primaryFocus!.unfocus();
+                }
+              },
+              child: MaterialApp.router(
+                title: APP_NAME,
+                // I set appTitle manually for now due to this issue:
+                // https://stackoverflow.com/q/77759180/3846032
+                // AppLocalizations.delegate,
+                onGenerateTitle: (context) => getAppTitle(locale),
+                localizationsDelegates:
+                    DictLibLocalizations.localizationsDelegates,
+                //
+                // localizationsDelegates: const [
+                //   DictLibLocalizations.delegate,
+                // ],
+                supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
+                locale: locale,
+                debugShowCheckedModeBanner: false,
+                themeMode: themeMode,
+                theme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: LIGHT_MAIN_COLOR,
+                    brightness: Brightness.light,
+                  ),
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: LIGHT_MAIN_COLOR,
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                  ),
+                  scaffoldBackgroundColor: Colors.white,
+                  cardTheme: CardTheme(
+                    color: Colors.white,
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  typography: Typography.material2021(
+                      colorScheme: ColorScheme.fromSeed(
+                          seedColor: LIGHT_MAIN_COLOR,
+                          brightness: Brightness.light)),
+                  textButtonTheme: TextButtonThemeData(
+                    style: ButtonStyle(
+                      foregroundColor: WidgetStatePropertyAll(Colors.black),
+                    ),
+                  ),
+                  iconButtonTheme: IconButtonThemeData(
+                    style: ButtonStyle(
+                      foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) =>
+                            states.contains(WidgetState.disabled)
+                                ? Colors.black38
+                                : Colors.black,
+                      ),
+                    ),
+                  ),
+                  // Update InputDecoration theme for search field underline and placeholder
+                  inputDecorationTheme: const InputDecorationTheme(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: LIGHT_MAIN_COLOR),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: LIGHT_MAIN_COLOR),
+                    ),
+                    hintStyle: TextStyle(color: Colors.black54),
+                  ),
+                  // Update TabBar theme
+                  tabBarTheme: TabBarTheme(
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white,
+                    labelStyle: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  snackBarTheme: SnackBarThemeData(
+                    backgroundColor: LIGHT_MAIN_COLOR,
+                    contentTextStyle: TextStyle(color: Colors.white),
+                  ),
+                  // Update BottomNavigationBar theme
+                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                    selectedItemColor: LIGHT_MAIN_COLOR,
+                    unselectedItemColor: Colors.grey,
+                    backgroundColor: Colors.white,
+                  ),
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                  pageTransitionsTheme: const PageTransitionsTheme(builders: {
+                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                  }),
+                ),
+                darkTheme: ThemeData(
+                  colorScheme: ColorScheme.fromSeed(
+                    seedColor: DARK_MAIN_COLOR,
+                    brightness: Brightness.dark,
+                  ),
+                  appBarTheme: const AppBarTheme(
+                    backgroundColor: Color(0xFF1F1F1F),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                  ),
+                  scaffoldBackgroundColor: const Color(0xFF121212),
+                  cardTheme: CardTheme(
+                    color: const Color(0xFF2C2C2C),
+                    elevation: 2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  typography: Typography.material2021(
+                      colorScheme: ColorScheme.fromSeed(
+                          seedColor: DARK_MAIN_COLOR,
+                          brightness: Brightness.dark)),
+                  // Update TextButton theme
+                  textButtonTheme: TextButtonThemeData(
+                    style: ButtonStyle(
+                      foregroundColor: WidgetStatePropertyAll(Colors.white),
+                    ),
+                  ),
+                  iconButtonTheme: IconButtonThemeData(
+                    style: ButtonStyle(
+                      foregroundColor: WidgetStateProperty.resolveWith<Color>(
+                        (Set<WidgetState> states) =>
+                            states.contains(WidgetState.disabled)
+                                ? Colors.white24
+                                : Colors.white,
+                      ),
+                    ),
+                  ),
+                  // Update InputDecoration theme for search field underline and placeholder
+                  inputDecorationTheme: const InputDecorationTheme(
+                    focusedBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: DARK_MAIN_COLOR),
+                    ),
+                    enabledBorder: UnderlineInputBorder(
+                      borderSide: BorderSide(color: DARK_MAIN_COLOR),
+                    ),
+                    hintStyle: TextStyle(color: Colors.white60),
+                  ),
+                  // Update TabBar theme
+                  tabBarTheme: TabBarTheme(
+                    labelColor: Colors.white,
+                    unselectedLabelColor: Colors.white,
+                    labelStyle: TextStyle(
+                      fontSize: 16.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    unselectedLabelStyle: TextStyle(
+                      fontSize: 16.0,
+                    ),
+                  ),
+                  snackBarTheme: SnackBarThemeData(
+                    backgroundColor: DARK_MAIN_COLOR,
+                    contentTextStyle: TextStyle(color: Colors.white),
+                  ),
+                  // Update BottomNavigationBar theme
+                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
+                    selectedItemColor: Colors.white,
+                    unselectedItemColor: Colors.grey,
+                    backgroundColor: Color(0xFF121212),
+                  ),
+                  visualDensity: VisualDensity.adaptivePlatformDensity,
+                  pageTransitionsTheme: const PageTransitionsTheme(builders: {
+                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+                  }),
+                ),
+                routerConfig: router,
+              ));
+        });
   }
 }
 

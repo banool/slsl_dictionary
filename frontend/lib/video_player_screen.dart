@@ -115,7 +115,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
 
   List<Future<void>> initializePlayerFutures = [];
 
-  CarouselController? carouselController;
+  CarouselSliderController? carouselController;
 
   int currentPage = 0;
 
@@ -128,7 +128,7 @@ class _VideoPlayerScreenState extends State<VideoPlayerScreen> {
       idx += 1;
     }
     // Make carousel slider controller.
-    carouselController = CarouselController();
+    carouselController = CarouselSliderController();
     super.initState();
   }
 

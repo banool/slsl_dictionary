@@ -5,7 +5,8 @@ import 'word_page.dart';
 
 const String APP_NAME = "SLSL Dictionary";
 
-const MaterialColor MAIN_COLOR = MaterialColor(
+/*
+const MaterialColor LIGHT_MAIN_COLOR = MaterialColor(
   0xFF7E1430,
   <int, Color>{
     50: Color(0xFF7E1430),
@@ -20,6 +21,25 @@ const MaterialColor MAIN_COLOR = MaterialColor(
     900: Color(0xFF7E1430),
   },
 );
+*/
+
+const MaterialColor DARK_MAIN_COLOR = MaterialColor(
+  0xFFeb7400,
+  <int, Color>{
+    50: Color(0xFFFEF2E7),
+    100: Color(0xFFFDE0C3),
+    200: Color(0xFFFBCB94),
+    300: Color(0xFFF9B665),
+    400: Color(0xFFF7A741),
+    500: Color(0xFFeb7400),
+    600: Color(0xFFD96B00),
+    700: Color(0xFFB35800),
+    800: Color(0xFF8C4600),
+    900: Color(0xFF663300),
+  },
+);
+
+const MaterialColor LIGHT_MAIN_COLOR = DARK_MAIN_COLOR;
 
 const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 

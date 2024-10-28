@@ -127,14 +127,15 @@ class MyFlashcardsLandingPageController
           await showDialog(
             context: context,
             builder: (ctx) {
-              return MultiSelectDialog(
-                listType: MultiSelectListType.CHIP,
-                title:
-                    Text(DictLibLocalizations.of(context)!.flashcardsRegions),
-                items: Region.values
-                    .map((e) =>
-                        MultiSelectItem(e.index, getRegionPretty(context, e)))
-                    .toList(),
+              List<MultiSelectItem<int>> items = [];
+              for (Region r in Region.values) {
+                items
+                    .add(MultiSelectItem(r.index, getRegionPretty(context, r)));
+              }
+              return buildMultiSelectDialog(
+                context: context,
+                title: DictLibLocalizations.of(context)!.flashcardsRegions,
+                items: items,
                 initialValue: regionsValues,
                 onConfirm: (values) {
                   setState(() {

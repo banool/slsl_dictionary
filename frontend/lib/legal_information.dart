@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-List<Widget> buildLegalInformationChildren(Color mainColor) {
+List<Widget> buildLegalInformationChildren() {
   return [
     const Text(
         "The Sri Lankan Sign Language data, including videos, images, and definitions, used in this app is provided by Nishani Shamila McCluskey and team.\n",
@@ -11,7 +11,7 @@ List<Widget> buildLegalInformationChildren(Color mainColor) {
     ),
     TextButton(
       child: Text("This data is licensed under\nCreative Commons BY-NC-ND 4.0.",
-          textAlign: TextAlign.center, style: TextStyle(color: mainColor)),
+          textAlign: TextAlign.center),
       onPressed: () async {
         const url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/';
         await launch(url, forceSafariVC: false);
@@ -22,7 +22,7 @@ List<Widget> buildLegalInformationChildren(Color mainColor) {
     ),
     TextButton(
       child: Text("All app code is licensed under\nApache 2.0.",
-          textAlign: TextAlign.center, style: TextStyle(color: mainColor)),
+          textAlign: TextAlign.center),
       onPressed: () async {
         const url =
             'https://github.com/banool/slsl_dictionary/blob/main/LICENSE.md';

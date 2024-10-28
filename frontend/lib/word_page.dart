@@ -2,7 +2,6 @@ import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dots_indicator/dots_indicator.dart';
-import 'package:flutter/gestures.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/language_dropdown.dart';
@@ -77,6 +76,7 @@ class _EntryPageState extends State<EntryPage> {
 
   @override
   Widget build(BuildContext context) {
+    Brightness brightness = Theme.of(context).brightness;
     Icon starIcon;
     if (isFavourited) {
       starIcon = Icon(Icons.star,
@@ -103,7 +103,6 @@ class _EntryPageState extends State<EntryPage> {
             await removeEntryFromFavourites(entry);
           }
         },
-        APP_BAR_DISABLED_COLOR,
       ));
     }
 
@@ -125,7 +124,9 @@ class _EntryPageState extends State<EntryPage> {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
               content: Text(
                   "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
-              backgroundColor: MAIN_COLOR,
+              backgroundColor: brightness == Brightness.light
+                  ? LIGHT_MAIN_COLOR
+                  : DARK_MAIN_COLOR,
               duration: const Duration(milliseconds: 1000)));
         },
       )
@@ -151,9 +152,11 @@ class _EntryPageState extends State<EntryPage> {
                     child: DotsIndicator(
                       dotsCount: entry.getSubEntries().length,
                       position: currentPage,
-                      decorator: const DotsDecorator(
+                      decorator: DotsDecorator(
                         color: Colors.black, // Inactive color
-                        activeColor: MAIN_COLOR,
+                        activeColor: brightness == Brightness.light
+                            ? LIGHT_MAIN_COLOR
+                            : DARK_MAIN_COLOR,
                       ),
                     ),
                   ),
@@ -171,65 +174,23 @@ class _EntryPageState extends State<EntryPage> {
 
 Widget? getRelatedEntriesWidget(
     BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay) {
-  int numRelatedWords = subEntry.getRelatedWords().length;
-  if (numRelatedWords == 0) {
-    return null;
-  }
-
-  List<TextSpan> textSpans = [];
-
-  int idx = 0;
-  for (String relatedWord in subEntry.getRelatedWords()) {
-    Color color;
-    void Function()? navFunction;
-    Entry? relatedEntry;
-    if (keyedByEnglishEntriesGlobal.containsKey(relatedWord)) {
-      relatedEntry = keyedByEnglishEntriesGlobal[relatedWord];
-    } else if (keyedByTamilEntriesGlobal.containsKey(relatedWord)) {
-      relatedEntry = keyedByTamilEntriesGlobal[relatedWord];
-    } else if (keyedBySinhalaEntriesGlobal.containsKey(relatedWord)) {
-      relatedEntry = keyedBySinhalaEntriesGlobal[relatedWord];
-    }
-
-    if (relatedEntry != null) {
-      color = MAIN_COLOR;
-      navFunction = () => navigateToEntryPage(context, relatedEntry!, true);
-    } else {
-      color = Colors.black;
-      navFunction = null;
-    }
-    String suffix;
-    if (idx < numRelatedWords - 1) {
-      suffix = ", ";
-    } else {
-      suffix = "";
-    }
-    textSpans.add(TextSpan(
-      text: "$relatedWord$suffix",
-      style: TextStyle(color: color),
-      recognizer: TapGestureRecognizer()..onTap = navFunction,
-    ));
-    idx += 1;
-  }
-
-  var initial = TextSpan(
-      text: "${DictLibLocalizations.of(context)!.relatedWords}: ",
-      style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold));
-  textSpans = [initial] + textSpans;
-  var richText = RichText(
-    text: TextSpan(children: textSpans),
-    textAlign: TextAlign.center,
-  );
-
-  if (shouldUseHorizontalDisplay) {
-    return Padding(
-        padding: const EdgeInsets.only(left: 10.0, right: 20.0, top: 5.0),
-        child: richText);
-  } else {
-    return Padding(
-        padding: const EdgeInsets.only(left: 20.0, right: 20.0, top: 15.0),
-        child: richText);
-  }
+  return getInnerRelatedEntriesWidget(
+      context: context,
+      subEntry: subEntry,
+      shouldUseHorizontalDisplay: shouldUseHorizontalDisplay,
+      getRelatedEntry: (keyword) {
+        Entry? relatedEntry;
+        if (keyedByEnglishEntriesGlobal.containsKey(keyword)) {
+          relatedEntry = keyedByEnglishEntriesGlobal[keyword];
+        } else if (keyedByTamilEntriesGlobal.containsKey(keyword)) {
+          relatedEntry = keyedByTamilEntriesGlobal[keyword];
+        } else if (keyedBySinhalaEntriesGlobal.containsKey(keyword)) {
+          relatedEntry = keyedBySinhalaEntriesGlobal[keyword];
+        }
+        return relatedEntry;
+      },
+      navigateToEntryPage: (context, entry, showFavouritesButton) =>
+          navigateToEntryPage(context, entry, showFavouritesButton));
 }
 
 Widget getRegionalInformationWidget(

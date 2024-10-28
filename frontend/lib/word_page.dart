@@ -153,7 +153,6 @@ class _EntryPageState extends State<EntryPage> {
                       dotsCount: entry.getSubEntries().length,
                       position: currentPage,
                       decorator: DotsDecorator(
-                        color: Colors.black, // Inactive color
                         activeColor: brightness == Brightness.light
                             ? LIGHT_MAIN_COLOR
                             : DARK_MAIN_COLOR,

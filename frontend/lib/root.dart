@@ -110,8 +110,11 @@ class _RootAppState extends State<RootApp> {
         GoRoute(
             path: SETTINGS_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
+              bool showPrivacyPolicy =
+                  state.uri.queryParameters["showPrivacyPolicy"] == "true";
               return NoTransitionPage(
                   child: SettingsPage(
+                showPrivacyPolicy: showPrivacyPolicy,
                 appName: APP_NAME,
                 additionalTopWidgets: [
                   Padding(

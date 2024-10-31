@@ -1,4 +1,8 @@
-# Generate a csv to be used for translating.
+"""
+This script can be used to generate a csv for entries or definitions that need to be
+translated. For definitions, this assumes that the only way we only ever add non-English
+definitions is through this csv based flow. See load_definition_translations.py.
+"""
 
 import csv
 import dataclasses
@@ -78,7 +82,18 @@ class Command(BaseCommand):
             "language",
             "category",
             "definition",
+            "translation_of_id",
         )
+
+        # Build a map of English definition ID -> language code -> non-English definition ID. This lets us
+        # look up if a translated definition already exists in the DB.
+        english_definition_id_to_language_to_other_definition = {}
+        for definition in definitions:
+            english_definition_id = definition.translation_of_id
+            d = english_definition_id_to_language_to_other_definition.setdefault(
+                english_definition_id, {}
+            )
+            d[definition.language] = definition
 
         subentries = models.SubEntry.objects.all()
         sub_entry_data = subentries.values(
@@ -146,6 +161,21 @@ class Command(BaseCommand):
 
         ds = []
         for d in data:
+            # Skip if this English definition already has both translations
+            existing_translations = (
+                english_definition_id_to_language_to_other_definition.get(
+                    d.definition_id, {}
+                )
+            )
+            si_translation = existing_translations.get("SI")
+            ta_translation = existing_translations.get("TA")
+            if si_translation and ta_translation:
+                continue
+
+            # Look up existing translations if any
+            sinhala_definition = si_translation.definition if si_translation else ""
+            tamil_definition = ta_translation.definition if ta_translation else ""
+
             out = {
                 "Definition ID": d.definition_id,
                 "Word in English": d.word_in_english,
@@ -154,9 +184,8 @@ class Command(BaseCommand):
                 "Region": d.region,
                 "Category": d.category,
                 "Definition in English": d.definition_in_english,
-                # Include empty column for translation.
-                "Definition in Sinhala": "",
-                "Definition in Tamil": "",
+                "Definition in Sinhala": sinhala_definition,
+                "Definition in Tamil": tamil_definition,
             }
             ds.append(out)
 

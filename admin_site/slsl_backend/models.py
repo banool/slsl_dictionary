@@ -159,6 +159,16 @@ class Definition(models.Model):
     # Link back to the SubEntry.
     sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
 
+    # If this definition is a translation of another definition, we link to it. This
+    # helps us find definitions that are missing translations.
+    translation_of = models.ForeignKey(
+        "self",
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="translations",
+    )
+
     language = models.CharField(
         max_length=3,
         choices=Language.choices,

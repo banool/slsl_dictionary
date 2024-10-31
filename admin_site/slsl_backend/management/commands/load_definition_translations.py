@@ -1,11 +1,8 @@
 """
 This script can be used to load in translations of definitions from a CSV file. The CSV
-would have originally come from scripts/translate_definitions.py. This is only idempotent
-if you use the exact same definitions Sinhala / Tamil translations, otherwise it will
-consider them to be new definitions and add them. So if you run this script multiple times
-with different csvs, be careful. Probably best to regenerate a new csv for the entries
-where there aren't definitions for Sinhala / Tamil. But note that there is no direct
-notion of "definition translations", definitions for different languages are not linked.
+would have originally come from scripts/translate_definitions.py. This is idemponent
+thanks to the translation_of field, assuming that there is only a single translation of
+a definition for each non-English language.
 """
 
 import csv
@@ -13,7 +10,6 @@ import csv
 from django.core.management.base import BaseCommand
 
 from slsl_backend import models
-from slsl_backend.dump import build_dump_models
 
 
 class Command(BaseCommand):
@@ -52,6 +48,14 @@ class Command(BaseCommand):
                 definition.sub_entry_id
             ]
 
+        # Build a map of English definition ID -> language code -> non-English definition ID. This lets us
+        # look up if a translated definition already exists in the DB.
+        english_definition_id_to_language_to_other_definition_id = {}
+        for definition in definitions:
+            english_definition_id = definition.translation_of_id
+            d = english_definition_id_to_language_to_other_definition_id.setdefault(english_definition_id, {})
+            d[definition.language] = definition.id
+
         sub_entry_id_to_definition = {}
         for definition in definitions:
             sub_entry_id_to_definition.setdefault(
@@ -86,11 +90,9 @@ class Command(BaseCommand):
                 if not definition_text:
                     continue
 
-                # Check if a definition for this language already exists for this sub-entry.
-                if sub_entry_id_to_definition.get(subentry.id, {}).get(language_code):
-                    print(
-                        f"Definition already exists for language '{language_code}' in SubEntry '{subentry.id}'."
-                    )
+                other_definition_id = english_definition_id_to_language_to_other_definition_id.get(definition_id, {}).get(language_code)
+                if other_definition_id:
+                    print(f"Translation of definition '{definition_id}' for '{language_code}' already exists as '{other_definition_id}'.")
                     continue
 
                 if dry_run:
@@ -104,8 +106,10 @@ class Command(BaseCommand):
                         category=category,
                         definition=definition_text,
                         sub_entry=subentry,
+                        # https://stackoverflow.com/a/2846537/3846032
+                        translation_of_id=definition_id,
                     )
                     new_definition.save()
                     print(
-                        f"Added definition for '{language_code}' to SubEntry '{subentry.id}'."
+                        f"Added definition for '{language_code}' to SubEntry '{subentry.id}' as translation of '{definition_id}'"
                     )

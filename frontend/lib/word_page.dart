@@ -1,15 +1,15 @@
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
-import 'package:dots_indicator/dots_indicator.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
+import 'package:dictionarylib/video_player_screen.dart';
+import 'package:dots_indicator/dots_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/language_dropdown.dart';
 
 import 'common.dart';
 import 'entries_types.dart';
 import 'globals.dart';
-import 'video_player_screen.dart';
 
 class EntryPage extends StatefulWidget {
   const EntryPage(
@@ -147,26 +147,28 @@ class _EntryPageState extends State<EntryPage> {
                   appBar: AppBar(
                       title: Text(phrase),
                       actions: buildActionButtons(actions)),
-                  bottomNavigationBar: Padding(
-                    padding: const EdgeInsets.only(top: 5, bottom: 10),
-                    child: DotsIndicator(
-                      dotsCount: entry.getSubEntries().length,
-                      position: currentPage,
-                      decorator: DotsDecorator(
-                        activeColor: brightness == Brightness.light
-                            ? LIGHT_MAIN_COLOR
-                            : DARK_MAIN_COLOR,
+                  body: Column(children: [
+                    Expanded(
+                        child: PageView.builder(
+                            itemCount: entry.getSubEntries().length,
+                            itemBuilder: (context, index) => SubEntryPage(
+                                  entry: entry,
+                                  subEntry: entry.getSubEntries()[index],
+                                ),
+                            onPageChanged: onPageChanged)),
+                    Padding(
+                      padding: const EdgeInsets.only(top: 5, bottom: 15),
+                      child: DotsIndicator(
+                        dotsCount: entry.getSubEntries().length,
+                        position: currentPage.toDouble(),
+                        decorator: DotsDecorator(
+                          activeColor: brightness == Brightness.light
+                              ? LIGHT_MAIN_COLOR
+                              : DARK_MAIN_COLOR,
+                        ),
                       ),
                     ),
-                  ),
-                  body: Center(
-                      child: PageView.builder(
-                          itemCount: entry.getSubEntries().length,
-                          itemBuilder: (context, index) => SubEntryPage(
-                                entry: entry,
-                                subEntry: entry.getSubEntries()[index],
-                              ),
-                          onPageChanged: onPageChanged)));
+                  ]));
             })));
   }
 }
@@ -246,6 +248,7 @@ class _SubEntryPageState extends State<SubEntryPage> {
 
     var videoPlayerScreen = VideoPlayerScreen(
       mediaLinks: subEntry.getMedia(),
+      fallbackAspectRatio: 16 / 12,
     );
     // If the display is wide enough, show the video beside the entries instead
     // of above the entries (as well as other layout changes).

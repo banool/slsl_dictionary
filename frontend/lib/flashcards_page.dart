@@ -1,16 +1,16 @@
 import 'dart:async';
 
 import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/revision.dart';
+import 'package:dictionarylib/video_player_screen.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 import 'common.dart';
-import 'video_player_screen.dart';
 import 'word_page.dart';
 
 // TODO: Refuse to show flashcards if there is no word in the current app language.
@@ -229,6 +229,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     // https://stackoverflow.com/questions/55237188/flutter-is-not-rebuilding-same-widget-with-different-parameters
     var videoPlayerScreen = VideoPlayerScreen(
       mediaLinks: subEntry.getMedia(),
+      fallbackAspectRatio: 16 / 12,
       key: Key(subEntry.getMedia()[0]),
     );
 

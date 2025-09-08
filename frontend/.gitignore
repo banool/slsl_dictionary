@@ -8,6 +8,7 @@ ios/*.cer
 ios/fastlane/screenshots
 ios/fastlane/Preview.html
 ios/build
+ios/Flutter/ephemeral
 
 # Miscellaneous
 *.class

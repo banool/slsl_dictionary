@@ -5,6 +5,7 @@ import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_force_upgrade.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:media_kit/media_kit.dart';
 import 'package:slsl_dictionary/common.dart';
 import 'package:slsl_dictionary/entries_loader.dart';
 import 'package:intl/intl_standalone.dart';
@@ -23,6 +24,9 @@ const String KNOB_URL_BASE =
 // implicitly depend on the side effects of earlier functions.
 Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
   var widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
+  // Initialize media_kit for video playback.
+  MediaKit.ensureInitialized();
 
   // Preserve the splash screen while the app initializes.
   FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);

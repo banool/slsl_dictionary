@@ -28,3 +28,14 @@ DATE===2024-01-01
 
 Exciting times coming, thanks everyone for testing the app! Happy New Year!!
 END===
+
+START===
+DATE===2026-01-01
+## Happy 2026!!
+
+Welcome to 2026 everyone!!!
+
+This update brings a new framework to help a few folks on Android who had issues loading videos, please reach out if you have issues. You can use the "Report issue with app (Email)" option in the settings page.
+
+Thanks all!
+END===

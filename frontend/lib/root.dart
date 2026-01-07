@@ -33,18 +33,12 @@ class RootApp extends StatefulWidget {
 
   static void applyLocaleOverride(BuildContext context, Locale newLocale) {
     _RootAppState state = context.findAncestorStateOfType<_RootAppState>()!;
-
-    state.setState(() {
-      state.locale = newLocale;
-    });
+    state._setLocale(newLocale);
   }
 
   static void clearLocaleOverride(BuildContext context) {
     _RootAppState state = context.findAncestorStateOfType<_RootAppState>()!;
-
-    state.setState(() {
-      state.locale = systemLocale;
-    });
+    state._setLocale(systemLocale);
   }
 }
 
@@ -52,6 +46,12 @@ class _RootAppState extends State<RootApp> {
   _RootAppState({required this.locale});
 
   Locale locale;
+
+  void _setLocale(Locale newLocale) {
+    setState(() {
+      locale = newLocale;
+    });
+  }
 
   @override
   void initState() {

@@ -236,14 +236,20 @@ class SubEntryPage extends StatefulWidget {
       _SubEntryPageState(entry: entry, subEntry: subEntry);
 }
 
-class _SubEntryPageState extends State<SubEntryPage> {
+class _SubEntryPageState extends State<SubEntryPage>
+    with AutomaticKeepAliveClientMixin {
   _SubEntryPageState({required this.entry, required this.subEntry});
 
   final Entry entry;
   final SubEntry subEntry;
 
   @override
+  bool get wantKeepAlive => true;
+
+  @override
   Widget build(BuildContext context) {
+    // Required by AutomaticKeepAliveClientMixin.
+    super.build(context);
     Locale locale = Localizations.localeOf(context);
 
     var videoPlayerScreen = VideoPlayerScreen(

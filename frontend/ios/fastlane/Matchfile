@@ -1,4 +1,4 @@
-git_url("git@github.com:banool/slsl_dictionary_match.git")
+git_url("git@github.com:banool/auslan_dictionary_match.git")
 
 storage_mode("git")
 

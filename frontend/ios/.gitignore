@@ -1,4 +1,6 @@
 publish.env
+*.certSigningRequest
+*.p12
 
 *.mobileprovision
 *.mode1v3

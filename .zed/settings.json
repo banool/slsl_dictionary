@@ -1,0 +1,7 @@
+// Project Zed settings.
+{
+  "languages": {
+    // Never reformat Markdown on save — prose stays long-line, soft-wrapped.
+    "Markdown": { "format_on_save": "off" }
+  }
+}

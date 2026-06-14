@@ -1,4 +1,10 @@
 # My stuff
+# Local dictionarylib path override for dev (matches auslan_dictionary). For
+# CI/release the app resolves dictionarylib from the git ref in pubspec.yaml.
+pubspec_overrides.yaml
+# Build caches that shouldn't be tracked.
+.wrangler/
+ios/**/xcshareddata/swiftpm/
 ios/publish_do_not_check_in.sh
 ios/fastlane/report.xml
 ios/Runner.ipa

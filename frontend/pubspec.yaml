@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 1.3.21+175
+version: 1.3.22+176
 
 environment:
   sdk: '>=3.2.3 <4.0.0'
@@ -16,15 +16,19 @@ dependencies:
     # path: ../../dictionarylib
     git:
       url: https://github.com/banool/dictionarylib.git
-      ref: main
+      ref: a72c134e66324b4120fba2a4f4459dbaeb2bf13b
   dolphinsr_dart:
     git:
       url: https://github.com/banool/dolphhinsr_dart.git
-      ref: master
+      # Pinned to the same commit dictionarylib uses so the two git refs don't
+      # conflict during resolution (dictionarylib pins this SHA, not master).
+      ref: 33ae39bf066ddb7e1169c97f56f5c9f2930a2f0b
   dots_indicator:
   flutter:
     sdk: flutter
   flutter_localizations:
+    sdk: flutter
+  flutter_web_plugins:
     sdk: flutter
   flutter_native_splash:
   go_router:
@@ -62,4 +66,9 @@ flutter_native_splash:
 flutter:
   uses-material-design: true
   generate: true
+  # MSAL Android config for Microsoft sign-in (msal_auth). The plugin reads this
+  # at app-creation time; client_id + redirect_uri are injected from
+  # SharingAuthConfig, so they're absent here. See the backend MANUAL_SETUP.md §4.
+  assets:
+    - assets/msal_config.json
 

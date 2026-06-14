@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
@@ -6,11 +8,15 @@ import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
 import 'package:dictionarylib/page_search.dart';
 import 'package:dictionarylib/page_settings.dart';
+import 'package:dictionarylib/sharing/deep_link_handler.dart';
+import 'package:dictionarylib/sharing/engine_notification_listener.dart';
+import 'package:dictionarylib/sharing/shared_list_landing_page.dart';
+import 'package:dictionarylib/sharing/sync_engine.dart' show SyncNotification;
+import 'package:dictionarylib/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
-// import 'l10n/app_localizations.dart' show AppLocalizations;
 import 'common.dart';
 import 'flashcards_landing_page.dart';
 import 'language_dropdown.dart';
@@ -21,7 +27,10 @@ const LISTS_ROUTE = "/lists";
 const REVISION_ROUTE = "/revision";
 const SETTINGS_ROUTE = "/settings";
 
-late Locale systemLocale;
+// Defaults to English so anything that reads it before main() assigns the real
+// device locale (e.g. the language dropdown in widget/integration tests that
+// pump RootApp without going through main()) doesn't hit a LateInitializationError.
+Locale systemLocale = LOCALE_ENGLISH;
 
 class RootApp extends StatefulWidget {
   const RootApp({super.key, required this.startingLocale});
@@ -53,12 +62,38 @@ class _RootAppState extends State<RootApp> {
     });
   }
 
+  StreamSubscription<SharePayload>? _deepLinkSub;
+  StreamSubscription<SyncNotification>? _engineNotificationSub;
+
   @override
   void initState() {
     super.initState();
     locale = widget.startingLocale;
-    themeNotifier.value = ThemeMode.values[
-        sharedPreferences.getInt(KEY_THEME_MODE) ?? ThemeMode.light.index];
+    // Default to following the OS light/dark setting until the user pins one.
+    themeNotifier.value = ThemeMode
+        .values[sharedPreferences.getInt(KEY_THEME_MODE) ?? DEFAULT_THEME_MODE];
+    // Which visual style (Hearth / Classic). The picker lives in dictionarylib's
+    // SettingsPage and writes KEY_THEME_VARIANT + this notifier.
+    themeVariantNotifier.value =
+        appThemeVariantFromName(sharedPreferences.getString(KEY_THEME_VARIANT));
+    // Forward incoming share deep-links to the share landing route, carrying
+    // the invite token through as a query parameter when present. `push` (not
+    // `go`) so the current screen stays underneath as something to pop back to.
+    _deepLinkSub = sharing.deepLinks.payloads.listen((payload) {
+      router.push(payload.toRouteLocation());
+    });
+    // Surface the sync engine's one-shot events (session expired, removed as
+    // editor, snapshot catch-up) as snackbars from any page.
+    if (sharing.isEnabled) {
+      _engineNotificationSub = installEngineNotificationSnackbars();
+    }
+  }
+
+  @override
+  void dispose() {
+    _deepLinkSub?.cancel();
+    _engineNotificationSub?.cancel();
+    super.dispose();
   }
 
   final GoRouter router = GoRouter(
@@ -108,13 +143,28 @@ class _RootAppState extends State<RootApp> {
               ));
             }),
         GoRoute(
+            path: '/share/:listId',
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              final id = state.pathParameters['listId']!;
+              final invite = state.uri.queryParameters['invite'];
+              return NoTransitionPage(
+                // Stable key per (listId, invite) so re-tapping the same share
+                // link doesn't tear down + rebuild the page (re-triggering
+                // subscribe / sign-in); distinct links still get fresh pages.
+                key: ValueKey('share-$id-${invite ?? ''}'),
+                child: SharedListLandingPage(
+                  listId: id,
+                  inviteToken:
+                      invite != null && invite.isNotEmpty ? invite : null,
+                  navigateToEntryPage: navigateToEntryPage,
+                ),
+              );
+            }),
+        GoRoute(
             path: SETTINGS_ROUTE,
             pageBuilder: (BuildContext context, GoRouterState state) {
-              bool showPrivacyPolicy =
-                  state.uri.queryParameters["showPrivacyPolicy"] == "true";
               return NoTransitionPage(
                   child: SettingsPage(
-                showPrivacyPolicy: showPrivacyPolicy,
                 appName: APP_NAME,
                 additionalTopWidgets: [
                   Padding(
@@ -138,6 +188,10 @@ class _RootAppState extends State<RootApp> {
                     'https://github.com/banool/slsl_dictionary/issues/new/choose',
                 reportAppProblemUrl:
                     'https://github.com/banool/slsl_dictionary/issues',
+                privacyPolicyUrl:
+                    'https://landing.srilankansignlanguage.org/privacy.html',
+                termsOfServiceUrl:
+                    'https://landing.srilankansignlanguage.org/terms.html',
                 iOSAppId: IOS_APP_ID,
                 androidAppId: ANDROID_APP_ID,
               ));
@@ -146,187 +200,52 @@ class _RootAppState extends State<RootApp> {
 
   @override
   Widget build(BuildContext context) {
+    // Outer listener: the light/dark mode. Inner listener: which visual style
+    // ("theme variant", Hearth or Classic). Both themes are built by the shared
+    // library so all the theming lives in one place; Classic is seeded from the
+    // SLSL orange.
     return ValueListenableBuilder<ThemeMode>(
-        valueListenable: themeNotifier,
-        builder: (context, themeMode, child) {
-          return GestureDetector(
-              onTap: () {
-                FocusScopeNode currentFocus = FocusScope.of(context);
-                if (!currentFocus.hasPrimaryFocus &&
-                    currentFocus.focusedChild != null) {
-                  FocusManager.instance.primaryFocus!.unfocus();
-                }
-              },
-              child: MaterialApp.router(
-                title: APP_NAME,
-                // I set appTitle manually for now due to this issue:
-                // https://stackoverflow.com/q/77759180/3846032
-                // AppLocalizations.delegate,
-                onGenerateTitle: (context) => getAppTitle(locale),
-                localizationsDelegates:
-                    DictLibLocalizations.localizationsDelegates,
-                //
-                // localizationsDelegates: const [
-                //   DictLibLocalizations.delegate,
-                // ],
-                supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
-                locale: locale,
-                debugShowCheckedModeBanner: false,
-                themeMode: themeMode,
-                theme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: LIGHT_MAIN_COLOR,
+      valueListenable: themeNotifier,
+      builder: (context, themeMode, child) {
+        return ValueListenableBuilder<AppThemeVariant>(
+          valueListenable: themeVariantNotifier,
+          builder: (context, themeVariant, child) {
+            return GestureDetector(
+                onTap: () {
+                  FocusScopeNode currentFocus = FocusScope.of(context);
+                  if (!currentFocus.hasPrimaryFocus &&
+                      currentFocus.focusedChild != null) {
+                    FocusManager.instance.primaryFocus!.unfocus();
+                  }
+                },
+                child: MaterialApp.router(
+                  title: APP_NAME,
+                  // I set appTitle manually for now due to this issue:
+                  // https://stackoverflow.com/q/77759180/3846032
+                  onGenerateTitle: (context) => getAppTitle(locale),
+                  scaffoldMessengerKey: rootScaffoldMessengerKey,
+                  localizationsDelegates:
+                      DictLibLocalizations.localizationsDelegates,
+                  supportedLocales: LANGUAGE_CODE_TO_LOCALE.values,
+                  locale: locale,
+                  debugShowCheckedModeBanner: false,
+                  themeMode: themeMode,
+                  theme: buildAppTheme(
+                    variant: themeVariant,
                     brightness: Brightness.light,
+                    classicSeed: LIGHT_MAIN_COLOR,
                   ),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: LIGHT_MAIN_COLOR,
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                  ),
-                  scaffoldBackgroundColor: Colors.white,
-                  cardTheme: CardThemeData(
-                    color: Colors.white,
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  typography: Typography.material2021(
-                      colorScheme: ColorScheme.fromSeed(
-                          seedColor: LIGHT_MAIN_COLOR,
-                          brightness: Brightness.light)),
-                  textButtonTheme: TextButtonThemeData(
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStatePropertyAll(Colors.black),
-                    ),
-                  ),
-                  iconButtonTheme: IconButtonThemeData(
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                        (Set<WidgetState> states) =>
-                            states.contains(WidgetState.disabled)
-                                ? Colors.black38
-                                : Colors.black,
-                      ),
-                    ),
-                  ),
-                  // Update InputDecoration theme for search field underline and placeholder
-                  inputDecorationTheme: const InputDecorationTheme(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: LIGHT_MAIN_COLOR),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: LIGHT_MAIN_COLOR),
-                    ),
-                    hintStyle: TextStyle(color: Colors.black54),
-                  ),
-                  // Update TabBar theme
-                  tabBarTheme: TabBarThemeData(
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white,
-                    labelStyle: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    unselectedLabelStyle: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  snackBarTheme: SnackBarThemeData(
-                    backgroundColor: LIGHT_MAIN_COLOR,
-                    contentTextStyle: TextStyle(color: Colors.white),
-                  ),
-                  // Update BottomNavigationBar theme
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                    selectedItemColor: LIGHT_MAIN_COLOR,
-                    unselectedItemColor: Colors.grey,
-                    backgroundColor: Colors.white,
-                  ),
-                  visualDensity: VisualDensity.adaptivePlatformDensity,
-                  pageTransitionsTheme: const PageTransitionsTheme(builders: {
-                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                  }),
-                ),
-                darkTheme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(
-                    seedColor: DARK_MAIN_COLOR,
+                  darkTheme: buildAppTheme(
+                    variant: themeVariant,
                     brightness: Brightness.dark,
+                    classicSeed: LIGHT_MAIN_COLOR,
                   ),
-                  appBarTheme: const AppBarTheme(
-                    backgroundColor: Color(0xFF1F1F1F),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                  ),
-                  scaffoldBackgroundColor: const Color(0xFF121212),
-                  cardTheme: CardThemeData(
-                    color: const Color(0xFF2C2C2C),
-                    elevation: 2,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  typography: Typography.material2021(
-                      colorScheme: ColorScheme.fromSeed(
-                          seedColor: DARK_MAIN_COLOR,
-                          brightness: Brightness.dark)),
-                  // Update TextButton theme
-                  textButtonTheme: TextButtonThemeData(
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStatePropertyAll(Colors.white),
-                    ),
-                  ),
-                  iconButtonTheme: IconButtonThemeData(
-                    style: ButtonStyle(
-                      foregroundColor: WidgetStateProperty.resolveWith<Color>(
-                        (Set<WidgetState> states) =>
-                            states.contains(WidgetState.disabled)
-                                ? Colors.white24
-                                : Colors.white,
-                      ),
-                    ),
-                  ),
-                  // Update InputDecoration theme for search field underline and placeholder
-                  inputDecorationTheme: const InputDecorationTheme(
-                    focusedBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: DARK_MAIN_COLOR),
-                    ),
-                    enabledBorder: UnderlineInputBorder(
-                      borderSide: BorderSide(color: DARK_MAIN_COLOR),
-                    ),
-                    hintStyle: TextStyle(color: Colors.white60),
-                  ),
-                  // Update TabBar theme
-                  tabBarTheme: TabBarThemeData(
-                    labelColor: Colors.white,
-                    unselectedLabelColor: Colors.white,
-                    labelStyle: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    unselectedLabelStyle: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                  ),
-                  snackBarTheme: SnackBarThemeData(
-                    backgroundColor: DARK_MAIN_COLOR,
-                    contentTextStyle: TextStyle(color: Colors.white),
-                  ),
-                  // Update BottomNavigationBar theme
-                  bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-                    selectedItemColor: Colors.white,
-                    unselectedItemColor: Colors.grey,
-                    backgroundColor: Color(0xFF121212),
-                  ),
-                  visualDensity: VisualDensity.adaptivePlatformDensity,
-                  pageTransitionsTheme: const PageTransitionsTheme(builders: {
-                    TargetPlatform.android: CupertinoPageTransitionsBuilder(),
-                    TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
-                  }),
-                ),
-                routerConfig: router,
-              ));
-        });
+                  routerConfig: router,
+                ));
+          },
+        );
+      },
+    );
   }
 }
 

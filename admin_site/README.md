@@ -46,10 +46,10 @@ Make a file called `prod_secrets.json` where the following keys are different fr
 ```
 
 For the secrets:
-- `sql_database`: Find the database name here: https://console.cloud.google.com/sql/instances/slsl-db-instance-04a74a9/databases?project=slsl-dictionary
-- `sql_user`: `pulumi config get sql_user` (from within `deployment/`)
-- `sql_password`, `admin_username`, `admin_password`: Same as with `sql_user`
-- `media_bucket_name`: Find the bucket name here: https://console.cloud.google.com/storage/browser?project=slsl-dictionary
+- `sql_database`: Find the database name here: https://console.cloud.google.com/sql/instances/slsl-db-instance-04a74a9/databases?project=slsl-dictionary.
+- `sql_user`: `pulumi config get sql_user` (from within `deployment/`).
+- `sql_password`, `admin_username`, `admin_password`: Same as with `sql_user`.
+- `media_bucket_name`: Find the bucket name here: https://console.cloud.google.com/storage/browser?project=slsl-dictionary.
 
 You'll notice we don't set `admin_bucket_name`. That's because for dev we just use the local staticfiles support.
 

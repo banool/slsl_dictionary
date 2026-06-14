@@ -1,0 +1,114 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>SLSL Dictionary</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 8]><link rel="stylesheet" href="assets/css/ie8.css" /><![endif]-->
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400..800&family=Hanken+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+		<style>
+			/* Hearth theme: a warm clay-and-cream re-skin of the stock template,
+			   using the app's typefaces (Bricolage Grotesque for display, Hanken
+			   Grotesk for body) so the site matches the app's redesign. */
+			html, body {
+				background-color: #FBF5EE;
+				font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+			}
+
+			#header {
+				background-color: #FBF5EE !important;
+				background-image: none !important;
+				color: #2A201A;
+			}
+			#header .content h1,
+			#header .content h1 a {
+				color: #2A201A;
+				border-bottom: 0;
+				font-family: 'Bricolage Grotesque', 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+				font-weight: 700;
+				letter-spacing: -0.01em;
+			}
+			#header .content p {
+				color: #6F6155;
+				font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+			}
+
+			/* Store + GitHub buttons become clay (the Hearth primary). */
+			#header .button.special {
+				background-color: #BF5C36 !important;
+				color: #FFFFFF !important;
+				box-shadow: none !important;
+				font-family: 'Hanken Grotesk', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+				font-weight: 700;
+			}
+			#header .button.special:hover { background-color: #A94E2C !important; }
+			#header .button.special:active { background-color: #8F3F22 !important; }
+
+			/* Render the screenshot inside a realistic iPhone device frame:
+			   a dark titanium bezel with large, concentric rounded corners. The
+			   screenshot is a full app screen captured from the simulator, so it
+			   already carries the iOS status bar + Dynamic Island — the notch
+			   reads naturally with no extra chrome. (Replaces the template's
+			   generic CSS wireframe phone.) */
+			#header .image.phone:before,
+			#header .image.phone:after,
+			#header .image.phone .inner:before,
+			#header .image.phone .inner:after { display: none !important; }
+			#header .image.phone {
+				width: 14.5em;
+				border-radius: 0 !important;
+				overflow: visible !important;
+			}
+			#header .image.phone .inner {
+				border: 0 !important;
+				background: #1c1b1d;
+				border-radius: 3em;
+				padding: 0.5em;
+				box-shadow: 0 26px 64px rgba(42, 32, 26, 0.32),
+				            inset 0 0 0 1.5px rgba(255, 255, 255, 0.07);
+			}
+			#header .image.phone .inner img {
+				display: block;
+				width: 100%;
+				border-radius: 2.5em;
+			}
+		</style>
+	</head>
+	<body id="top">
+
+		<!-- Header -->
+			<header id="header">
+				<div class="content">
+					<h1><a href="#">SLSL Dictionary</a></h1>
+					<p>Free video dictionary for Sri Lankan Sign Language</p>
+					<ul class="actions">
+						<li><a href="https://app.srilankansignlanguage.org" class="button special icon fa-globe">Open the web app</a></li>
+					</ul>
+					<ul class="actions">
+						<li><a href="https://apps.apple.com/app/id6445848879" class="button special icon fa-apple">iOS</a></li>
+						<li><a href="https://play.google.com/store/apps/details?id=com.banool.slsl_dictionary" class="button special icon fa-android">Android</a></li>
+						<li><a href="https://github.com/banool/slsl_dictionary" class="button special icon fa-github">GitHub</a></li>
+					</ul>
+					<ul class="actions" style="margin-top: 1em;">
+						<li><a href="privacy.html" style="color: #6F6155; font-size: 0.85em;">Privacy Policy</a></li>
+						<li><a href="terms.html" style="color: #6F6155; font-size: 0.85em;">Terms of Service</a></li>
+					</ul>
+				</div>
+				<div class="image phone"><div class="inner"><img src="images/app-slsl.png" alt="SLSL Dictionary app showing a sign language entry" /></div></div>
+			</header>
+
+		<!-- Scripts -->
+			<script src="assets/js/jquery.min.js"></script>
+			<script src="assets/js/jquery.scrolly.min.js"></script>
+			<script src="assets/js/skel.min.js"></script>
+			<script src="assets/js/util.js"></script>
+			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+			<script src="assets/js/main.js"></script>
+
+	</body>
+</html>

@@ -122,7 +122,7 @@ jobs:
 
     - uses: subosito/flutter-action@v1
       with:
-        flutter-version: '3.41.2'
+        flutter-version: '3.44.2'
         channel: stable
 
     - run: flutter pub get
@@ -140,44 +140,5 @@ jobs:
         releaseFile: frontend/build/app/outputs/bundle/release/app-release.aab
         track: internal
 
-  # Build for web and upload the artifact.
-  build_web:
-    needs: [changes]
-    if: needs.changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: subosito/flutter-action@v1
-      with:
-        flutter-version: '3.41.2'
-        channel: stable
-
-    # Test and build
-    - run: flutter pub get
-    - run: flutter test
-    - run: flutter build web
-
-    # Upload the artifact.
-    - uses: actions/upload-pages-artifact@v3
-      with:
-        path: frontend/build/web
-
-
-  # Deploy to GitHub Pages using the artifact from the previous job.
-  deploy_web:
-    needs: [build_web]
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-    - uses: actions/configure-pages@v4
-    - id: deployment
-      uses: actions/deploy-pages@v4
+  # The web build now deploys to Cloudflare Pages (app.srilankansignlanguage.org)
+  # via .github/workflows/web.yaml, replacing the old GitHub Pages deploy.

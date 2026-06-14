@@ -1,0 +1,17 @@
+# Cloudflare Pages config for the SLSL Dictionary info site (landing page,
+# privacy policy, terms of service), served at https://landing.srilankansignlanguage.org.
+# The apex srilankansignlanguage.org is already taken by the legacy site, so the
+# Auslan-style landing page lives at the `landing.` subdomain.
+#
+# Having the project name + output dir here lets you run `npx wrangler pages
+# deploy` from this directory without flags; CI (.github/workflows/pages.yaml)
+# runs the same command from here.
+#
+# No build step and no secrets: the deployable output is the static `src/` tree
+# as-is. The deploy authenticates with the account-level CLOUDFLARE_API_TOKEN /
+# CLOUDFLARE_ACCOUNT_ID. Attach the custom domain with `bun scripts/cf.ts
+# landing` from the dictionary_backend repo after the first deploy.
+
+name = "slsl-landing"
+pages_build_output_dir = "src"
+compatibility_date = "2026-05-01"

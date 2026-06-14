@@ -2,19 +2,15 @@ import 'dart:async';
 
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
-import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/flashcards_logic.dart';
-import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/hearth.dart';
 import 'package:dictionarylib/revision.dart';
 import 'package:dictionarylib/video_player_screen.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
 
-import 'common.dart';
 import 'word_page.dart';
 
-// TODO: Refuse to show flashcards if there is no word in the current app language.
-// TODO: Add the language override button.
 class FlashcardsPage extends StatefulWidget {
   const FlashcardsPage({
     super.key,
@@ -89,11 +85,13 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         // From here the only cards Dolphin will return are cards that were
         // failed as part of the revision session. We choose to cut the user
         // off here, they can start a new session to review these if they wish.
-        // Accordingly set currentCard to null and store the results.
         currentCard = null;
         beforePop();
       } else {
         currentCard = widget.di.dolphin.nextCard();
+        if (currentCard == null) {
+          beforePop();
+        }
       }
       currentCardRevealed = false;
       forgotRatingWidgetActive = false;
@@ -133,10 +131,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     if (shouldNavigate) {
       if (forceUseTimer ||
           (previousRating != null && previousRating != review.rating)) {
-        // If we're navigating to the next card because the user changed the
-        // rating from the default ("remembered") to something else ("forgot"),
-        // start a timer for nextCard, so they can see the feedback for hitting
-        // forgot momentarily.
+        // Brief feedback delay so the user sees the changed rating register.
         setState(() {
           nextCardTimer = Timer(const Duration(milliseconds: 750), () {
             if (mounted) {
@@ -156,89 +151,86 @@ class FlashcardsPageState extends State<FlashcardsPage> {
   }
 
   Widget getRatingButton(Rating rating, bool active, {bool isNext = false}) {
-    String textData;
-    Color backgroundColor;
-    Color overlayColor; // For tap animation, should be translucent.
-    Color borderColor;
-    if (rating == Rating.Easy && isNext) {
-      textData = DictLibLocalizations.of(context)!.flashcardsNext;
-      overlayColor = const Color.fromARGB(92, 30, 143, 250);
-      backgroundColor = const Color.fromARGB(0, 255, 255, 255);
-      borderColor = const Color.fromARGB(255, 116, 116, 116);
-    } else {
+    final cs = Theme.of(context).colorScheme;
+    final l = DictLibLocalizations.of(context)!;
+
+    void onPressed() {
       switch (rating) {
         case Rating.Hard:
-          textData = DictLibLocalizations.of(context)!.flashcardsForgot;
-          overlayColor = const Color.fromARGB(90, 211, 88, 79);
+          forgotRatingWidgetActive = true;
+          rememberedRatingWidgetActive = false;
           break;
         case Rating.Good:
-          textData = DictLibLocalizations.of(context)!.flashcardsGotIt;
-          overlayColor = const Color.fromARGB(90, 72, 167, 77);
+          rememberedRatingWidgetActive = true;
+          forgotRatingWidgetActive = false;
+          break;
+        case Rating.Easy:
           break;
         default:
           throw "Rating $rating not supported yet";
       }
-      if (active) {
-        switch (rating) {
-          case Rating.Hard:
-            backgroundColor = const Color.fromARGB(118, 255, 104, 104);
-            borderColor = const Color.fromARGB(255, 189, 40, 29);
-            break;
-          case Rating.Good:
-            backgroundColor = const Color.fromARGB(60, 88, 255, 124);
-            borderColor = const Color.fromARGB(255, 33, 102, 37);
-            break;
-          default:
-            throw "Rating $rating not supported yet";
-        }
-      } else {
-        backgroundColor = const Color.fromARGB(0, 255, 255, 255);
-        borderColor = const Color.fromARGB(255, 116, 116, 116);
-      }
+      completeCard(currentCard!, rating: rating, forceUseTimer: isNext);
     }
-    return TextButton(
-        onPressed: () {
-          switch (rating) {
-            case Rating.Hard:
-              forgotRatingWidgetActive = true;
-              rememberedRatingWidgetActive = false;
-              break;
-            case Rating.Good:
-              rememberedRatingWidgetActive = true;
-              forgotRatingWidgetActive = false;
-              break;
-            case Rating.Easy:
-              break;
-            default:
-              throw "Rating $rating not supported yet";
-          }
-          completeCard(currentCard!, rating: rating, forceUseTimer: isNext);
-        },
-        style: ButtonStyle(
-            backgroundColor: WidgetStatePropertyAll(backgroundColor),
-            overlayColor: WidgetStatePropertyAll(overlayColor),
-            padding: WidgetStatePropertyAll(const EdgeInsets.only(
-                top: 14, bottom: 14, left: 40, right: 40)),
-            side: WidgetStatePropertyAll(
-                BorderSide(color: borderColor, width: 1.5))),
-        child: Text(
-          textData,
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 16),
-        ));
+
+    if (rating == Rating.Easy && isNext) {
+      return FilledButton.icon(
+        onPressed: onPressed,
+        style: FilledButton.styleFrom(minimumSize: const Size(0, 54)),
+        icon: const Icon(Icons.arrow_forward, size: 20),
+        label: Text(l.ratingNext),
+      );
+    }
+    if (rating == Rating.Hard) {
+      return active
+          ? FilledButton.icon(
+              onPressed: onPressed,
+              style: FilledButton.styleFrom(
+                  backgroundColor: cs.error,
+                  foregroundColor: cs.onError,
+                  minimumSize: const Size(0, 54)),
+              icon: const Icon(Icons.close, size: 20),
+              label: Text(l.ratingForgot))
+          : OutlinedButton.icon(
+              onPressed: onPressed,
+              style: OutlinedButton.styleFrom(
+                  foregroundColor: cs.error,
+                  side: BorderSide(color: cs.error, width: 1.5),
+                  minimumSize: const Size(0, 54)),
+              icon: const Icon(Icons.close, size: 20),
+              label: Text(l.ratingForgot));
+    }
+    // Rating.Good
+    return active
+        ? FilledButton.icon(
+            onPressed: onPressed,
+            style: FilledButton.styleFrom(
+                backgroundColor: cs.tertiary,
+                foregroundColor: cs.onTertiary,
+                minimumSize: const Size(0, 54)),
+            icon: const Icon(Icons.check, size: 20),
+            label: Text(l.ratingGotIt))
+        : OutlinedButton.icon(
+            onPressed: onPressed,
+            style: OutlinedButton.styleFrom(
+                foregroundColor: cs.tertiary,
+                side: BorderSide(color: cs.tertiary, width: 1.5),
+                minimumSize: const Size(0, 54)),
+            icon: const Icon(Icons.check, size: 20),
+            label: Text(l.ratingGotIt));
   }
 
   Widget buildFlashcardWidget(BuildContext context, DRCard card,
-      SubEntry subEntry, String word, bool wordToSign, bool revealed) {
-    ColorScheme colorScheme = Theme.of(context).colorScheme;
+      ResolvedSavedVideo resolved, String word, bool wordToSign, bool revealed) {
+    final l = DictLibLocalizations.of(context)!;
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
-    // See here for an explanation of why I pass in a key here:
-    // https://stackoverflow.com/questions/55237188/flutter-is-not-rebuilding-same-widget-with-different-parameters
+    // Each card is one specific saved video (already resolved to a playable
+    // URL); render just that, not every video of the sub-entry.
     var videoPlayerScreen = VideoPlayerScreen(
-      mediaLinks: subEntry.getMedia(),
+      mediaLinks: [resolved.videoUrl],
       fallbackAspectRatio: 16 / 12,
-      key: Key(subEntry.getMedia()[0]),
+      key: Key(resolved.videoUrl),
+      expandOnTap: true,
     );
 
     Widget topWidget;
@@ -249,8 +241,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         double top = shouldUseHorizontalDisplay ? 100 : 120;
         topWidget = Container(
             padding: EdgeInsets.only(top: top, bottom: 70),
-            child: Text(
-                DictLibLocalizations.of(context)!.flashcardsWhatIsSignForWord,
+            child: Text(l.studyPromptWordToSign,
                 textAlign: TextAlign.center,
                 style: const TextStyle(fontSize: 20)));
       }
@@ -258,24 +249,13 @@ class FlashcardsPageState extends State<FlashcardsPage> {
       topWidget = videoPlayerScreen;
     }
 
-    Widget bottomWidget;
-    if (wordToSign) {
-      bottomWidget = Text(word,
-          textAlign: TextAlign.center, style: const TextStyle(fontSize: 20));
-    } else {
-      if (!revealed) {
-        bottomWidget = Text(
-            DictLibLocalizations.of(context)!.flashcardsWhatDoesSignMean,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 20));
-      } else {
-        bottomWidget = Text(word,
-            textAlign: TextAlign.center, style: const TextStyle(fontSize: 20));
-      }
-    }
+    Widget bottomWidget = Text(
+        wordToSign || revealed ? word : l.studyPromptSignToWord,
+        textAlign: TextAlign.center,
+        style: const TextStyle(fontSize: 20));
 
     Widget regionalInformationWidget = getRegionalInformationWidget(
-        context, subEntry, shouldUseHorizontalDisplay,
+        context, resolved.subEntry, shouldUseHorizontalDisplay,
         hide: !revealed);
 
     Widget? ratingButtonsRow;
@@ -285,11 +265,12 @@ class FlashcardsPageState extends State<FlashcardsPage> {
           ratingButtonsRow = Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              getRatingButton(Rating.Hard, forgotRatingWidgetActive),
-              const Padding(
-                padding: EdgeInsets.only(left: 15, right: 15),
-              ),
-              getRatingButton(Rating.Good, rememberedRatingWidgetActive),
+              Expanded(
+                  child: getRatingButton(Rating.Hard, forgotRatingWidgetActive)),
+              const SizedBox(width: 15),
+              Expanded(
+                  child:
+                      getRatingButton(Rating.Good, rememberedRatingWidgetActive)),
             ],
           );
           break;
@@ -297,8 +278,9 @@ class FlashcardsPageState extends State<FlashcardsPage> {
           ratingButtonsRow = Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              getRatingButton(Rating.Easy, forgotRatingWidgetActive,
-                  isNext: true),
+              Expanded(
+                  child: getRatingButton(Rating.Easy, forgotRatingWidgetActive,
+                      isNext: true)),
             ],
           );
           break;
@@ -306,40 +288,28 @@ class FlashcardsPageState extends State<FlashcardsPage> {
     }
 
     List<Widget> openDictionaryEntryWidgets = [
-      const Padding(padding: EdgeInsets.only(top: 30)),
+      const Padding(padding: EdgeInsets.only(top: 24)),
       TextButton(
-          style: ButtonStyle(
-            padding:
-                WidgetStatePropertyAll<EdgeInsets>(const EdgeInsets.all(10)),
-            backgroundColor: WidgetStateProperty.resolveWith(
-              (states) {
-                if (states.contains(WidgetState.disabled)) {
-                  return Colors.grey;
-                } else {
-                  return colorScheme.primaryContainer;
-                }
-              },
-            ),
-          ),
           onPressed: () async {
             await Navigator.push(
                 context,
                 MaterialPageRoute(
                     builder: (context) => EntryPage(
-                          // TODO: I'm not sure this is valid, double check.
-                          entry: keyedByEnglishEntriesGlobal[word]!,
-                          showFavouritesButton: false,
+                          entry: resolved.entry,
+                          showFavouritesButton: true,
                         )));
           },
-          child: Text(
-            DictLibLocalizations.of(context)!.flashcardsOpenDictionaryEntry,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 14),
-          ))
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(l.openDictionaryEntry,
+                style: const TextStyle(
+                    fontSize: 14, fontWeight: FontWeight.w700)),
+            const SizedBox(width: 6),
+            const Icon(Icons.arrow_forward, size: 16),
+          ]))
     ];
 
     if (!shouldUseHorizontalDisplay) {
-      List<Widget?> children = [];
+      List<Widget> children = [];
       children.add(topWidget);
       children.add(const Divider(
         height: 80,
@@ -348,39 +318,28 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         endIndent: 20,
       ));
       children.add(bottomWidget);
-
       if (revealed) {
-        children += openDictionaryEntryWidgets;
+        children.addAll(openDictionaryEntryWidgets);
       }
-
       children.add(Expanded(child: Container()));
-
       if (revealed) {
         children.add(const Padding(padding: EdgeInsets.only(bottom: 10)));
-        children.add(ratingButtonsRow);
+        children.add(Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ratingButtonsRow));
         children.add(regionalInformationWidget);
       }
+      children.add(const Padding(padding: EdgeInsets.only(bottom: 35)));
 
-      children.add(const Padding(
-        padding: EdgeInsets.only(bottom: 35),
-      ));
-
-      List<Widget> nonNullChildren = [];
-      for (Widget? w in children) {
-        if (w != null) {
-          nonNullChildren.add(w);
-        }
-      }
-
-      // Note: I put the Expanded inside a column to make the "Incorrect use
-      // "of ParentDataWidget" error go away.
       return Stack(children: [
         Column(children: [
           Expanded(
               child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => setState(() {
-              completeCard(currentCard!, rating: Rating.Good);
+              if (!revealed) {
+                completeCard(currentCard!, rating: Rating.Good);
+              }
             }),
             child: Container(
               key: const ValueKey("revealTapArea"),
@@ -392,7 +351,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
           mainAxisAlignment: MainAxisAlignment.start,
           mainAxisSize: MainAxisSize.max,
           crossAxisAlignment: CrossAxisAlignment.center,
-          children: nonNullChildren,
+          children: children,
         )
       ]);
     } else {
@@ -407,13 +366,13 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         bottomWidget,
       ];
       if (revealed) {
-        children += openDictionaryEntryWidgets;
+        children.addAll(openDictionaryEntryWidgets);
       }
-      children.add(Expanded(
-        child: Container(),
-      ));
+      children.add(Expanded(child: Container()));
       if (revealed) {
-        children.add(ratingButtonsRow!);
+        children.add(Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: ratingButtonsRow!));
       }
       children.add(const Padding(padding: EdgeInsets.only(bottom: 80)));
       var secondColumn = Column(
@@ -426,7 +385,9 @@ class FlashcardsPageState extends State<FlashcardsPage> {
               child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTap: () => setState(() {
-              completeCard(currentCard!, rating: Rating.Good);
+              if (!revealed) {
+                completeCard(currentCard!, rating: Rating.Good);
+              }
             }),
             child: Container(
               key: const ValueKey("revealTapArea"),
@@ -451,88 +412,90 @@ class FlashcardsPageState extends State<FlashcardsPage> {
   }
 
   Widget buildSummaryWidget() {
-    int numCardsRemembered = answers.values
-        .where(
-          (element) => element.rating == Rating.Good,
-        )
-        .length;
-    int numCardsForgotten = answers.values
-        .where(
-          (element) => element.rating == Rating.Hard,
-        )
-        .length;
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    final l = DictLibLocalizations.of(context)!;
+    int numCardsRemembered =
+        answers.values.where((e) => e.rating == Rating.Good).length;
+    int numCardsForgotten =
+        answers.values.where((e) => e.rating == Rating.Hard).length;
     int totalAnswers = answers.length;
-    double rememberRate = numCardsRemembered / totalAnswers;
+    double rememberRate =
+        totalAnswers == 0 ? 0 : numCardsRemembered / totalAnswers;
 
-    Widget getText(String s, {bool bold = false}) {
-      FontWeight? weight;
-      if (bold) {
-        weight = FontWeight.w600;
-      }
-      return Padding(
-        padding: const EdgeInsets.only(top: 30),
-        child: Text(s, style: TextStyle(fontSize: 16, fontWeight: weight)),
-      );
-    }
-
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(24, 28, 24, 28),
       children: [
-        Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          const Padding(
-            padding: EdgeInsets.only(left: 60),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              getText(
-                  "${DictLibLocalizations.of(context)!.flashcardsSuccessRate}:",
-                  bold: true),
-              getText(
-                  "${DictLibLocalizations.of(context)!.flashcardsTotalCards}:",
-                  bold: true),
-              getText(
-                  "${DictLibLocalizations.of(context)!.flashcardsSuccessfulCards}:",
-                  bold: true),
-              getText(
-                  "${DictLibLocalizations.of(context)!.flashcardsIncorrectCards}:",
-                  bold: true)
-            ],
-          ),
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              getText("${(rememberRate * 100).toStringAsFixed(1)}%"),
-              getText("$totalAnswers"),
-              getText("$numCardsRemembered"),
-              getText("$numCardsForgotten"),
-            ],
-          ),
-          const Padding(
-            padding: EdgeInsets.only(left: 60),
-          ),
-        ]),
-        const Padding(padding: EdgeInsets.only(bottom: 250))
+        Text(
+          l.sessionComplete.toUpperCase(),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.6,
+              color: cs.primary),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          l.sessionCompleteHeadline(totalAnswers),
+          textAlign: TextAlign.center,
+          style: tt.displaySmall?.copyWith(fontSize: 28),
+        ),
+        const SizedBox(height: 26),
+        Center(
+          child: HearthRing(
+              percent: rememberRate, size: 140, centerLabel: l.summarySuccess),
+        ),
+        const SizedBox(height: 28),
+        Row(
+          children: [
+            Expanded(
+                child: HearthStatTile(
+                    value: "$totalAnswers", label: l.summaryCards)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: HearthStatTile(
+                    value: "$numCardsRemembered",
+                    label: l.summaryGotIt,
+                    valueColor: cs.tertiary)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: HearthStatTile(
+                    value: "$numCardsForgotten",
+                    label: l.summaryForgot,
+                    valueColor: cs.error)),
+          ],
+        ),
       ],
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    Brightness brightness = Theme.of(context).brightness;
+    final l = DictLibLocalizations.of(context)!;
     Widget body;
     String appBarTitle;
     List<Widget> actions = [];
     if (currentCard != null) {
       DRCard card = currentCard!;
 
-      SubEntry subEntry = widget.di.keyToSubEntryMap[card.master]!;
+      final resolved = widget.di.masterToVideoMap[card.master];
+      if (resolved == null) {
+        // Defensive: couldn't resolve the saved video for this card (e.g. the
+        // dictionary data changed mid-session). Skip rather than crash.
+        printAndLog(
+            "No resolved video for master ${card.master}; skipping card");
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          showSnack(context, l.flashcardsCardUnavailable);
+          nextCard();
+        });
+        return const Scaffold(body: Center(child: CircularProgressIndicator()));
+      }
 
       String word;
       bool wordToSign = card.back![0] == VIDEO_LINKS_MARKER;
       if (wordToSign) {
-        // Word on front, video on back.
         word = card.front![0];
       } else {
         word = card.back![0];
@@ -543,7 +506,7 @@ class FlashcardsPageState extends State<FlashcardsPage> {
       body = Center(
           child: InheritedPlaybackSpeed(
               playbackSpeed: playbackSpeed,
-              child: buildFlashcardWidget(context, card, subEntry, word,
+              child: buildFlashcardWidget(context, card, resolved, word,
                   wordToSign, currentCardRevealed)));
       int progressString = getCardsReviewed() + 1;
       if (currentCardRevealed) {
@@ -554,18 +517,13 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         setState(() {
           playbackSpeed = p!;
         });
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(
-                "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}"),
-            backgroundColor: brightness == Brightness.light
-                ? LIGHT_MAIN_COLOR
-                : DARK_MAIN_COLOR,
-            duration: const Duration(milliseconds: 1000)));
-      }, enabled: videoIsShowing));
+        showSnack(context,
+            "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(playbackSpeed)}",
+            duration: const Duration(milliseconds: 1000));
+      }, enabled: videoIsShowing, current: playbackSpeed));
     } else {
       body = buildSummaryWidget();
-      appBarTitle =
-          DictLibLocalizations.of(context)!.flashcardsRevisionSummaryTitle;
+      appBarTitle = l.revisionSummaryTitle;
     }
 
     // Disable swipe back with PopScope.
@@ -574,16 +532,13 @@ class FlashcardsPageState extends State<FlashcardsPage> {
         child: Scaffold(
           appBar: AppBar(
               centerTitle: true,
-              title: Text(
-                appBarTitle,
-                textAlign: TextAlign.center,
-              ),
+              title: Text(appBarTitle, textAlign: TextAlign.center),
               actions: buildActionButtons(actions),
               leading: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () async {
                     await beforePop();
-                    Navigator.of(context).pop();
+                    if (context.mounted) Navigator.of(context).pop();
                   })),
           body: body,
         ));

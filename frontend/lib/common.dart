@@ -1,4 +1,6 @@
+import 'package:dictionarylib/entry_list.dart';
 import 'package:dictionarylib/entry_types.dart';
+import 'package:dictionarylib/saved_video.dart';
 import 'package:flutter/material.dart';
 
 import 'word_page.dart';
@@ -46,13 +48,21 @@ const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 const String IOS_APP_ID = "6445848879";
 const String ANDROID_APP_ID = "com.banool.slsl_dictionary";
 
+// Matches dictionarylib's NavigateToEntryPageFn typedef. The named params
+// drive the per-video save flow: [focusVideo] lands the page on a specific
+// saved video, and [saveToList] makes the save button toggle membership of
+// that one list (instead of opening the all-lists picker).
 Future<void> navigateToEntryPage(
-    BuildContext context, Entry entry, bool showFavouritesButton) {
+    BuildContext context, Entry entry, bool showFavouritesButton,
+    {SavedVideo? focusVideo, EntryList? saveToList}) {
   return Navigator.push(
     context,
     MaterialPageRoute(
         builder: (context) => EntryPage(
-            entry: entry, showFavouritesButton: showFavouritesButton)),
+            entry: entry,
+            showFavouritesButton: showFavouritesButton,
+            focusVideo: focusVideo,
+            saveToList: saveToList)),
   );
 }
 

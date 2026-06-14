@@ -1,5 +1,7 @@
 # Uncomment this line to define a global platform for your project
-platform :ios, '13.0'
+# 16.0 is required by msal_auth (Microsoft sign-in); the other shared-lists
+# auth plugins are happy at or below it. Matches auslan_dictionary.
+platform :ios, '16.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -37,9 +39,5 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     flutter_additional_ios_build_settings(target)
-    # https://stackoverflow.com/a/58367269/3846032
-    target.build_configurations.each do |config|
-      config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.0'
-    end
   end
 end

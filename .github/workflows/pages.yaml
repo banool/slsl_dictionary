@@ -1,0 +1,38 @@
+name: Deploy landing site to Cloudflare Pages
+
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', '.github/workflows/pages.yaml']
+  workflow_dispatch:
+
+# Single deployment at a time.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    # Run from site/ so wrangler picks up site/wrangler.toml (project name +
+    # output dir).
+    defaults: { run: { working-directory: site } }
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      # The account id is not a credential (it appears in dashboard URLs); a
+      # repo secret, if added, wins, otherwise this literal fallback is used.
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID || '47989fc190166b22bc15768dc41e8693' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Ensure Pages project exists
+        run: npx wrangler@latest pages project create slsl-landing --production-branch=main || true
+      - name: Deploy to Cloudflare Pages
+        run: npx wrangler@latest pages deploy --branch=main --commit-dirty=true
+      # Custom-domain reconciliation (landing.srilankansignlanguage.org) is a
+      # one-time, idempotent step owned by the private backend repo's Cloudflare
+      # CLI: `bun scripts/cf.ts landing`. It isn't run from this public CI
+      # because that can't reach the private script — and a deploy never
+      # detaches an already-attached domain, so there's nothing to do per push.

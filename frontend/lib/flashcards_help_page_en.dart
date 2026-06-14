@@ -1,6 +1,5 @@
 import 'package:dictionarylib/help_common.dart';
 import 'package:flutter/material.dart';
-import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
 // This would be too much too annoying to localize the normal way so instead
 // I have different files for each of these in each language.
@@ -20,27 +19,13 @@ Widget getFlashcardsHelpPageEn(BuildContext context) {
       "You can also just tap again anywhere if you got the answer right, as "
           "we select that option by default.",
     ],
-    "Where do the words for the flashcards come from?": const [
+    "Where do the signs for the flashcards come from?": const [
       "You may select one or more lists as the flashcard source. By default "
           "there is only one list, your favourites, but you may create additional "
-          "lists and use words from many of them at once in a single revision session. ",
-      "If two lists contain the same word, we will still only show the word once."
-    ],
-    "What do all these sign selection options mean?": const [
-      "Within a single dictionary entry in SLSL Dictionary there may be "
-          "multiple \"sub-entries\", for example showing signs from different regions. "
-          "By default we automatically opt you in to signs that are known to be "
-          "used throughout the whole country, but you may also opt in to seeing "
-          "signs from specific regions (e.g. Northern, VIC, WA, etc). ",
-    ],
-    "What does \"${DictLibLocalizations.of(context)!.flashcardsOnlyOneCard}\" mean?":
-        const [
-      "Based on the other filtering options you have set, there may be "
-          "situations where there are multiple sub-entries for a single entry. "
-          "In other words, for a single word you might have a sub-entry from "
-          "VIC, another from WA, and another that applies Australia-wide.",
-      "You may not want this behaviour, instead preferring to see only one "
-          "set of cards per word. If so, you should enable this option."
+          "lists and revise videos from many of them at once in a single revision "
+          "session. ",
+      "Revision works on the individual videos you've saved, so if two lists "
+          "contain the same video we will still only show it once."
     ],
     "What is a revision strategy?": const [
       "A revision strategy determines how we decide what flashcards to show "

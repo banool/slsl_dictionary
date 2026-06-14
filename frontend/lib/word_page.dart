@@ -1,9 +1,14 @@
 import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/entry_list.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/lists_service.dart';
+import 'package:dictionarylib/save_video_sheet.dart';
+import 'package:dictionarylib/saved_video.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:dictionarylib/video_player_screen.dart';
 import 'package:dots_indicator/dots_indicator.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/language_dropdown.dart';
 
@@ -12,59 +17,72 @@ import 'entries_types.dart';
 import 'globals.dart';
 
 class EntryPage extends StatefulWidget {
-  const EntryPage(
-      {super.key, required this.entry, required this.showFavouritesButton});
+  const EntryPage({
+    super.key,
+    required this.entry,
+    required this.showFavouritesButton,
+    this.focusVideo,
+    this.saveToList,
+  });
 
   final Entry entry;
+
+  /// Whether to render the per-video save button. Named `showFavouritesButton`
+  /// for source-compat with the pre-per-video-saves callers — it's no longer a
+  /// favourites star but a per-video bookmark that opens the all-lists picker.
   final bool showFavouritesButton;
 
+  /// If supplied, the page lands on the sub-entry + video matching this saved
+  /// video (used by the list view's tap-to-jump flow).
+  final SavedVideo? focusVideo;
+
+  /// If supplied, the save button toggles membership of this one list directly
+  /// instead of opening the picker (the list-edit "add videos" flow).
+  final EntryList? saveToList;
+
   @override
-  _EntryPageState createState() =>
-      _EntryPageState(entry: entry, showFavouritesButton: showFavouritesButton);
+  State<EntryPage> createState() => _EntryPageState();
 }
 
 class _EntryPageState extends State<EntryPage> {
-  _EntryPageState({required this.entry, required this.showFavouritesButton});
-
-  final Entry entry;
-  final bool showFavouritesButton;
-
   int currentPage = 0;
 
-  bool isFavourited = false;
+  /// Within-sub-entry video index to land on when [EntryPage.focusVideo] points
+  /// into the first-shown sub-entry. Null otherwise.
+  int? _focusedVideoInitialIndex;
 
   PlaybackSpeed playbackSpeed = PlaybackSpeed.One;
 
-  // On the word page we let people override the language.
+  // On the word page we let people override the displayed language.
   Locale? localeOverride;
+
+  late final PageController _pageController;
 
   @override
   void initState() {
-    if (entryIsFavourited(entry)) {
-      isFavourited = true;
-    } else {
-      isFavourited = false;
-    }
     super.initState();
+    _applyFocusVideo();
+    _pageController = PageController(initialPage: currentPage);
   }
 
-  bool entryIsFavourited(Entry entry) {
-    return userEntryListManager
-        .getEntryLists()[KEY_FAVOURITES_ENTRIES]!
-        .entries
-        .contains(entry);
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
   }
 
-  Future<void> addEntryToFavourites(Entry entry) async {
-    await userEntryListManager
-        .getEntryLists()[KEY_FAVOURITES_ENTRIES]!
-        .addEntry(entry);
-  }
-
-  Future<void> removeEntryFromFavourites(Entry entry) async {
-    await userEntryListManager
-        .getEntryLists()[KEY_FAVOURITES_ENTRIES]!
-        .removeEntry(entry);
+  void _applyFocusVideo() {
+    final focus = widget.focusVideo;
+    if (focus == null) return;
+    final subEntries = widget.entry.getSubEntries();
+    for (var i = 0; i < subEntries.length; i++) {
+      final idx = subEntries[i].getMedia().indexOf(focus.mediaPath);
+      if (idx >= 0) {
+        currentPage = i;
+        _focusedVideoInitialIndex = idx;
+        return;
+      }
+    }
   }
 
   void onPageChanged(int index) {
@@ -76,37 +94,7 @@ class _EntryPageState extends State<EntryPage> {
 
   @override
   Widget build(BuildContext context) {
-    Brightness brightness = Theme.of(context).brightness;
-    Icon starIcon;
-    if (isFavourited) {
-      starIcon = Icon(Icons.star,
-          semanticLabel:
-              DictLibLocalizations.of(context)!.wordAlreadyFavourited);
-    } else {
-      starIcon = Icon(Icons.star_outline,
-          semanticLabel:
-              DictLibLocalizations.of(context)!.wordFavouriteThisWord);
-    }
-
-    List<Widget> actions = [];
-    if (showFavouritesButton && getShowLists()) {
-      actions.add(buildActionButton(
-        context,
-        starIcon,
-        () async {
-          setState(() {
-            isFavourited = !isFavourited;
-          });
-          if (isFavourited) {
-            await addEntryToFavourites(entry);
-          } else {
-            await removeEntryFromFavourites(entry);
-          }
-        },
-      ));
-    }
-
-    actions += [
+    List<Widget> actions = [
       LanguageDropdown(
           asPopUpMenu: true,
           includeDeviceDefaultOption: false,
@@ -121,14 +109,12 @@ class _EntryPageState extends State<EntryPage> {
           setState(() {
             playbackSpeed = p!;
           });
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text(
-                  "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}"),
-              backgroundColor: brightness == Brightness.light
-                  ? LIGHT_MAIN_COLOR
-                  : DARK_MAIN_COLOR,
-              duration: const Duration(milliseconds: 1000)));
+          showSnack(
+              context,
+              "${DictLibLocalizations.of(context)!.setPlaybackSpeedTo} ${getPlaybackSpeedString(p!)}",
+              duration: const Duration(milliseconds: 1000));
         },
+        current: playbackSpeed,
       )
     ];
 
@@ -141,8 +127,9 @@ class _EntryPageState extends State<EntryPage> {
             context: context,
             locale: locale,
             child: Builder(builder: (context) {
-              var phrase = entry.getPhrase(locale) ??
+              var phrase = widget.entry.getPhrase(locale) ??
                   DictLibLocalizations.of(context)!.wordDataMissing;
+              final subEntries = widget.entry.getSubEntries();
               return Scaffold(
                   appBar: AppBar(
                       title: Text(phrase),
@@ -150,21 +137,27 @@ class _EntryPageState extends State<EntryPage> {
                   body: Column(children: [
                     Expanded(
                         child: PageView.builder(
-                            itemCount: entry.getSubEntries().length,
+                            controller: _pageController,
+                            itemCount: subEntries.length,
                             itemBuilder: (context, index) => SubEntryPage(
-                                  entry: entry,
-                                  subEntry: entry.getSubEntries()[index],
+                                  entry: widget.entry,
+                                  subEntry: subEntries[index],
+                                  initialVideoIndex: index == currentPage
+                                      ? _focusedVideoInitialIndex
+                                      : null,
+                                  // No saving on web (no account there).
+                                  showSaveButton:
+                                      widget.showFavouritesButton && !kIsWeb,
+                                  saveToList: widget.saveToList,
                                 ),
                             onPageChanged: onPageChanged)),
                     Padding(
                       padding: const EdgeInsets.only(top: 5, bottom: 15),
                       child: DotsIndicator(
-                        dotsCount: entry.getSubEntries().length,
+                        dotsCount: subEntries.length,
                         position: currentPage.toDouble(),
                         decorator: DotsDecorator(
-                          activeColor: brightness == Brightness.light
-                              ? LIGHT_MAIN_COLOR
-                              : DARK_MAIN_COLOR,
+                          activeColor: Theme.of(context).colorScheme.primary,
                         ),
                       ),
                     ),
@@ -190,8 +183,7 @@ Widget? getRelatedEntriesWidget(
         }
         return relatedEntry;
       },
-      navigateToEntryPage: (context, entry, showFavouritesButton) =>
-          navigateToEntryPage(context, entry, showFavouritesButton));
+      navigateToEntryPage: navigateToEntryPage);
 }
 
 Widget getRegionalInformationWidget(
@@ -226,25 +218,39 @@ class SubEntryPage extends StatefulWidget {
     super.key,
     required this.entry,
     required this.subEntry,
+    this.initialVideoIndex,
+    this.showSaveButton = true,
+    this.saveToList,
   });
 
   final Entry entry;
   final SubEntry subEntry;
 
+  /// Within-sub-entry video index to land on (first build only).
+  final int? initialVideoIndex;
+
+  /// Whether to render the per-video bookmark button.
+  final bool showSaveButton;
+
+  /// When set, the bookmark toggles membership of this one list directly.
+  final EntryList? saveToList;
+
   @override
-  _SubEntryPageState createState() =>
-      _SubEntryPageState(entry: entry, subEntry: subEntry);
+  _SubEntryPageState createState() => _SubEntryPageState();
 }
 
 class _SubEntryPageState extends State<SubEntryPage>
     with AutomaticKeepAliveClientMixin {
-  _SubEntryPageState({required this.entry, required this.subEntry});
-
-  final Entry entry;
-  final SubEntry subEntry;
+  late int _currentVideo;
 
   @override
   bool get wantKeepAlive => true;
+
+  @override
+  void initState() {
+    super.initState();
+    _currentVideo = widget.initialVideoIndex ?? 0;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -252,28 +258,55 @@ class _SubEntryPageState extends State<SubEntryPage>
     super.build(context);
     Locale locale = Localizations.localeOf(context);
 
+    // getMedia() returns paths (the saved-video identity); resolve each to a
+    // playable URL. VideoPlayerScreen handles both videos (.mp4) and images
+    // (.jpg).
+    final paths = widget.subEntry.getMedia();
     var videoPlayerScreen = VideoPlayerScreen(
-      mediaLinks: subEntry.getMedia(),
+      mediaLinks: paths.map(mediaUrlForPath).toList(),
       fallbackAspectRatio: 16 / 12,
+      initialPage: paths.isEmpty ? 0 : _currentVideo.clamp(0, paths.length - 1),
+      onPageChanged: (index) {
+        if (index != _currentVideo) setState(() => _currentVideo = index);
+      },
     );
+
+    Widget? bookmarkRow;
+    if (widget.showSaveButton && getShowLists() && paths.isNotEmpty) {
+      final path = paths[_currentVideo.clamp(0, paths.length - 1)];
+      bookmarkRow = _BookmarkButton(
+        key: const ValueKey('wordPage.saveButton'),
+        entry: widget.entry,
+        mediaPath: path,
+        saveToList: widget.saveToList,
+      );
+    }
+
     // If the display is wide enough, show the video beside the entries instead
     // of above the entries (as well as other layout changes).
     var shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
 
     Widget? relatedWordsWidget =
-        getRelatedEntriesWidget(context, subEntry, shouldUseHorizontalDisplay);
+        getRelatedEntriesWidget(context, widget.subEntry, shouldUseHorizontalDisplay);
     Widget regionalInformationWidget = getRegionalInformationWidget(
-        context, subEntry, shouldUseHorizontalDisplay);
+        context, widget.subEntry, shouldUseHorizontalDisplay);
 
     if (!shouldUseHorizontalDisplay) {
       List<Widget> children = [];
-      children.add(videoPlayerScreen);
+      // Loose Flexible: the video keeps its natural size when there's room, but
+      // yields height under pressure (e.g. a short transition frame during a
+      // route pop) so the column — video + bookmark + definitions + region —
+      // never overflows. Definitions below is the Expanded that takes the slack.
+      children.add(Flexible(child: videoPlayerScreen));
+      if (bookmarkRow != null) {
+        children.add(bookmarkRow);
+      }
       if (relatedWordsWidget != null) {
         children.add(Center(child: relatedWordsWidget));
       }
       children.add(Expanded(
         child: Definitions(
-            context, subEntry.getDefinitions(locale) as List<Definition>),
+            context, widget.subEntry.getDefinitions(locale) as List<Definition>),
       ));
       children.add(regionalInformationWidget);
       return Column(
@@ -291,20 +324,19 @@ class _SubEntryPageState extends State<SubEntryPage>
         children: [
           Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             videoPlayerScreen,
+            if (bookmarkRow != null) bookmarkRow,
             regionalInformationWidget,
           ]),
           LayoutBuilder(
               builder: (BuildContext context, BoxConstraints constraints) {
             // TODO Make this less janky and hardcoded.
-            // The issue is the parent has infinite width and height
-            // and Expanded doesn't seem to be working.
             List<Widget> children = [];
             if (relatedWordsWidget != null) {
               children.add(relatedWordsWidget);
             }
             children.add(Expanded(
                 child: Definitions(context,
-                    subEntry.getDefinitions(locale) as List<Definition>)));
+                    widget.subEntry.getDefinitions(locale) as List<Definition>)));
             return ConstrainedBox(
                 constraints: BoxConstraints(
                     maxWidth: screenWidth * 0.4, maxHeight: screenHeight * 0.7),
@@ -315,6 +347,112 @@ class _SubEntryPageState extends State<SubEntryPage>
         ],
       );
     }
+  }
+}
+
+/// Per-video save toggle rendered beneath the video player. Owns its own state
+/// so swiping to a new video — or toggling the picker sheet — repaints just
+/// this button rather than the whole entry page.
+class _BookmarkButton extends StatefulWidget {
+  final Entry entry;
+
+  /// The media **path** (stable identity) of the video this button saves.
+  final String mediaPath;
+
+  /// When set, the button toggles this video's membership in [saveToList]
+  /// directly; when null it opens the all-lists picker sheet.
+  final EntryList? saveToList;
+
+  const _BookmarkButton({
+    super.key,
+    required this.entry,
+    required this.mediaPath,
+    this.saveToList,
+  });
+
+  @override
+  State<_BookmarkButton> createState() => _BookmarkButtonState();
+}
+
+class _BookmarkButtonState extends State<_BookmarkButton> {
+  @override
+  Widget build(BuildContext context) {
+    final v = SavedVideo(
+        entryKey: widget.entry.getKey(), mediaPath: widget.mediaPath);
+    final l = DictLibLocalizations.of(context)!;
+
+    // Direct mode: came from a specific list, so just toggle membership of it.
+    final target = widget.saveToList;
+    if (target != null) {
+      final saved = target.containsVideo(v);
+      final messenger = ScaffoldMessenger.of(context);
+      Future<void> toggle() async {
+        try {
+          if (saved) {
+            await target.removeVideo(v);
+          } else {
+            await target.addVideo(v);
+          }
+        } catch (e) {
+          printAndLog("Failed to toggle video in list ${target.key}: $e");
+          if (mounted) {
+            showSnackVia(messenger, l.saveVideoFailed);
+          }
+        }
+        if (mounted) setState(() {});
+      }
+
+      final name = target.getName(context);
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+        child: SizedBox(
+          width: double.infinity,
+          child: saved
+              ? FilledButton.icon(
+                  onPressed: toggle,
+                  icon: const Icon(Icons.bookmark, size: 20),
+                  label: Text(l.savedToNamedList(name)),
+                )
+              : OutlinedButton.icon(
+                  onPressed: toggle,
+                  icon: const Icon(Icons.bookmark_border, size: 20),
+                  label: Text(l.saveToNamedList(name)),
+                ),
+        ),
+      );
+    }
+
+    // Picker mode: count against the same set the save sheet shows.
+    var savedCount = 0;
+    for (final list in listsService.writableLists) {
+      if (list.containsVideo(v)) savedCount++;
+    }
+    final saved = savedCount > 0;
+
+    Future<void> openSheet() async {
+      await showSaveVideoSheet(context, video: v);
+      if (mounted) setState(() {});
+    }
+
+    final label = saved ? l.savedToListCount(savedCount) : l.saveVideoButton;
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 4),
+      child: SizedBox(
+        width: double.infinity,
+        child: saved
+            ? FilledButton.icon(
+                onPressed: openSheet,
+                icon: const Icon(Icons.bookmark, size: 20),
+                label: Text(label),
+              )
+            : OutlinedButton.icon(
+                onPressed: openSheet,
+                icon: const Icon(Icons.bookmark_border, size: 20),
+                label: Text(label),
+              ),
+      ),
+    );
   }
 }
 

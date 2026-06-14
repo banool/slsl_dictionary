@@ -13,8 +13,9 @@ List<Widget> buildLegalInformationChildren() {
       child: Text("This data is licensed under\nCreative Commons BY-NC-ND 4.0.",
           textAlign: TextAlign.center),
       onPressed: () async {
-        const url = 'https://creativecommons.org/licenses/by-nc-nd/4.0/';
-        await launch(url, forceSafariVC: false);
+        final url =
+            Uri.parse('https://creativecommons.org/licenses/by-nc-nd/4.0/');
+        await launchUrl(url, mode: LaunchMode.externalApplication);
       },
     ),
     Container(
@@ -24,9 +25,9 @@ List<Widget> buildLegalInformationChildren() {
       child: Text("All app code is licensed under\nApache 2.0.",
           textAlign: TextAlign.center),
       onPressed: () async {
-        const url =
-            'https://github.com/banool/slsl_dictionary/blob/main/LICENSE.md';
-        await launch(url, forceSafariVC: false);
+        final url = Uri.parse(
+            'https://github.com/banool/slsl_dictionary/blob/main/LICENSE.md');
+        await launchUrl(url, mode: LaunchMode.externalApplication);
       },
     ),
   ];

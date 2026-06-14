@@ -30,17 +30,84 @@
               android:name="io.flutter.embedding.android.SplashScreenDrawable"
               android:resource="@drawable/launch_background"
               />
+            <!-- Disable Flutter's built-in deep linking so the app_links-based
+                 handler in dictionarylib is the sole deep-link entry point —
+                 otherwise inbound share links reach go_router as raw URIs and
+                 throw "no routes for location". Matches auslan_dictionary. -->
+            <meta-data
+                android:name="flutter_deeplinking_enabled"
+                android:value="false" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <!-- Verified App Link for shared-list URLs. The matching
+                 assetlinks.json is served at
+                 https://share.srilankansignlanguage.org/.well-known/assetlinks.json
+                 by the static site in dictionarylib/lists/site/. -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                      android:host="share.srilankansignlanguage.org"
+                      android:pathPrefix="/l/" />
+            </intent-filter>
+            <!-- Custom-scheme fallback used by the landing-page JS when App
+                 Link verification hasn't completed. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                />
+                <data android:scheme="slsl" android:host="share" />
+            </intent-filter>
+        </activity>
+        <!-- Sign in with Apple — Android web flow. The package's
+             SignInWithAppleCallback activity needs an App-Link intent filter
+             pointing at the URL the Worker 302s to after Apple POSTs the
+             form_post. Same host as the share-link landing pages; a distinct
+             path so it doesn't collide with the main activity's /l/* filter. -->
+        <activity
+            android:name="com.aboutyou.dart_packages.sign_in_with_apple.SignInWithAppleCallback"
+            android:exported="true">
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https"
+                      android:host="share.srilankansignlanguage.org"
+                      android:path="/apple-callback" />
+            </intent-filter>
+        </activity>
+        <!-- Microsoft sign-in (MSAL via msal_auth). The browser-delegated auth
+             flow redirects back to msauth://<package>/<sig-hash>, caught here.
+             One <data> per signing key the app may run under so the redirect
+             resolves in every build. Hashes are the RAW base64 SHA-1 of each
+             cert — Android matches intent-filter paths against the percent-
+             DECODED URI path, so the URL-encoded form (correct in main.dart +
+             Azure) would never match here. Play App Signing re-signs the upload,
+             so the store build runs under Google's app-signing key — its hash is
+             listed too. Keep in sync with microsoftAndroid*RedirectUri in
+             lib/main.dart and the Azure app registration. -->
+        <activity
+            android:name="com.microsoft.identity.client.BrowserTabActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <!-- Play App Signing key (production / store builds) -->
+                <data android:scheme="msauth"
+                      android:host="com.banool.slsl_dictionary"
+                      android:path="/NteHMzzGTBV9TlUL3U7Iu2zFr6w=" />
+                <!-- release / upload key -->
+                <data android:scheme="msauth"
+                      android:host="com.banool.slsl_dictionary"
+                      android:path="/x7LGJXVDC1TRVjvRFCUCvufX/wQ=" />
+                <!-- local debug key -->
+                <data android:scheme="msauth"
+                      android:host="com.banool.slsl_dictionary"
+                      android:path="/mLnUCgy8ygvZ+2jXJtHai/NmrCw=" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
@@ -50,4 +117,6 @@
             android:value="2" />
     </application>
     <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- MSAL browser-delegated auth needs network-state visibility. -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 </manifest>

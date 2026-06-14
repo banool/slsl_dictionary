@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 
-import 'entries_loader.dart';
-
 part 'entries_types.g.dart';
 
 @JsonSerializable()
@@ -134,10 +132,13 @@ class MySubEntry implements SubEntry {
 
   @override
   List<String> getMedia() {
-    // The dump only contains the final filename + ext, we have to build the
-    // full URL. We do it here. buildUrl depends on the useCdnUrl knob having
-    // a value.
-    return videos.map((e) => buildUrl("media/$e")).toList();
+    // Returns each media item's **path** (the stable identity a saved video
+    // is keyed by), not a full URL — so a save survives the content moving
+    // between hosts / CDNs. The dump stores just the filename; the path is
+    // `/media/<file>`. Resolve to a playable URL with mediaUrlForPath
+    // (dictionarylib globals) + mediaBaseUrls, which main.dart configures from
+    // the useCdnUrl knob. See SubEntryPage in word_page.dart.
+    return videos.map((e) => "/media/$e").toList();
   }
 
   @override

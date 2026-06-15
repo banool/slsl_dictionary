@@ -25,4 +25,10 @@ English is the canonical language: an entry's stable key is always its English p
 
 ## Development
 
-Start in [`frontend/README.md`](frontend/README.md) — it covers building the app, deploying to the stores and the web, and the screenshot tooling. All Dart is formatted with `dart format`.
+Start in [`frontend/README.md`](frontend/README.md) — it covers building the app, deploying to the stores and the web, and the screenshot tooling.
+
+All Dart is formatted with `dart format`; CI enforces it. Install the git hooks once after cloning so the same check (and an automatic build-number bump) runs before each commit:
+
+```sh
+git config core.hooksPath .githooks
+```

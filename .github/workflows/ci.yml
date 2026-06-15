@@ -27,6 +27,27 @@ jobs:
         ADMIN_SITE: ${{ steps.filter.outputs.admin_site }}
         FRONTEND: ${{ steps.filter.outputs.frontend }}
 
+  # Formatting gate for the Flutter app. Matches the local pre-commit hook
+  # (.githooks/pre-commit) and the `dart format` style the repo is kept in.
+  format:
+    needs: [changes]
+    if: needs.changes.outputs.frontend == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./frontend
+    steps:
+    - uses: actions/checkout@v4
+    - uses: subosito/flutter-action@v1
+      with:
+        flutter-version: '3.44.2'
+        channel: stable
+    # `dart format` derives its style from the package's language version (the
+    # pubspec sdk lower bound), so resolve the package first — without pub get
+    # it falls back to the latest style and reformats everything.
+    - run: flutter pub get
+    - run: dart format --output=none --set-exit-if-changed lib test integration_test test_driver
+
   # Build the admin site image and publish to Docker Hub.
   build_push_admin_site:
     needs: [changes]

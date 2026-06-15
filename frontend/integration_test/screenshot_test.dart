@@ -261,16 +261,19 @@ void main() async {
     await letVideoLoad(tester);
     await takeScreenshot(tester, binding, info, "flashcardFront");
 
-    // 9. The same flashcard revealed, with the rating buttons. SLSL reveals by
-    // tapping the card itself (revealTapArea) rather than a dedicated button.
-    await tester.tap(find.byKey(const ValueKey("revealTapArea")));
+    // 9. The same flashcard revealed, with the rating buttons.
+    await tester.tap(find.byKey(const ValueKey("revealButton")));
     await letVideoLoad(tester);
     await takeScreenshot(tester, binding, info, "flashcardRevealed");
 
-    // Leave the session via the app-bar close button. SLSL's flashcards pop
-    // straight back to the revision landing page (the summary only appears once
-    // every card has been reviewed), so a single × exits. Target the IconButton
-    // specifically — the "Forgot" rating button also uses an Icons.close glyph.
+    // Leave the session via the app-bar close button. Tapping × mid-session
+    // ends it early and shows the revision summary first (revealing a card adds
+    // a default answer, so there's something to summarise), then a second × pops
+    // the summary back to the revision landing page. Both writes happen on that
+    // first close. Target the IconButton specifically — the "Forgot" rating
+    // button also uses an Icons.close glyph.
+    await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
+    await settle(tester);
     await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
     await settle(tester);
 
@@ -313,7 +316,8 @@ void main() async {
       await letVideoLoad(tester);
 
       // 12. Word page in landscape: video left, definitions right.
-      app.navigateToEntryPage(rootNavigatorKey.currentContext!, heroEntry, true);
+      app.navigateToEntryPage(
+          rootNavigatorKey.currentContext!, heroEntry, true);
       await letVideoLoad(tester);
       await takeScreenshot(tester, binding, info, "wordPageLandscape");
       rootNavigatorKey.currentState!.pop();
@@ -340,7 +344,7 @@ void main() async {
 
         // 14. The same flashcard revealed: video left, word + rating buttons
         // right.
-        await tester.tap(find.byKey(const ValueKey("revealTapArea")));
+        await tester.tap(find.byKey(const ValueKey("revealButton")));
         await letVideoLoad(tester);
         await takeScreenshot(
             tester, binding, info, "flashcardRevealedLandscape");

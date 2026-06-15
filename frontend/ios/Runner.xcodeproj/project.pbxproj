@@ -472,6 +472,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.banool.slsldictionary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 
@@ -707,6 +708,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.banool.slsldictionary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 
@@ -741,6 +743,7 @@
 					"$(inherited)",
 					"$(PROJECT_DIR)/Flutter",
 				);
+				CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;
 				PRODUCT_BUNDLE_IDENTIFIER = com.banool.slsldictionary;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 

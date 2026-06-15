@@ -82,10 +82,10 @@ IOS_DISPLAY_TYPES = {
 #
 # The capture directories are named after the app locale used at capture time
 # (SLSL captures under "en"), but each store listing uses a fuller locale code,
-# so map the capture locale onto the store's. SLSL's Play listing is en-AU; the
-# App Store listing is en-US.
+# so map the capture locale onto the store's. Both of SLSL's listings (App Store
+# and Play) are en-AU.
 PLAY_LOCALE_MAP = {"en": "en-AU"}
-IOS_LOCALE_MAP = {"en": "en-US"}
+IOS_LOCALE_MAP = {"en": "en-AU"}
 ANDROID_IMAGE_TYPES = {
     "1080x2400": ["phoneScreenshots"],
     "2560x1600": ["sevenInchScreenshots", "tenInchScreenshots"],

@@ -4,6 +4,9 @@
 pubspec_overrides.yaml
 # Build caches that shouldn't be tracked.
 .wrangler/
+# Downloaded videos + extracted first-frame posters used only when capturing
+# Android screenshots (take_screenshots.py); a regenerable cache, not an artifact.
+screenshots/.posters/
 ios/**/xcshareddata/swiftpm/
 ios/publish_do_not_check_in.sh
 ios/fastlane/report.xml

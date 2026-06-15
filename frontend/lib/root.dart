@@ -21,6 +21,7 @@ import 'common.dart';
 import 'flashcards_landing_page.dart';
 import 'language_dropdown.dart';
 import 'legal_information.dart';
+import 'word_page.dart';
 
 const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
@@ -195,6 +196,41 @@ class _RootAppState extends State<RootApp> {
                 iOSAppId: IOS_APP_ID,
                 androidAppId: ANDROID_APP_ID,
               ));
+            }),
+        GoRoute(
+            path: "$WORD_ROUTE/:key",
+            pageBuilder: (BuildContext context, GoRouterState state) {
+              final key = Uri.decodeComponent(state.pathParameters['key']!);
+              final entry = keyedByEnglishEntriesGlobal[key];
+              // Unknown / not-yet-loaded word (a stale or hand-typed /word/<x>
+              // URL) → fall back to search rather than a broken page.
+              if (entry == null) {
+                return NoTransitionPage(
+                  child: SearchPage(
+                    navigateToEntryPage: navigateToEntryPage,
+                    includeEntryTypeButton: true,
+                  ),
+                );
+              }
+              final args = state.extra is EntryPageArgs
+                  ? state.extra as EntryPageArgs
+                  : null;
+              return NoTransitionPage(
+                // Stable key per entry so updating only the ?variation/?video
+                // query as the user swipes preserves the page's state instead of
+                // tearing it down and rebuilding (which resets the carousel).
+                key: ValueKey('word-$key'),
+                child: EntryPage(
+                  entry: entry,
+                  showFavouritesButton: args?.showFavouritesButton ?? true,
+                  focusVideo: args?.focusVideo,
+                  saveToList: args?.saveToList,
+                  initialVariation: int.tryParse(
+                      state.uri.queryParameters['variation'] ?? ''),
+                  initialVideo:
+                      int.tryParse(state.uri.queryParameters['video'] ?? ''),
+                ),
+              );
             }),
       ]);
 

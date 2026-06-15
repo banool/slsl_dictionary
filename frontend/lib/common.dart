@@ -1,7 +1,9 @@
 import 'package:dictionarylib/entry_list.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/saved_video.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import 'word_page.dart';
 
@@ -48,22 +50,58 @@ const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 const String IOS_APP_ID = "6445848879";
 const String ANDROID_APP_ID = "com.banool.slsl_dictionary";
 
-// Matches dictionarylib's NavigateToEntryPageFn typedef. The named params
-// drive the per-video save flow: [focusVideo] lands the page on a specific
-// saved video, and [saveToList] makes the save button toggle membership of
-// that one list (instead of opening the all-lists picker).
+/// Route path for an entry page. The entry's key (its English phrase) is the
+/// `:key` path segment; `?variation=N&video=M` optionally deep-link to a
+/// specific sub-entry / video within it.
+const String WORD_ROUTE = "/word";
+
+/// Non-URL-serialisable args carried to the [WORD_ROUTE] page by an in-app
+/// navigation (the entry object is re-resolved from the URL key, but these
+/// can't be). Absent on a cold deep link, where the route falls back to
+/// sensible defaults (full UI, no focused video, no save-to-list target).
+class EntryPageArgs {
+  const EntryPageArgs({
+    this.showFavouritesButton = true,
+    this.focusVideo,
+    this.saveToList,
+  });
+
+  final bool showFavouritesButton;
+  final SavedVideo? focusVideo;
+  final EntryList? saveToList;
+}
+
+/// Open an entry. Matches dictionarylib's NavigateToEntryPageFn typedef.
+///
+/// Web: pushes a real `/word/<key>` go_router route so the URL reflects the
+/// entry and it's deep-linkable (a pasted link resolves the entry from the key).
+/// Native: keeps the proven imperative push — URLs are invisible there anyway,
+/// and going through go_router would clobber a raw-pushed parent (e.g. the list
+/// view) and break its back button. The non-serialisable bits ([focusVideo],
+/// [saveToList]) ride along as `extra`.
 Future<void> navigateToEntryPage(
     BuildContext context, Entry entry, bool showFavouritesButton,
-    {SavedVideo? focusVideo, EntryList? saveToList}) {
-  return Navigator.push(
-    context,
-    MaterialPageRoute(
-        builder: (context) => EntryPage(
-            entry: entry,
-            showFavouritesButton: showFavouritesButton,
-            focusVideo: focusVideo,
-            saveToList: saveToList)),
-  );
+    {SavedVideo? focusVideo, EntryList? saveToList}) async {
+  if (kIsWeb) {
+    await context.push(
+      "$WORD_ROUTE/${Uri.encodeComponent(entry.getKey())}",
+      extra: EntryPageArgs(
+        showFavouritesButton: showFavouritesButton,
+        focusVideo: focusVideo,
+        saveToList: saveToList,
+      ),
+    );
+  } else {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => EntryPage(
+              entry: entry,
+              showFavouritesButton: showFavouritesButton,
+              focusVideo: focusVideo,
+              saveToList: saveToList)),
+    );
+  }
 }
 
 // For example, en_US -> en. I'm pretty sure this isn't necessary because the

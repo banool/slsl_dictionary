@@ -49,7 +49,7 @@ def parse_args():
         "--android-only", action="store_true", help="Only take screenshots for Android"
     )
     parser.add_argument(
-        "--locale", default="en-AU",
+        "--locale", default="en",
     )
     args = parser.parse_args()
     return args

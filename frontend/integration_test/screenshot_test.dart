@@ -1,21 +1,41 @@
 import 'dart:io';
 import 'dart:ui';
 
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_list.dart';
+import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
+import 'package:dictionarylib/page_entry_list_overview.dart'
+    show KEY_LISTS_OVERVIEW_TAB_INDEX;
 import 'package:dictionarylib/revision.dart';
-import 'package:slsl_dictionary/root.dart';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:integration_test/src/channel.dart';
 
+import 'package:slsl_dictionary/common.dart' as app;
 import 'package:slsl_dictionary/main.dart';
+import 'package:slsl_dictionary/root.dart';
 
+import 'helpers.dart';
+
+// Drives the app through its marketable screens and captures a screenshot of
+// each. Run it (and actually save the PNGs) via:
+//
+//   flutter drive \
+//     --driver=test_driver/integration_driver.dart \
+//     --target=integration_test/screenshot_test.dart \
+//     -d <device>
+//
+// (see screenshots/take_screenshots.py, which fans this out across the device
+// matrix). Under `flutter drive` the integration_driver's onScreenshot callback
+// writes each capture to screenshots/<name>.png. This is the current official
+// Flutter screenshot approach — `integration_test` + IntegrationTestWidgets-
+// FlutterBinding.takeScreenshot — driven by flutter_driver.
+//
 // Note, sometimes the test will crash at the end, but the screenshots do
 // actually still get taken.
 
@@ -57,17 +77,24 @@ Future<void> takeScreenshotForAndroid(
   );
 }
 
+/// Give an on-screen video a few seconds of real frames to fetch and paint a
+/// first frame before we capture, so video-bearing screens aren't shot mid-load.
+Future<void> letVideoLoad(WidgetTester tester) async {
+  for (var i = 0; i < 22; i++) {
+    await tester.pump(const Duration(milliseconds: 150));
+  }
+}
+
 Future<void> takeScreenshot(
     WidgetTester tester,
     IntegrationTestWidgetsFlutterBinding binding,
     ScreenshotNameInfo screenshotNameInfo,
     String name) async {
-  name = "${screenshotNameInfo.platformName}/en-AU/"
+  name = "${screenshotNameInfo.platformName}/en/"
       "${screenshotNameInfo.deviceName}-${screenshotNameInfo.physicalScreenSize}-"
       "${screenshotNameInfo.getAndIncrementCounter().toString().padLeft(2, '0')}-"
       "$name";
-  await tester.pumpAndSettle();
-  await Future.delayed(const Duration(milliseconds: 500));
+  await settle(tester);
   if (Platform.isAndroid) {
     await takeScreenshotForAndroid(binding, name);
   } else {
@@ -94,7 +121,9 @@ class ScreenshotNameInfo {
   }
 
   static Future<ScreenshotNameInfo> buildScreenshotNameInfo() async {
-    Size size = window.physicalSize;
+    // Use the modern single-view accessor rather than the deprecated top-level
+    // `window`.
+    Size size = PlatformDispatcher.instance.implicitView!.physicalSize;
     String physicalScreenSize = "${size.width.toInt()}x${size.height.toInt()}";
 
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -120,10 +149,7 @@ class ScreenshotNameInfo {
   }
 }
 
-// https://github.com/flutter/flutter/issues/89651#issuecomment-1237416761
 void main() async {
-  await Future.delayed(const Duration(seconds: 3));
-
   // ignore: unnecessary_cast
   final binding = IntegrationTestWidgetsFlutterBinding.ensureInitialized()
       as IntegrationTestWidgetsFlutterBinding;
@@ -131,121 +157,209 @@ void main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
   testWidgets("takeScreenshots", (WidgetTester tester) async {
-    keyedByEnglishEntriesGlobal = {};
-
-    await Future.delayed(const Duration(seconds: 3));
     await setup();
 
-    // Wait for the data to be downloaded.
+    // SLSL loads its dictionary over the network; setupPhaseThree usually has it
+    // ready by here, but wait defensively so the seeding below isn't a no-op on
+    // a slow fetch.
     while (keyedByEnglishEntriesGlobal.isEmpty) {
       await Future.delayed(const Duration(milliseconds: 500));
       print("Waiting for data to be downloaded...");
     }
 
-    print("Data has been downloaded, continuing");
+    // --- Seed data so the captured screens are populated. ---
+    const String listName = "Animals";
+    final String listKey = EntryList.getKeyFromName(listName);
+    // Idempotent: the screenshot run may target a simulator that already holds
+    // this list from a previous run, and createEntryList throws on a duplicate.
+    if (!userEntryListManager.getEntryLists().containsKey(listKey)) {
+      await userEntryListManager.createEntryList(listKey);
+    }
+    final animalList = userEntryListManager.getEntryLists()[listKey]!;
+    for (final word in const [
+      "bear",
+      "fish",
+      "rabbit",
+      "elephant",
+      "tiger",
+      "wolf"
+    ]) {
+      final entry = keyedByEnglishEntriesGlobal[word];
+      if (entry != null) await animalList.addAllVideosOfEntry(entry);
+    }
 
-    String listName = "Animals";
-    String listKey = EntryList.getKeyFromName(listName);
-    await userEntryListManager.createEntryList(listKey);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["bear"]!);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["fish"]!);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["rabbit"]!);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["elephant"]!);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["tiger"]!);
-    await userEntryListManager
-        .getEntryLists()[listKey]!
-        .addAllVideosOfEntry(keyedByEnglishEntriesGlobal["wolf"]!);
-
-    await sharedPreferences
-        .setStringList(KEY_LISTS_TO_REVIEW, [KEY_FAVOURITES_ENTRIES, listKey]);
-
+    // Revise the Animals list with spaced repetition so the session always has
+    // cards. SLSL has only two regions and doesn't filter the flashcard pool by
+    // region (unlike Auslan), so there's no KEY_FLASHCARD_REGIONS to seed.
+    await sharedPreferences.setStringList(KEY_LISTS_TO_REVIEW, [listKey]);
     await sharedPreferences.setInt(
         KEY_REVISION_STRATEGY, RevisionStrategy.SpacedRepetition.index);
 
-    await tester.pumpWidget(const RootApp(startingLocale: Locale("en")));
-    await tester.pumpAndSettle(const Duration(seconds: 10));
-    var screenshotNameInfo = await ScreenshotNameInfo.buildScreenshotNameInfo();
+    // Open the lists overview on the My Lists tab, and don't let the advisories
+    // interstitial pop over the search screen.
+    await sharedPreferences.setInt(KEY_LISTS_OVERVIEW_TAB_INDEX, 0);
+    advisoryShownOnce = true;
 
-    await takeScreenshot(tester, binding, screenshotNameInfo, "search");
+    await tester.pumpWidget(RootApp(startingLocale: LOCALE_ENGLISH));
+    await tester.pumpAndSettle(const Duration(seconds: 5));
+    final info = await ScreenshotNameInfo.buildScreenshotNameInfo();
 
-    final Finder searchField =
-        find.byKey(const ValueKey("searchPage.searchForm"));
+    // Pin the theme. The app follows the OS by default, and emulators can
+    // boot with dark mode active (battery-saver forces it), which would
+    // silently flip the entire light-mode set. Shot 11 switches to dark
+    // explicitly and back.
+    themeNotifier.value = ThemeMode.light;
+    await settle(tester);
+
+    // 1. Search screen — the productive empty state (sign of the day, recents).
+    await takeScreenshot(tester, binding, info, "search");
+
+    // 2. Search results for a query.
+    final searchField = find.byKey(const ValueKey("searchPage.searchForm"));
     await tester.tap(searchField);
-    await tester.pumpAndSettle();
-    await tester.enterText(searchField, "hey");
-    await takeScreenshot(tester, binding, screenshotNameInfo, "searchWithText");
+    await settle(tester);
+    await tester.enterText(searchField, "sri");
+    await takeScreenshot(tester, binding, info, "searchResults");
+    FocusManager.instance.primaryFocus?.unfocus();
+    await settle(tester);
 
-    final Finder listsNavBarButton = find.byIcon(Icons.view_list);
-    await tester.tap(listsNavBarButton);
-    await tester.pumpAndSettle();
-    await takeScreenshot(tester, binding, screenshotNameInfo, "listsOverview");
+    // 3. A word page (opened in all-lists picker mode, so the save button opens
+    // the sheet). Pushed on the root navigator, the same way search results do.
+    final heroEntry = keyedByEnglishEntriesGlobal["Sri Lanka"]!;
+    app.navigateToEntryPage(rootNavigatorKey.currentContext!, heroEntry, true);
+    await letVideoLoad(tester);
+    await takeScreenshot(tester, binding, info, "wordPage");
 
-    final Finder animalsListButton = find.byKey(ValueKey(listName));
-    await tester.tap(animalsListButton);
-    await tester.pumpAndSettle();
-    await takeScreenshot(tester, binding, screenshotNameInfo, "insideList");
+    // 4. The per-video "save to list" sheet — the recent per-video-saves feature.
+    await tester.tap(find.byKey(const ValueKey("wordPage.saveButton")).first);
+    await settle(tester);
+    await takeScreenshot(tester, binding, info, "saveToList");
+    rootNavigatorKey.currentState!.pop(); // close the sheet
+    await settle(tester);
+    rootNavigatorKey.currentState!.pop(); // close the word page
+    await settle(tester);
 
-    final Finder dogButton = find.byKey(const ValueKey("bear"));
-    await tester.tap(dogButton);
-    await tester.pumpAndSettle();
-    await Future.delayed(const Duration(seconds: 5));
-    await takeScreenshot(tester, binding, screenshotNameInfo, "wordPage");
+    // 5. Lists overview (My Lists tab).
+    await tester.tap(find.byIcon(Icons.view_list));
+    await settle(tester);
+    await takeScreenshot(tester, binding, info, "lists");
 
-    await tester.pumpAndSettle();
+    // 6. Inside a list.
+    await tester.tap(find.byKey(ValueKey(listKey)));
+    await letVideoLoad(tester);
+    await takeScreenshot(tester, binding, info, "insideList");
     await tester.pageBack();
-    await tester.pumpAndSettle();
-    await tester.pageBack();
-    await tester.pumpAndSettle();
+    await settle(tester);
 
-    final Finder revisionNavBarButton = find.byIcon(Icons.style);
-    await tester.tap(revisionNavBarButton);
-    await tester.pumpAndSettle();
-    await takeScreenshot(
-        tester, binding, screenshotNameInfo, "revisionLanding");
+    // 7. Revision landing — the flashcard session setup.
+    await tester.tap(find.byIcon(Icons.style));
+    await settle(tester);
+    await takeScreenshot(tester, binding, info, "revisionLanding");
 
-    final Finder helpAppBarButton = find.byIcon(Icons.help);
-    await tester.tap(helpAppBarButton);
-    await tester.pumpAndSettle();
-    await takeScreenshot(
-        tester, binding, screenshotNameInfo, "revisionHelpPage");
+    // 8. A flashcard, front side.
+    await tester.tap(find.byKey(const ValueKey("startButton")));
+    await letVideoLoad(tester);
+    await takeScreenshot(tester, binding, info, "flashcardFront");
 
-    await tester.pumpAndSettle();
-    await tester.pageBack();
-    await tester.pumpAndSettle();
+    // 9. The same flashcard revealed, with the rating buttons. SLSL reveals by
+    // tapping the card itself (revealTapArea) rather than a dedicated button.
+    await tester.tap(find.byKey(const ValueKey("revealTapArea")));
+    await letVideoLoad(tester);
+    await takeScreenshot(tester, binding, info, "flashcardRevealed");
 
-    final Finder startAppBarButton = find.byKey(const ValueKey("startButton"));
-    await tester.tap(startAppBarButton);
-    await tester.pumpAndSettle();
-    await Future.delayed(const Duration(seconds: 4));
-    await takeScreenshot(tester, binding, screenshotNameInfo, "revisionPage");
+    // Leave the session via the app-bar close button. SLSL's flashcards pop
+    // straight back to the revision landing page (the summary only appears once
+    // every card has been reviewed), so a single × exits. Target the IconButton
+    // specifically — the "Forgot" rating button also uses an Icons.close glyph.
+    await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
+    await settle(tester);
 
-    await Future.delayed(const Duration(seconds: 1));
-    await tester.pumpAndSettle();
-    final Finder revealTapArea = find.byKey(const ValueKey("revealTapArea"));
-    await tester.tap(revealTapArea);
-    await tester.pumpAndSettle();
-    await Future.delayed(const Duration(seconds: 4));
-    await tester.pumpAndSettle();
-    await takeScreenshot(
-        tester, binding, screenshotNameInfo, "revisionPageRevealed");
+    // 10. Settings.
+    await tester.tap(find.byIcon(Icons.settings));
+    await settle(tester);
+    await takeScreenshot(tester, binding, info, "settings");
 
-    final Finder exitRevisionAppBarButton = find.byIcon(Icons.close);
-    await tester.tap(exitRevisionAppBarButton);
-    await tester.pumpAndSettle();
+    // --- The home screen in Hearth dark mode. ---
+    await tester.tap(find.byIcon(Icons.search));
+    await settle(tester);
 
-    final Finder settingsNavBarButton = find.byIcon(Icons.settings);
-    await tester.tap(settingsNavBarButton);
-    await tester.pumpAndSettle();
-    await takeScreenshot(tester, binding, screenshotNameInfo, "settingsPage");
+    // 11. Dark mode (Hearth).
+    themeNotifier.value = ThemeMode.dark;
+    await settle(tester);
+    await takeScreenshot(tester, binding, info, "searchDark");
+
+    // Restore the default light mode.
+    themeNotifier.value = ThemeMode.light;
+    await settle(tester);
+
+    // --- Landscape captures. The word page and the flashcards page have
+    // dedicated horizontal layouts that have historically broken without
+    // anyone noticing (no test or screenshot covered them), so capture
+    // them explicitly — but only where rotating actually changes anything.
+    // On landscape-natural panels (the touch-TV target) the app is already
+    // landscape, and on multitasking iPads iOS ignores
+    // setPreferredOrientations, so shots 12-14 would just duplicate 03/08/09
+    // as dead repo bytes — skip them there. The phone captures are the
+    // authoritative landscape record.
+    final logicalSize = tester.view.physicalSize / tester.view.devicePixelRatio;
+    final rotationIsNoOp = logicalSize.width > logicalSize.height ||
+        (Platform.isIOS && logicalSize.shortestSide >= 600);
+    if (rotationIsNoOp) {
+      print("Skipping landscape captures: rotation is a no-op here");
+    } else {
+      await SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.landscapeLeft]);
+      // Give the OS rotation animation time to settle (real frames).
+      await letVideoLoad(tester);
+
+      // 12. Word page in landscape: video left, definitions right.
+      app.navigateToEntryPage(rootNavigatorKey.currentContext!, heroEntry, true);
+      await letVideoLoad(tester);
+      await takeScreenshot(tester, binding, info, "wordPageLandscape");
+      rootNavigatorKey.currentState!.pop();
+      await settle(tester);
+
+      // 13/14. Flashcard front + revealed in landscape. Skipped on Android:
+      // rotating the flashcard re-creates its media_kit video player, which
+      // needs a GL context the emulator can't provide (eglCreateContext fails
+      // with EGL_BAD_ATTRIBUTE) — the very mpv/GL limitation the poster
+      // workaround exists for, except this rotation path bypasses the poster
+      // and crashes the capture instead of rendering it. These shots are
+      // local-only (neither store publishes them) and the iOS phone is the
+      // authoritative landscape record for the flashcard, so dropping them on
+      // Android costs nothing. Shot 12 above (the landscape word page, which
+      // keeps using the poster) still covers the landscape layout on Android.
+      if (!Platform.isAndroid) {
+        // 13. Flashcard front in landscape (the "what does this sign mean"
+        // prompt next to the controls).
+        await tester.tap(find.byIcon(Icons.style));
+        await settle(tester);
+        await tester.tap(find.byKey(const ValueKey("startButton")));
+        await letVideoLoad(tester);
+        await takeScreenshot(tester, binding, info, "flashcardFrontLandscape");
+
+        // 14. The same flashcard revealed: video left, word + rating buttons
+        // right.
+        await tester.tap(find.byKey(const ValueKey("revealTapArea")));
+        await letVideoLoad(tester);
+        await takeScreenshot(
+            tester, binding, info, "flashcardRevealedLandscape");
+        await tester.tap(find.widgetWithIcon(IconButton, Icons.close));
+        await settle(tester);
+      }
+
+      // Restore portrait, then hand orientation control back to the OS.
+      await SystemChrome.setPreferredOrientations(
+          [DeviceOrientation.portraitUp]);
+      await settle(tester);
+      await SystemChrome.setPreferredOrientations([]);
+    }
+
+    // Machine-readable completion marker for take_screenshots.py: it
+    // verifies this many files with this prefix actually landed on disk,
+    // so a drive that dies partway can't pass silently.
+    print("SCREENSHOTS_COMPLETE count=${info.counter - 1} "
+        "prefix=${info.platformName}/en/"
+        "${info.deviceName}-${info.physicalScreenSize}");
   });
 }

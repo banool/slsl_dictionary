@@ -259,6 +259,10 @@ Widget? getRelatedEntriesWidget(
       navigateToEntryPage: navigateToEntryPage);
 }
 
+/// The region(s) a sub-entry's sign is used in, as a plain centred line.
+/// Still used by the flashcard back, which wants a centred label with a
+/// [hide] toggle (the region stays hidden until the card is revealed). The
+/// word page uses [buildWordFooter] instead for its richer footer styling.
 Widget getRegionalInformationWidget(
     BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay,
     {bool hide = false}) {
@@ -270,6 +274,50 @@ Widget getRegionalInformationWidget(
   return Padding(
     padding: const EdgeInsets.only(top: 15.0),
     child: Text(regionsStr, textAlign: TextAlign.center),
+  );
+}
+
+/// A quiet footer under the definitions: a demoted "See also" related-words
+/// line first, then a globe + region line beneath it, separated from the
+/// content above by a hairline. Matches Auslan's word-page footer so the
+/// region reads as gray secondary text with an icon rather than plain white
+/// text floating at the bottom-left.
+Widget buildWordFooter(
+    BuildContext context, SubEntry subEntry, Widget? keywordsWidget) {
+  final cs = Theme.of(context).colorScheme;
+  final region =
+      subEntry.getRegions().map((r) => getRegionPretty(context, r)).join(", ");
+  final hasRegion = region.trim().isNotEmpty;
+  if (!hasRegion && keywordsWidget == null) return const SizedBox.shrink();
+  return Container(
+    width: double.infinity,
+    margin: const EdgeInsets.only(top: 8),
+    padding: const EdgeInsets.fromLTRB(20, 14, 20, 14),
+    decoration: BoxDecoration(
+      border: Border(top: BorderSide(color: cs.outlineVariant)),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        if (keywordsWidget != null) keywordsWidget,
+        if (hasRegion)
+          Padding(
+            padding: EdgeInsets.only(top: keywordsWidget != null ? 8 : 0),
+            child: Row(children: [
+              Icon(Icons.public, size: 18, color: cs.onSurfaceVariant),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(region,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(color: cs.onSurfaceVariant)),
+              ),
+            ]),
+          ),
+      ],
+    ),
   );
 }
 
@@ -477,8 +525,6 @@ class SubEntryPageState extends State<SubEntryPage>
     final shouldUseHorizontalDisplay = getShouldUseHorizontalLayout(context);
     final relatedWordsWidget = getRelatedEntriesWidget(
         context, widget.subEntry, shouldUseHorizontalDisplay);
-    final regionalInformationWidget = getRegionalInformationWidget(
-        context, widget.subEntry, shouldUseHorizontalDisplay);
     final videoIndicator = _videoIndicator(context);
     final variationIndicator = _variationIndicator(context);
     final definitionsWidget = Definitions(
@@ -492,11 +538,10 @@ class SubEntryPageState extends State<SubEntryPage>
       children.add(Flexible(child: tappableVideo));
       if (bookmarkRow != null) children.add(bookmarkRow);
       if (videoIndicator != null) children.add(videoIndicator);
-      if (relatedWordsWidget != null) {
-        children.add(Center(child: relatedWordsWidget));
-      }
       children.add(Expanded(child: definitionsWidget));
-      children.add(regionalInformationWidget);
+      // Quiet footer: a demoted "See also" line, then the region info.
+      children
+          .add(buildWordFooter(context, widget.subEntry, relatedWordsWidget));
       if (variationIndicator != null) children.add(variationIndicator);
       return Column(
         mainAxisAlignment: MainAxisAlignment.start,
@@ -539,13 +584,11 @@ class SubEntryPageState extends State<SubEntryPage>
               child: ListView(
                 padding: const EdgeInsets.symmetric(vertical: 12),
                 children: [
-                  if (relatedWordsWidget != null)
-                    Center(child: relatedWordsWidget),
                   ...widget.subEntry
                       .getDefinitions(locale)
                       .cast<Definition>()
                       .map((d) => definition(context, d)),
-                  regionalInformationWidget,
+                  buildWordFooter(context, widget.subEntry, relatedWordsWidget),
                   if (variationIndicator != null)
                     Padding(
                       padding: const EdgeInsets.only(top: 8),

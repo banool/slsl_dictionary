@@ -4,6 +4,8 @@ from django.core.validators import FileExtensionValidator, RegexValidator
 from django.db import models
 from django.utils.translation import gettext_lazy as _
 
+from .validators import validate_media
+
 COMMA_SEPARATED_LIST_REGEX = re.compile(r"^(?!.*,$)([\w|\s]+(?:,\s*\w(\w|\s)*)*)?$")
 
 # TODO: Require that each entry has at least one sub entry and that each subentry has
@@ -142,9 +144,13 @@ class Video(models.Model):
     # just use the development server file management (which is either in memory
     # or in a temp dir depending on the size). In prod this will use a real cloud
     # bucket. See settings.py for more.
-    # TODO: Consider actually validating that the file is valid H.264 mp4.
+    # Reject corrupt uploads and videos in formats clients can't decode (see
+    # validators.validate_media). The extension check stays as a cheap first gate.
     media = models.FileField(
-        validators=[FileExtensionValidator(allowed_extensions=["mp4", "jpg"])]
+        validators=[
+            FileExtensionValidator(allowed_extensions=["mp4", "jpg"]),
+            validate_media,
+        ]
     )
 
     def __str__(self):

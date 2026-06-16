@@ -1,4 +1,4 @@
-FROM python:3.10-slim as base
+FROM python:3.14-slim as base
 
 # Standard Python settings for running in a container.
 ENV PYTHONFAULTHANDLER=1 \
@@ -13,7 +13,7 @@ FROM base as builder
 ENV PIP_DEFAULT_TIMEOUT=90 \
     PIP_DISABLE_PIP_VERSION_CHECK=1 \
     PIP_NO_CACHE_DIR=1 \
-    POETRY_VERSION=1.3.2
+    POETRY_VERSION=2.2.1
 
 # Install Poetry.
 RUN pip install "poetry==$POETRY_VERSION"
@@ -30,6 +30,12 @@ RUN poetry build
 
 # Now we're building up the final image.
 FROM base as final
+
+# ffprobe (part of ffmpeg) is used at upload time to reject corrupt and
+# undecodable videos — see slsl_backend/validators.py.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg \
+    && rm -rf /var/lib/apt/lists/*
 
 # Copy across files from the build into the final image.
 COPY --from=builder /app/.venv ./.venv

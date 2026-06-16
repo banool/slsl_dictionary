@@ -7,26 +7,36 @@ packages = [{ include = "slsl_backend" }]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.9, <3.13"
-Django = "^4.2.1"
-uvicorn = {extras = ["standard"], version = "^0.20.0"}
-gunicorn = "^20.1.0"
-django-nested-admin = "^4.0.2"
-django-storages = {extras = ["google"], version = "^1.13.2"}
-psycopg2-binary = "^2.9.5"
+python = ">=3.14,<3.15"
+Django = "^5.2"
+uvicorn = {extras = ["standard"], version = "^0.34"}
+# uvicorn[standard]'s native transitive deps (watchfiles/uvloop/httptools) must
+# be floated to releases that ship Python 3.14 (cp314) wheels — otherwise they
+# build from source (Rust / C) and fail to install.
+watchfiles = ">=1.1"
+uvloop = ">=0.22.1"
+httptools = ">=0.8"
+gunicorn = "^23.0"
+django-nested-admin = "^4.1"
+django-storages = {extras = ["google"], version = "^1.14"}
+psycopg2-binary = "^2.9.11"
+# django-nested-admin -> monkeybiz imports pkg_resources, which Python 3.12+
+# venvs no longer ship by default. setuptools provides it, but it was removed in
+# setuptools 81, so stay on the 80.x line until nested-admin/monkeybiz drop it.
+setuptools = ">=80,<81"
 
-[tool.poetry.dev-dependencies]
-autoflake = "^2.0.1"
-black = "^23.1.0"
+[tool.poetry.group.dev.dependencies]
+autoflake = "^2.3"
+black = "^25.1"
 googletrans = "3.1.0a0"
-isort = "^5.12.0"
-poethepoet = "^0.25.0"
-pytest = "^5.2"
+isort = "^6.0"
+poethepoet = "^0.32"
+pytest = "^8.3"
 
 [tool.poe.tasks]
 isort = "isort . --skip .venv"
 black = "poetry run python -m black manage.py . --exclude .venv"
 
 [build-system]
-requires = ["poetry-core>=1.4.2"]
+requires = ["poetry-core>=1.9.0"]
 build-backend = "poetry.core.masonry.api"

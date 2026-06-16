@@ -9,7 +9,7 @@ import { appServiceAccount, role1, role2, role3 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
-const GIT_SHA = "73b6f5786f8466650f9d27f586b82377ae360e58";
+const GIT_SHA = "361d0fbef2e871834d24b68d1bda6f315ab9c554";
 const IMAGE_TAG = `sha-${GIT_SHA}`;
 
 // TODO: Set up image retention policy.

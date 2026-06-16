@@ -4,27 +4,32 @@ import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/hearth.dart';
+import 'package:dictionarylib/page_flashcards.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
-import 'package:dictionarylib/revision.dart';
-import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter/material.dart';
 
+import 'common.dart';
 import 'flashcards_help_page_en.dart';
-import 'flashcards_page.dart';
 import 'language_dropdown.dart';
+import 'word_page.dart';
+
+/// SLSL's wiring for the shared [FlashcardsPage]: a 16:12 video, region info
+/// via [getRegionalInformationWidget], no Signbank link, and the app's own
+/// entry-page navigation.
+final FlashcardsConfig slslFlashcardsConfig = FlashcardsConfig(
+  videoAspectRatio: 16 / 12,
+  regionRowHeight: 56,
+  navigateToEntryPage: navigateToEntryPage,
+  buildRegionInfo: (context, resolved, shouldUseHorizontalDisplay, revealed) =>
+      getRegionalInformationWidget(
+          context, resolved.subEntry, shouldUseHorizontalDisplay,
+          hide: !revealed),
+);
 
 class MyFlashcardsLandingPageController
     extends FlashcardsLandingPageController {
   @override
-  Widget buildFlashcardsPage(
-      {required DolphinInformation dolphinInformation,
-      required RevisionStrategy revisionStrategy,
-      required List<Review> existingReviews}) {
-    return FlashcardsPage(
-        di: dolphinInformation,
-        revisionStrategy: revisionStrategy,
-        existingReviews: existingReviews);
-  }
+  FlashcardsConfig get flashcardsConfig => slslFlashcardsConfig;
 
   @override
   Widget buildHelpPage(BuildContext context) {

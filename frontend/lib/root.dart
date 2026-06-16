@@ -8,11 +8,13 @@ import 'package:dictionarylib/page_entry_list_overview.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
 import 'package:dictionarylib/page_search.dart';
 import 'package:dictionarylib/page_settings.dart';
+import 'package:dictionarylib/page_word.dart';
 import 'package:dictionarylib/sharing/deep_link_handler.dart';
 import 'package:dictionarylib/sharing/engine_notification_listener.dart';
 import 'package:dictionarylib/sharing/shared_list_landing_page.dart';
 import 'package:dictionarylib/sharing/sync_engine.dart' show SyncNotification;
 import 'package:dictionarylib/theme.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
@@ -27,6 +29,18 @@ const SEARCH_ROUTE = "/search";
 const LISTS_ROUTE = "/lists";
 const REVISION_ROUTE = "/revision";
 const SETTINGS_ROUTE = "/settings";
+
+// Debug-only launch overrides for testing a specific screen / theme without
+// hand-editing this file. Set via --dart-define, default to empty when absent,
+// and ignored entirely outside debug builds. Mirror auslan_dictionary's hooks.
+// Examples:
+//   flutter run --dart-define=DEBUG_INITIAL_LOCATION='/search?query=mother&navigate_to_first_match=true'
+//   flutter run --dart-define=DEBUG_THEME_VARIANT=classic --dart-define=DEBUG_THEME_MODE=dark
+const String _kDebugInitialLocation =
+    String.fromEnvironment('DEBUG_INITIAL_LOCATION');
+const String _kDebugThemeVariant =
+    String.fromEnvironment('DEBUG_THEME_VARIANT');
+const String _kDebugThemeMode = String.fromEnvironment('DEBUG_THEME_MODE');
 
 // Defaults to English so anything that reads it before main() assigns the real
 // device locale (e.g. the language dropdown in widget/integration tests that
@@ -77,6 +91,15 @@ class _RootAppState extends State<RootApp> {
     // SettingsPage and writes KEY_THEME_VARIANT + this notifier.
     themeVariantNotifier.value =
         appThemeVariantFromName(sharedPreferences.getString(KEY_THEME_VARIANT));
+    // Debug-only theme overrides (see _kDebug* consts above). No-ops in release
+    // and when the corresponding --dart-define isn't set.
+    if (kDebugMode && _kDebugThemeMode.isNotEmpty) {
+      themeNotifier.value =
+          _kDebugThemeMode == 'dark' ? ThemeMode.dark : ThemeMode.light;
+    }
+    if (kDebugMode && _kDebugThemeVariant.isNotEmpty) {
+      themeVariantNotifier.value = appThemeVariantFromName(_kDebugThemeVariant);
+    }
     // Forward incoming share deep-links to the share landing route, carrying
     // the invite token through as a query parameter when present. `push` (not
     // `go`) so the current screen stays underneath as something to pop back to.
@@ -99,7 +122,9 @@ class _RootAppState extends State<RootApp> {
 
   final GoRouter router = GoRouter(
       navigatorKey: rootNavigatorKey,
-      initialLocation: SEARCH_ROUTE,
+      initialLocation: kDebugMode && _kDebugInitialLocation.isNotEmpty
+          ? _kDebugInitialLocation
+          : SEARCH_ROUTE,
       routes: [
         GoRoute(
           path: "/",
@@ -222,6 +247,7 @@ class _RootAppState extends State<RootApp> {
                 key: ValueKey('word-$key'),
                 child: EntryPage(
                   entry: entry,
+                  config: slslWordPageConfig,
                   showFavouritesButton: args?.showFavouritesButton ?? true,
                   focusVideo: args?.focusVideo,
                   saveToList: args?.saveToList,

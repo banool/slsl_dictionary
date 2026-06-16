@@ -20,6 +20,13 @@ gunicorn = "^23.0"
 django-nested-admin = "^4.1"
 django-storages = {extras = ["google"], version = "^1.14"}
 psycopg2-binary = "^2.9.11"
+# django-storages[google] pulls protobuf via google-cloud-storage, which left to
+# itself resolves an old 4.25.x. That release's C extension (google._upb._message)
+# uses metaclasses Python 3.14 rejects ("Metaclasses with custom tp_new are not
+# supported"), so importing the GCS storage backend crashes on 3.14 — breaking
+# collectstatic and any runtime use of the bucket. 5.29+ ships a 3.14-compatible
+# upb, so float protobuf forward.
+protobuf = ">=5.29"
 # django-nested-admin -> monkeybiz imports pkg_resources, which Python 3.12+
 # venvs no longer ship by default. setuptools provides it, but it was removed in
 # setuptools 81, so stay on the 80.x line until nested-admin/monkeybiz drop it.

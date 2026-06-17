@@ -26,7 +26,7 @@ const SECRET_KEYS = [
 
 // Add to that env objects where the value is a pulumi.Output containing a secret.
 const envSecrets = SECRET_KEYS.map((key) =>
-  buildEnvObject(key, config.requireSecret(key))
+  buildEnvObject(key, config.requireSecret(key)),
 );
 
 // Add to that the random number. This is just used to force a redeploy if we want,
@@ -42,7 +42,7 @@ const envDbName = [buildEnvObject("sql_database", database.name)];
 const envUnixSocket = [
   buildEnvObject(
     "sql_unix_socket",
-    pulumi.interpolate`/cloudsql/${databaseInstance.connectionName}`
+    pulumi.interpolate`/cloudsql/${databaseInstance.connectionName}`,
   ),
 ];
 

@@ -114,7 +114,7 @@ export const adminSite = new gcp.cloudrun.Service(
       'metadata.annotations["run.googleapis.com/client-name"]',
       'template.metadata.annotations["run.googleapis.com/client-name"]',
     ],
-  }
+  },
 );
 
 // Make service accessible to the public internet.
@@ -127,5 +127,5 @@ new gcp.cloudrun.IamMember(
     project: projectId,
     location: adminSite.location,
   },
-  { dependsOn: [adminSite] }
+  { dependsOn: [adminSite] },
 );

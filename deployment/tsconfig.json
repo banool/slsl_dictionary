@@ -5,6 +5,10 @@
         "target": "es2016",
         "module": "commonjs",
         "moduleResolution": "node",
+        // TS 6 deprecated the legacy "node" (node10) resolution; ts-node and
+        // Pulumi still expect the CommonJS setup, so keep it and silence the
+        // deprecation until we migrate the module system separately.
+        "ignoreDeprecations": "6.0",
         "sourceMap": true,
         "experimentalDecorators": true,
         "pretty": true,

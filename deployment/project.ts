@@ -19,7 +19,7 @@ export function enableGCPServices<ServiceKey extends string[]>(
       pulumi
         .output(projectId)
         .apply((projectId) => enableGCPService(projectId, svc)),
-    ])
+    ]),
   );
 }
 
@@ -30,5 +30,5 @@ export const gcpServices = enableGCPServices(
   "compute",
   "run",
   "cloudfunctions",
-  "sqladmin"
+  "sqladmin",
 );

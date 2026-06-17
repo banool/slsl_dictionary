@@ -1,0 +1,5 @@
+# protobufjs ships a build script; @pulumi/pulumi works fine without running
+# it (it's only used at runtime, not built locally), so it stays disabled —
+# this also stops pnpm prompting about it on every install.
+allowBuilds:
+  protobufjs: false

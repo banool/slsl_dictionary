@@ -37,7 +37,7 @@ new gcp.storage.BucketIAMMember(
     role: "roles/storage.objectViewer",
     bucket: adminBucket.name,
   },
-  { dependsOn: [adminBucket] }
+  { dependsOn: [adminBucket] },
 );
 
 new gcp.storage.BucketIAMMember(
@@ -47,7 +47,7 @@ new gcp.storage.BucketIAMMember(
     role: "roles/storage.objectViewer",
     bucket: mediaBucket.name,
   },
-  { dependsOn: [mediaBucket] }
+  { dependsOn: [mediaBucket] },
 );
 
 // Set up Cloud CDN, which is really just a fancy LB in front of the bucket. This
@@ -55,7 +55,7 @@ new gcp.storage.BucketIAMMember(
 export const createCloudCdn = (
   namePrefix: string,
   bucket: gcp.storage.Bucket,
-  options?: pulumi.ComponentResourceOptions
+  options?: pulumi.ComponentResourceOptions,
 ) => {
   // Enable the storage bucket as a CDN.
   const backendBucket = new gcp.compute.BackendBucket(
@@ -82,7 +82,7 @@ export const createCloudCdn = (
         requestCoalescing: true,
       },
     },
-    options
+    options,
   );
 
   // Provision a global IP address for the CDN.

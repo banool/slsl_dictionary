@@ -12,7 +12,7 @@ export const appServiceAccount = new gcp.serviceaccount.Account(
     accountId: SLSL + "-cloud-run-sa",
     displayName: "SLSL Cloud Run Service Account",
     project: projectId,
-  }
+  },
 );
 export const appServiceAccountRef = pulumi.interpolate`serviceAccount:${appServiceAccount.email}`;
 
@@ -24,7 +24,7 @@ export const role1 = new gcp.projects.IAMMember(
     project: projectId,
     role: "roles/run.invoker",
   },
-  { dependsOn: [appServiceAccount] }
+  { dependsOn: [appServiceAccount] },
 );
 
 export const role2 = new gcp.projects.IAMMember(
@@ -34,7 +34,7 @@ export const role2 = new gcp.projects.IAMMember(
     project: projectId,
     role: "roles/cloudsql.client",
   },
-  { dependsOn: [appServiceAccount] }
+  { dependsOn: [appServiceAccount] },
 );
 
 export const role3 = new gcp.storage.BucketIAMMember(
@@ -44,7 +44,7 @@ export const role3 = new gcp.storage.BucketIAMMember(
     bucket: adminBucket.name,
     role: "roles/storage.admin",
   },
-  { dependsOn: [appServiceAccount] }
+  { dependsOn: [appServiceAccount] },
 );
 
 export const role4 = new gcp.storage.BucketIAMMember(
@@ -54,7 +54,7 @@ export const role4 = new gcp.storage.BucketIAMMember(
     bucket: mediaBucket.name,
     role: "roles/storage.admin",
   },
-  { dependsOn: [appServiceAccount] }
+  { dependsOn: [appServiceAccount] },
 );
 
 export const role5 = new gcp.projects.IAMMember(
@@ -64,5 +64,5 @@ export const role5 = new gcp.projects.IAMMember(
     project: projectId,
     role: "roles/cloudfunctions.invoker",
   },
-  { dependsOn: [appServiceAccount] }
+  { dependsOn: [appServiceAccount] },
 );

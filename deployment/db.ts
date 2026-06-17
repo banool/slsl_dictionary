@@ -18,7 +18,7 @@ export const databaseInstance = new gcp.sql.DatabaseInstance(
       tier: "db-f1-micro",
     },
     deletionProtection: true,
-  }
+  },
 );
 
 // Create a DB in that instance.

@@ -22,8 +22,10 @@ function zipCode() {
   if (fs.existsSync(ZIP_LOCATION)) {
     fs.unlinkSync(ZIP_LOCATION);
   }
-  const archive = archiver("zip");
-  archive.on("error", function (err) {
+  // archiver 8 dropped the callable default export; construct the zip
+  // archiver directly instead of archiver("zip").
+  const archive = new archiver.ZipArchive({});
+  archive.on("error", function (err: Error) {
     throw err;
   });
   const output = fs.createWriteStream(ZIP_LOCATION);
@@ -42,7 +44,7 @@ const archive = new gcp.storage.BucketObject(
     source: new pulumi.asset.FileAsset(ZIP_LOCATION),
     name: "functions/dump_function.zip",
   },
-  { replaceOnChanges: ["*"] }
+  { replaceOnChanges: ["*"] },
 );
 
 // Create the Cloud Function.
@@ -69,8 +71,11 @@ export const func = new gcp.cloudfunctions.Function(
       dump_auth_token: config.requireSecret("dump_auth_token"),
       cloud_run_instance_url: adminSite.statuses[0].url,
       // Cache the file slightly longer than how often we run the function.
-      cache_duration_secs: RUN_EVERY_N_MINUTES * 60 + 10,
+      // Stringified because Cloud Function env values are strings (the
+      // @pulumi/gcp types require Input<string>); the deployed value is
+      // unchanged.
+      cache_duration_secs: `${RUN_EVERY_N_MINUTES * 60 + 10}`,
     },
   },
-  { dependsOn: [gcpServices.cloudfunctions], replaceOnChanges: ["*"] }
+  { dependsOn: [gcpServices.cloudfunctions], replaceOnChanges: ["*"] },
 );

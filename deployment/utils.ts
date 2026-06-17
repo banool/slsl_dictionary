@@ -3,7 +3,7 @@ import * as gcp from "@pulumi/gcp";
 
 export function buildEnvObject(
   name: string,
-  value: string | pulumi.Output<string>
+  value: string | pulumi.Output<string>,
 ) {
   if (typeof value == "string") {
     value = pulumi.output(value);
@@ -58,7 +58,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   const sslCert = new gcp.compute.ManagedSslCertificate(
@@ -71,7 +71,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   const targetHttpsProxy = new gcp.compute.TargetHttpsProxy(
@@ -83,7 +83,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   const httpsLb = new gcp.compute.GlobalForwardingRule(
@@ -97,7 +97,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   // All the stuff from this point is for setting up the http LB and setting it up to
@@ -115,7 +115,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   const redirectProxy = new gcp.compute.TargetHttpProxy(
@@ -126,7 +126,7 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 
   const redirectLb = new gcp.compute.GlobalForwardingRule(
@@ -140,6 +140,6 @@ export const createLoadBalancer = ({
     },
     {
       parent,
-    }
+    },
   );
 };

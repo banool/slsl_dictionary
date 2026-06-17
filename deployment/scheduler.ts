@@ -26,5 +26,5 @@ new gcp.cloudscheduler.Job(
     schedule: `*/${RUN_EVERY_N_MINUTES} * * * *`,
     timeZone: "Europe/London",
   },
-  { dependsOn: [role4] }
+  { dependsOn: [role4] },
 );

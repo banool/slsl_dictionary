@@ -42,6 +42,13 @@ export const adminSite = new gcp.cloudrun.Service(
           // though this means request handling will be take more time as the container
           // spins up.
           "run.googleapis.com/cpu-throttling": "true",
+          // The admin image is slow to import (~3 min) when the container only
+          // has its requested 0.1 vCPU during startup, which blew the Cloud Run
+          // startup window and made cold starts fail. Startup CPU boost gives
+          // full CPU during startup *only* (not always-on, so billing is
+          // unaffected outside startup), letting the container bind the port in
+          // time.
+          "run.googleapis.com/startup-cpu-boost": "true",
           // This configures the Cloud Run service to use the Cloud SQL proxy.
           "run.googleapis.com/cloudsql-instances":
             databaseInstance.connectionName,
@@ -95,8 +102,12 @@ export const adminSite = new gcp.cloudrun.Service(
       role3,
     ],
     customTimeouts: {
-      create: "5m",
-      update: "3m",
+      create: "8m",
+      // Bumped from 3m: a cold start (image import + migrate) can take a few
+      // minutes, and the provider was giving up before the new revision went
+      // healthy. Startup CPU boost (above) should keep this well under, but the
+      // extra headroom avoids a premature timeout reporting a false failure.
+      update: "8m",
       delete: "5m",
     },
     ignoreChanges: [

@@ -85,6 +85,7 @@ class DefinitionCategory(models.TextChoices):
     NOTE = "NOTE", _("Note")
     AUGMENTED_MEANING = "AUGMENTED_MEANING", _("Augmented meaning")
     AS_A_POINTING_SIGN = "AS_A_POINTING_SIGN", _("As a pointing sign")
+    TRANSLATION = "TRANSLATION", _("Translation")
 
 
 # TODO Because there are only 3, we could do 3 checkboxes in the form instead of a dropdown.

@@ -235,6 +235,8 @@ String getCategoryPretty(String s) {
       return "Augmented meaning";
     case "AS_A_POINTING_SIGN":
       return "As a pointing sign";
+    case "TRANSLATION":
+      return "Translation";
     default:
       return s;
   }

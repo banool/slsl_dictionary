@@ -16,6 +16,12 @@ from . import models
 class DefinitionInline(NestedTabularInline):
     model = models.Definition
     extra = 0
+    # `translation_of` is a self-FK to Definition. Rendered as a normal dropdown
+    # it loads EVERY definition (~7.7k) as <option>s — once per definition on the
+    # change page — producing multi-MB pages, tens of thousands of options, and
+    # N full-table queries that time out the (small) prod DB. raw_id_fields makes
+    # it a lightweight id + lookup popup instead.
+    raw_id_fields = ("translation_of",)
 
 
 # Stacked (not tabular) so the per-video versioning fields — the status

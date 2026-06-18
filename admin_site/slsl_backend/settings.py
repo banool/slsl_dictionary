@@ -137,6 +137,21 @@ else:
     DATABASES["default"]["HOST"] = secrets["sql_host"]
     DATABASES["default"]["PORT"] = secrets["sql_port"]
 
+# Reuse a DB connection across requests instead of opening a fresh one every
+# time. Establishing a Cloud SQL connection is a real per-request cost, and with
+# the default (CONN_MAX_AGE=0) every admin page paid it; reusing the connection
+# across the requests of an editing session removes that.
+#
+# Kept modest (60s) on purpose: this runs on Cloud Run with CPU throttled to ~0
+# between requests, so a connection held open across an idle gap can be dropped
+# by the server side without us being able to keep it alive — and the small
+# f1-micro instance has a low connection ceiling, so we don't want connections
+# lingering long after a session goes quiet. CONN_HEALTH_CHECKS makes this safe:
+# Django validates (and transparently re-opens) the connection at the start of
+# each request rather than failing on one that died during the idle period.
+DATABASES["default"]["CONN_MAX_AGE"] = 60
+DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
+
 # File Storage: Media and static files
 
 STATIC_URL = "/static/"

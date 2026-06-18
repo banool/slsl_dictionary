@@ -1,4 +1,6 @@
+from django import forms
 from django.contrib import admin
+from django.db.models import Q
 from nested_admin import (
     NestedModelAdmin,
     NestedStackedInline,
@@ -13,16 +15,42 @@ from . import models
 # actually more useful, e.g. the video file name. It is helpful for the history / debugging.
 
 
+class DefinitionInlineForm(forms.ModelForm):
+    class Meta:
+        model = models.Definition
+        fields = "__all__"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # A definition only ever translates another definition in the SAME
+        # sub-entry (the EN / SI / TA versions of one sign), so scope the
+        # `translation_of` choices to that handful. This is what makes the field
+        # usable AND fixes the perf problem: the old unscoped dropdown loaded all
+        # ~7.7k definitions, once per definition, which made the change page
+        # multi-MB and timed it out on the small prod DB. A new (unsaved) row has
+        # no sub-entry yet, so its list is empty until the definition is saved.
+        field = self.fields.get("translation_of")
+        if field is None:
+            return
+        sub_entry_id = getattr(self.instance, "sub_entry_id", None)
+        if not sub_entry_id:
+            field.queryset = models.Definition.objects.none()
+            return
+        scope = Q(sub_entry_id=sub_entry_id)
+        # Keep the current value selectable even if it's somehow out of scope, so
+        # saving an unrelated row never silently clears an existing link.
+        if self.instance.translation_of_id:
+            scope |= Q(pk=self.instance.translation_of_id)
+        qs = models.Definition.objects.filter(scope)
+        if self.instance.pk:
+            qs = qs.exclude(pk=self.instance.pk)  # can't translate itself
+        field.queryset = qs
+
+
 class DefinitionInline(NestedTabularInline):
     model = models.Definition
+    form = DefinitionInlineForm
     extra = 0
-    # `translation_of` is a self-FK to Definition. As a plain dropdown it loads
-    # EVERY definition (~7.7k) as <option>s, once per definition on the change
-    # page — multi-MB pages + N full-table queries that timed out the small prod
-    # DB. Use a searchable autocomplete (results fetched server-side as you type,
-    # so the page never loads them all); it needs DefinitionAdmin registered with
-    # search_fields (below). The readable labels come from Definition.__str__.
-    autocomplete_fields = ("translation_of",)
 
 
 # Stacked (not tabular) so the per-video versioning fields — the status
@@ -71,21 +99,6 @@ class EntryAdmin(NestedModelAdmin):
     inlines = [
         SubEntryAdmin,
     ]
-
-
-@admin.register(models.Definition)
-class DefinitionAdmin(admin.ModelAdmin):
-    # Definitions are normally edited via the Entry page; this standalone admin
-    # exists mainly so the translation_of autocomplete (in DefinitionInline) has
-    # a registered, searchable target. search_fields powers that autocomplete —
-    # you find the source definition by typing its text.
-    search_fields = ["definition"]
-    list_display = ("__str__", "language", "category")
-    list_filter = ("language", "category")
-    # Definition has no default ordering; give the changelist one so the
-    # autocomplete view's pagination is stable (avoids UnorderedObjectList
-    # warnings on every search).
-    ordering = ("id",)
 
 
 # Register relevant models.

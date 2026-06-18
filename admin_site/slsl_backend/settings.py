@@ -42,6 +42,14 @@ if deployment_mode == "prod":
 if deployment_mode == "dev":
     DEBUG = True
 
+# Whether to run the ffprobe codec/corruption validation on uploaded videos
+# (see slsl_backend.validators). Off in dev by default: local dev runs against
+# the prod media *filenames* (which aren't on the local disk), so saving an
+# entry would re-validate an existing video and crash trying to open a file
+# that isn't there. Prod keeps it on. Override per-environment via the
+# `validate_media` secret.
+VALIDATE_UPLOADED_MEDIA = bool(secrets.get("validate_media", deployment_mode == "prod"))
+
 
 ###########################################################
 # The following stuff is generic to all deployment modes. #

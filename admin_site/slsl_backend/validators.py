@@ -22,6 +22,7 @@ import shutil
 import subprocess
 import tempfile
 
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.files.uploadedfile import UploadedFile
 
@@ -52,10 +53,19 @@ def check_video_path(path):
 
     proc = subprocess.run(
         [
-            ffprobe, "-v", "error", "-select_streams", "v:0",
-            "-show_entries", "stream=codec_name,pix_fmt", "-of", "json", path,
+            ffprobe,
+            "-v",
+            "error",
+            "-select_streams",
+            "v:0",
+            "-show_entries",
+            "stream=codec_name,pix_fmt",
+            "-of",
+            "json",
+            path,
         ],
-        capture_output=True, text=True,
+        capture_output=True,
+        text=True,
     )
     if proc.returncode != 0:
         raise ValidationError(
@@ -84,6 +94,12 @@ def check_video_path(path):
 def validate_media(value):
     """Django validator for Video.media. Validates only freshly uploaded videos;
     images and already-stored files pass through untouched."""
+    # Off in local dev (see settings.VALIDATE_UPLOADED_MEDIA): the bucket's media
+    # files aren't on the local disk, and the `getattr(value, "file")` probe
+    # below would open an existing stored file — raising FileNotFoundError when
+    # it isn't there. Skipping early avoids that and lets admins save entries.
+    if not getattr(settings, "VALIDATE_UPLOADED_MEDIA", True):
+        return
     name = (getattr(value, "name", "") or "").lower()
     if name.endswith(IMAGE_EXTS):
         return

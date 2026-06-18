@@ -254,13 +254,11 @@ class Definition(models.Model):
     definition = models.TextField()
 
     def __str__(self):
-        # Descriptive so the admin (e.g. the translation_of autocomplete picker
-        # and history) shows what this definition actually is — language +
-        # category + a short snippet — rather than a useless constant. Uses only
-        # this row's own fields to avoid extra queries.
-        snippet = " ".join((self.definition or "").split())
-        if len(snippet) > 60:
-            snippet = snippet[:60] + "…"
-        return (
-            f"{self.get_language_display()} · {self.get_category_display()}: {snippet}"
-        )
+        # Descriptive so the admin (e.g. the translation_of dropdown and history)
+        # shows what this definition actually is — language + category + a short
+        # snippet — rather than a useless constant. Uses only this row's own
+        # fields to avoid extra queries. Capped at ~50 chars so dropdown rows
+        # stay short.
+        text = " ".join((self.definition or "").split())
+        label = f"{self.get_language_display()} · {self.get_category_display()}: {text}"
+        return f"{label[:50]}…" if len(label) > 50 else label

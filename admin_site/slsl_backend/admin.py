@@ -51,6 +51,9 @@ class DefinitionInline(NestedTabularInline):
     model = models.Definition
     form = DefinitionInlineForm
     extra = 0
+    # Column order: the actual definition first, with translation_of (the
+    # secondary "this is a translation of …" link) last.
+    fields = ("language", "category", "definition", "translation_of")
 
 
 # Stacked (not tabular) so the per-video versioning fields — the status

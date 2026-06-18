@@ -16,12 +16,13 @@ from . import models
 class DefinitionInline(NestedTabularInline):
     model = models.Definition
     extra = 0
-    # `translation_of` is a self-FK to Definition. Rendered as a normal dropdown
-    # it loads EVERY definition (~7.7k) as <option>s — once per definition on the
-    # change page — producing multi-MB pages, tens of thousands of options, and
-    # N full-table queries that time out the (small) prod DB. raw_id_fields makes
-    # it a lightweight id + lookup popup instead.
-    raw_id_fields = ("translation_of",)
+    # `translation_of` is a self-FK to Definition. As a plain dropdown it loads
+    # EVERY definition (~7.7k) as <option>s, once per definition on the change
+    # page — multi-MB pages + N full-table queries that timed out the small prod
+    # DB. Use a searchable autocomplete (results fetched server-side as you type,
+    # so the page never loads them all); it needs DefinitionAdmin registered with
+    # search_fields (below). The readable labels come from Definition.__str__.
+    autocomplete_fields = ("translation_of",)
 
 
 # Stacked (not tabular) so the per-video versioning fields — the status
@@ -70,6 +71,21 @@ class EntryAdmin(NestedModelAdmin):
     inlines = [
         SubEntryAdmin,
     ]
+
+
+@admin.register(models.Definition)
+class DefinitionAdmin(admin.ModelAdmin):
+    # Definitions are normally edited via the Entry page; this standalone admin
+    # exists mainly so the translation_of autocomplete (in DefinitionInline) has
+    # a registered, searchable target. search_fields powers that autocomplete —
+    # you find the source definition by typing its text.
+    search_fields = ["definition"]
+    list_display = ("__str__", "language", "category")
+    list_filter = ("language", "category")
+    # Definition has no default ordering; give the changelist one so the
+    # autocomplete view's pagination is stable (avoids UnorderedObjectList
+    # warnings on every search).
+    ordering = ("id",)
 
 
 # Register relevant models.

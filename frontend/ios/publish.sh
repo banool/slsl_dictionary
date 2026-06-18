@@ -17,6 +17,36 @@ cd "$DIR/.."
 [[ -z "${API_KEY_PATH:-}" ]] && echo 'Please set API_KEY_PATH' && exit 1
 [[ ! -f "$API_KEY_PATH" ]] && echo "API key not found at $API_KEY_PATH" && exit 1
 
+# --beta: after uploading, also promote this build to the external tester group.
+# The flag is parsed and the notes prompted up front so the prompt doesn't
+# interrupt the long build/upload.
+BETA=false
+for arg in "$@"; do
+  case "$arg" in
+    --beta) BETA=true ;;
+    *) echo "Unknown argument: $arg (only --beta is supported)" >&2; exit 1 ;;
+  esac
+done
+
+BETA_GROUP="SLSL Testers"
+BETA_NOTES=""
+if [[ "$BETA" == true ]]; then
+  echo "==> --beta: this build will be sent to the '$BETA_GROUP' external group after upload."
+  echo "    External testing needs 'What to Test' notes. Type them now, then finish with"
+  echo "    an empty line (or Ctrl-D):"
+  while IFS= read -r line; do
+    if [[ -z "$line" ]]; then
+      break
+    fi
+    BETA_NOTES+="$line"$'\n'
+  done
+  BETA_NOTES="${BETA_NOTES%$'\n'}"
+  if [[ -z "$BETA_NOTES" ]]; then
+    echo "No 'What to Test' notes entered — aborting." >&2
+    exit 1
+  fi
+fi
+
 ARCHIVE_PATH="build/ios/Runner.xcarchive"
 EXPORT_PATH="build/ios/ipa"
 
@@ -69,5 +99,20 @@ xcrun altool --upload-app \
   --apiKey "$APP_STORE_CONNECT_API_KEY_ID" \
   --apiIssuer "$APP_STORE_CONNECT_API_ISSUER_ID"
 rm -rf "$PRIVATE_KEYS_DIR"
+
+if [[ "$BETA" == true ]]; then
+  echo "==> Promoting the build to the '$BETA_GROUP' external group..."
+  # The build number is the +N part of the pubspec version; it identifies the
+  # build in App Store Connect.
+  BUILD_NUMBER=$(grep -E '^version:' pubspec.yaml | sed -E 's/.*\+([0-9]+).*$/\1/')
+  ASC_BUNDLE_ID="com.banool.slsldictionary" \
+  ASC_BUILD_NUMBER="$BUILD_NUMBER" \
+  ASC_GROUP_NAME="$BETA_GROUP" \
+  ASC_WHATS_NEW="$BETA_NOTES" \
+  APP_STORE_CONNECT_API_KEY_ID="$APP_STORE_CONNECT_API_KEY_ID" \
+  APP_STORE_CONNECT_API_ISSUER_ID="$APP_STORE_CONNECT_API_ISSUER_ID" \
+  API_KEY_PATH="$API_KEY_PATH" \
+  python3 ios/appstore_beta.py
+fi
 
 echo "==> Done! Build uploaded to TestFlight."

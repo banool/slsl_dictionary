@@ -100,6 +100,14 @@ class Region(models.TextChoices):
     NORTH_EAST = "NE", _("North East")
 
 
+# Per-video status. Intentionally an OPEN set: kept as plain text choices so new
+# states (e.g. a regional variant) can be added later with just a migration, and
+# downstream (dump + app) treats it as a string token rather than a closed enum.
+class VideoStatus(models.TextChoices):
+    CURRENT = "CURRENT", _("Current")
+    HISTORICAL = "HISTORICAL", _("Historical")
+
+
 # This links back to the Entry, implying there can be multiple SubEntries per Entry.
 # per SubEntry.
 class SubEntry(models.Model):
@@ -153,6 +161,29 @@ class Video(models.Model):
             validate_media,
         ]
     )
+
+    # Whether this is the current sign or an older/archived recording kept for
+    # documentation. New uploads default to CURRENT; switch older ones to
+    # HISTORICAL. See VideoStatus (open set).
+    status = models.CharField(
+        max_length=32,
+        choices=VideoStatus.choices,
+        default=VideoStatus.CURRENT,
+    )
+
+    # Free-form display dates. Deliberately strings, not DateFields: an admin may
+    # only know a year ("2014") or a phrase ("March 2016"). Shown verbatim in the
+    # app's source sheet; never parsed.
+    researched = models.CharField(max_length=64, blank=True, default="")
+    recorded = models.CharField(max_length=64, blank=True, default="")
+    published = models.CharField(max_length=64, blank=True, default="")
+
+    # Where the sign came from, e.g. "Deaf School Archive, Kandy". Free text for
+    # now; may later become a person/org/URL.
+    source = models.CharField(max_length=256, blank=True, default="")
+
+    # Admin-authored free text shown in the source sheet's note card. Optional.
+    note = models.TextField(blank=True, default="")
 
     def __str__(self):
         return f"Video"

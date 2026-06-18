@@ -3,9 +3,11 @@
 ## Local development
 Install Poetry: https://python-poetry.org/docs/#installation.
 
-Change anything relevant in `secrets.json`. This contains no actual secrets, this file is just used for development.
+Change anything relevant in `secrets.json`. This contains no actual secrets, this file is just used for development. It configures the local SQLite DB and the `admin` / `password` superuser.
 
-Run the local development server on port 8000:
+Note: if you have a `prod_secrets.json` (see "Running locally with the prod DB" below), it **takes precedence over `secrets.json`** (see `secrets.py`'s filename order), so the server connects to the prod DB instead of local SQLite. Move it aside (`mv prod_secrets.json prod_secrets.json.bak`) to do plain local dev, and restore it when you want the prod DB again.
+
+Run the local development server on port 8080:
 ```
 poetry run ./run.sh 8080 dev
 ```

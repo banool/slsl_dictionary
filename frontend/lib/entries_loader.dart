@@ -64,13 +64,16 @@ class MyEntryLoader extends EntryLoader {
     // At this point we know we got a 200, we can look at the body of the response.
     String newData = response.body;
 
-    // Take note of when this data was last modified. If the header isn't set,
-    // use the latest unix time. This should only happen when developing locally
-    // where you pull the dump file from a local server.
-    int newVersion = HttpDate.parse(response.headers['last-modified'] ??
-                DateTime.now().millisecondsSinceEpoch.toString())
-            .millisecondsSinceEpoch ~/
-        1000;
+    // Take note of when this data was last modified, as unix seconds. Prod
+    // (GCS / the CDN) sends a Last-Modified header; a local dev backend's
+    // dynamic /dump endpoint doesn't, in which case we treat "now" as the
+    // version so the data is always considered fresh. Don't route the fallback
+    // through HttpDate.parse — an epoch-millis string isn't a valid HTTP date,
+    // so that throws "Invalid HTTP date".
+    final lastModified = response.headers['last-modified'];
+    int newVersion = lastModified != null
+        ? HttpDate.parse(lastModified).millisecondsSinceEpoch ~/ 1000
+        : DateTime.now().millisecondsSinceEpoch ~/ 1000;
 
     return NewData(newData, currentVersion, newVersion);
   }

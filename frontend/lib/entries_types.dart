@@ -77,13 +77,19 @@ class MyEntry implements Entry {
   }
 }
 
+/// A sub-entry's `videos` JSON item is either a bare filename string (legacy /
+/// current with no metadata) or a versioning object with a `video` key plus
+/// status/dates/source/note; pull out the filename either way.
+String _videoFileName(dynamic v) =>
+    v is String ? v : (v as Map<String, dynamic>)["video"] as String;
+
 @JsonSerializable()
 class MySubEntry implements SubEntry {
-  // Even though the backend allows sub entries without videos (against which
-  // I should add validation), the dump function skips sub entries that don't
-  // have them, so we can assume that there will be a list of videos here and
-  // that it will be non empty. Don't access this directly, use getMedia.
-  final List<String> videos;
+  // Each item is either a bare filename string or a versioning object
+  // ({"video": <file>, "status", researched/recorded/published, source, note};
+  // see admin_site dump.py). Kept as `dynamic` so both forms parse; don't access
+  // directly — use getMedia (paths) or getMediaItems (paths + metadata).
+  final List<dynamic> videos;
   final List<Definition>? definitions;
   final String region;
   final String? related_words;
@@ -109,7 +115,9 @@ class MySubEntry implements SubEntry {
   // might use the same video).
   @override
   String getKey(Entry parentEntry) {
-    var videoLinks = List.from(videos);
+    // Derive the master id from the sorted video *filenames* — unchanged by the
+    // string-or-object migration — so saved-review history stays stable.
+    var videoLinks = videos.map(_videoFileName).toList();
     videoLinks.sort();
     return videoLinks[0] + parentEntry.getKey();
   }
@@ -138,7 +146,28 @@ class MySubEntry implements SubEntry {
     // `/media/<file>`. Resolve to a playable URL with mediaUrlForPath
     // (dictionarylib globals) + mediaBaseUrls, which main.dart configures from
     // the useCdnUrl knob. See SubEntryPage in word_page.dart.
-    return videos.map((e) => "/media/$e").toList();
+    return videos.map((v) => "/media/${_videoFileName(v)}").toList();
+  }
+
+  @override
+  List<MediaItem> getMediaItems() {
+    return videos.map((v) {
+      if (v is String) {
+        // Legacy bare filename: a current video with no extra metadata.
+        return MediaItem(path: "/media/$v", status: "CURRENT");
+      }
+      final m = v as Map<String, dynamic>;
+      return MediaItem(
+        path: "/media/${m["video"]}",
+        // Default to CURRENT so an object that omits status still reads sanely.
+        status: (m["status"] as String?) ?? "CURRENT",
+        researched: m["researched"] as String?,
+        recorded: m["recorded"] as String?,
+        published: m["published"] as String?,
+        source: m["source"] as String?,
+        note: m["note"] as String?,
+      );
+    }).toList();
   }
 
   @override

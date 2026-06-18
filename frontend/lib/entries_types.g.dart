@@ -29,8 +29,7 @@ Map<String, dynamic> _$MyEntryToJson(MyEntry instance) => <String, dynamic>{
     };
 
 MySubEntry _$MySubEntryFromJson(Map<String, dynamic> json) => MySubEntry(
-      videos:
-          (json['videos'] as List<dynamic>).map((e) => e as String).toList(),
+      videos: json['videos'] as List<dynamic>,
       definitions: (json['definitions'] as List<dynamic>?)
           ?.map((e) => Definition.fromJson(e as Map<String, dynamic>))
           .toList(),

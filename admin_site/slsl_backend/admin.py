@@ -13,9 +13,19 @@ class DefinitionInline(NestedTabularInline):
     extra = 0
 
 
-class VideoInline(NestedTabularInline):
+# Stacked (not tabular) so the per-video versioning fields — the status
+# dropdown, the date/source text fields, and the multiline note — lay out
+# vertically and stay legible.
+class VideoInline(NestedStackedInline):
     model = models.Video
     extra = 0
+    fields = [
+        "media",
+        "status",
+        ("researched", "recorded", "published"),
+        "source",
+        "note",
+    ]
 
 
 class SubEntryAdmin(NestedStackedInline):

@@ -1,5 +1,6 @@
 # Secrets
 prod_secrets.json
+prod_secrets.json.bak
 blah
 *.sqlite3
 

@@ -13,7 +13,10 @@ export const databaseInstance = new gcp.sql.DatabaseInstance(
   "slsl-admin-db-instance",
   {
     region: ADMIN_LOCATION,
-    databaseVersion: "POSTGRES_14",
+    // The live instance is on POSTGRES_18 (upgraded out-of-band); the old gcp
+    // provider never diffed this, but gcp 9 does and would otherwise try to
+    // "downgrade" to 14, which GCP rejects. Align the IaC with reality.
+    databaseVersion: "POSTGRES_18",
     settings: {
       tier: "db-f1-micro",
     },

@@ -5,7 +5,7 @@ import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_force_upgrade.dart';
 import 'package:dictionarylib/sharing/sharing_config.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
+import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
@@ -24,6 +24,29 @@ import 'root.dart';
 
 const String KNOB_URL_BASE =
     "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/";
+
+/// Debug-only override: fetch the dictionary **dump** from a locally-running
+/// admin backend instead of the prod bucket. Set e.g.
+/// `--dart-define=DEBUG_BACKEND_BASE_URL=http://127.0.0.1:8080`. When set (and
+/// only in debug builds — it's ignored in release), the dump is fetched from
+/// `<base>/dump` (the admin's dump endpoint). **Media is NOT redirected** — it
+/// still resolves from the prod CDN / bucket, because (a) the local dev backend
+/// doesn't serve media at all, and (b) that way the videos in your local data
+/// actually play, as long as they reference real filenames that exist in the
+/// bucket. Empty by default. Note: on iOS the simulator still needs an ATS
+/// exception to allow the cleartext-HTTP dump fetch from localhost (see
+/// VIDEO_VERSIONING_TESTING.md).
+const String _kDebugBackendBaseUrlRaw =
+    String.fromEnvironment("DEBUG_BACKEND_BASE_URL");
+
+/// The above, normalised (trailing slash stripped) and gated on debug mode.
+/// Empty string means "not set / release build" → use the prod URLs.
+String get _debugBackendBaseUrl {
+  if (!kDebugMode || _kDebugBackendBaseUrlRaw.isEmpty) return "";
+  return _kDebugBackendBaseUrlRaw.endsWith("/")
+      ? _kDebugBackendBaseUrlRaw.substring(0, _kDebugBackendBaseUrlRaw.length - 1)
+      : _kDebugBackendBaseUrlRaw;
+}
 
 // Setup the app. Be careful when reordering things here, later functions
 // implicitly depend on the side effects of earlier functions.
@@ -78,8 +101,18 @@ Future<void> setup({Set<Entry>? entriesGlobalReplacement}) async {
       ? const [DATA_URL_PREFIX_CDN, DATA_URL_PREFIX_DIRECT]
       : const [DATA_URL_PREFIX_DIRECT, DATA_URL_PREFIX_CDN];
 
+  // Debug-only: DEBUG_BACKEND_BASE_URL redirects ONLY the dump fetch to a local
+  // backend; media keeps resolving from the bucket/CDN above (the local dev
+  // backend doesn't serve media, and this lets real video filenames play).
+  final debugBackend = _debugBackendBaseUrl;
+  if (debugBackend.isNotEmpty) {
+    printAndLog("DEBUG_BACKEND_BASE_URL set: fetching the dump from "
+        "$debugBackend/dump (media still resolves from the prod CDN)");
+  }
   MyEntryLoader myEntryLoader = MyEntryLoader(
-    dumpFileUrl: Uri.parse(buildUrl("dump/dump.json")),
+    dumpFileUrl: debugBackend.isNotEmpty
+        ? Uri.parse("$debugBackend/dump")
+        : Uri.parse(buildUrl("dump/dump.json")),
   );
 
   // Do the rest of the common stuff defined in dictionarylib. This will set

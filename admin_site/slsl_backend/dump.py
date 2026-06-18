@@ -7,6 +7,34 @@ from . import models
 LOG = logging.getLogger(__name__)
 
 
+def dump_video(video):
+    """Serialise one Video for the dump.
+
+    Back-compat: a plain CURRENT video with no versioning metadata is emitted as
+    a bare filename string (the legacy shape older app builds understand).
+    Anything with versioning info — HISTORICAL status, or any date/source/note —
+    is emitted as an object the new app parses into a MediaItem. The "video" key
+    always carries the filename, so the saved-video identity (its path) is
+    unchanged either way.
+    """
+    name = video.media.name
+    meta = {
+        "researched": video.researched,
+        "recorded": video.recorded,
+        "published": video.published,
+        "source": video.source,
+        "note": video.note,
+    }
+    has_meta = any(v for v in meta.values())
+    if video.status == models.VideoStatus.CURRENT and not has_meta:
+        return name
+    out = {"video": name, "status": video.status}
+    for key, value in meta.items():
+        if value:
+            out[key] = value
+    return out
+
+
 def build_dump_models():
     # Load all the information we care about from the entries. We don't load up
     # categories here for efficiency reasons, it is faster to load up the relations
@@ -71,14 +99,16 @@ def build_dump_models():
         del sub_entry_dict["entry"]
         sub_entry = sub_entries.setdefault(sub_entry.id, sub_entry_dict)
 
-    # Attach video information to the sub-entry data.
-    videos = models.Video.objects.all()
+    # Attach video information to the sub-entry data, newest-first (highest id =
+    # most recently uploaded). The app trusts this order — index 0 is the current
+    # video — and does not re-sort client-side.
+    videos = models.Video.objects.all().order_by("-id")
     for video in videos:
         entry_id = sub_entry_id_to_entry_id[video.sub_entry_id]
         entry = entry_id_to_entry[entry_id]
         sub_entries = entry["sub_entries"]
         sub_entry = sub_entries.setdefault(video.sub_entry_id, {})
-        sub_entry.setdefault("videos", []).append(video.media.name)
+        sub_entry.setdefault("videos", []).append(dump_video(video))
 
     # Attach definitions information to the sub-entry data.
     definitions = models.Definition.objects.all()

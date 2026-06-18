@@ -113,9 +113,16 @@ class VideoStatus(models.TextChoices):
 class SubEntry(models.Model):
     class Meta:
         verbose_name_plural = "sub-entries"
+        # Admin-controlled display order within an entry (drag-to-reorder in the
+        # admin; the dump emits sub-entries in this order). See `order` below.
+        ordering = ["order"]
 
     # Link back to the Entry.
     entry = models.ForeignKey(Entry, on_delete=models.CASCADE)
+
+    # Position of this sub-entry within its entry. Set via the admin's
+    # drag-to-reorder (nested_admin sortable_field_name); lower = earlier.
+    order = models.PositiveIntegerField(default=0, db_index=True)
 
     # All videos in a sub entry should share the same region information.
     region = models.CharField(
@@ -146,8 +153,19 @@ class SubEntry(models.Model):
 # This links back to the SubEntry, implying there can be multiple Videos per SubEntry.
 # Video is a legacy name, this can also contain images, e.g. for fingerspelling.
 class Video(models.Model):
+    class Meta:
+        # Admin-controlled display order within a sub-entry (drag-to-reorder;
+        # the dump emits videos in this order, so order 0 = the first/primary
+        # video). See `order` below and the save() override for the auto-first
+        # behaviour on a new current upload.
+        ordering = ["order"]
+
     # Link back to the SubEntry.
     sub_entry = models.ForeignKey(SubEntry, on_delete=models.CASCADE)
+
+    # Position of this video within its sub-entry. Set via the admin's
+    # drag-to-reorder (nested_admin sortable_field_name); lower = earlier.
+    order = models.PositiveIntegerField(default=0, db_index=True)
 
     # This manages the file that this video captures. In local dev mode this will
     # just use the development server file management (which is either in memory
@@ -184,6 +202,22 @@ class Video(models.Model):
 
     # Admin-authored free text shown in the source sheet's note card. Optional.
     note = models.TextField(blank=True, default="")
+
+    def save(self, *args, **kwargs):
+        # A newly-uploaded current video becomes the first (primary) video for
+        # its sub-entry: bump the existing videos down one so it sorts ahead of
+        # them (the dump orders by `order`, so 0 = first). Only on creation of a
+        # CURRENT video — editing an existing video, or reordering, is left to
+        # the admin's drag-to-reorder. (Reordering happens via the historical
+        # model in migrations and via nested_admin in the admin, neither of
+        # which is "adding", so they don't trip this.)
+        promote = self._state.adding and self.status == VideoStatus.CURRENT
+        if promote and self.sub_entry_id is not None:
+            Video.objects.filter(sub_entry_id=self.sub_entry_id).update(
+                order=models.F("order") + 1
+            )
+            self.order = 0
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Video"

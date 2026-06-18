@@ -83,8 +83,10 @@ def build_dump_models():
         if entry["categories"]:
             entry["category"] = entry["categories"][0]
 
-    # Load up a map of SubEntry ID to Entry ID.
-    sub_entries = models.SubEntry.objects.all()
+    # Load up a map of SubEntry ID to Entry ID. Ordered by the admin-controlled
+    # `order` (then id as a stable tiebreak) so the dump emits sub-entries in the
+    # order the admin arranged them.
+    sub_entries = models.SubEntry.objects.all().order_by("order", "id")
     sub_entry_id_to_entry_id = {
         k: v for (k, v) in sub_entries.values_list("id", "entry")
     }
@@ -99,10 +101,12 @@ def build_dump_models():
         del sub_entry_dict["entry"]
         sub_entry = sub_entries.setdefault(sub_entry.id, sub_entry_dict)
 
-    # Attach video information to the sub-entry data, newest-first (highest id =
-    # most recently uploaded). The app trusts this order — index 0 is the current
-    # video — and does not re-sort client-side.
-    videos = models.Video.objects.all().order_by("-id")
+    # Attach video information to the sub-entry data in the admin-controlled
+    # `order` (then id as a stable tiebreak). The app trusts this order — index 0
+    # is the first/primary video — and does not re-sort client-side. New current
+    # uploads are auto-promoted to order 0 (see Video.save()), and admins can
+    # drag to reorder.
+    videos = models.Video.objects.all().order_by("order", "id")
     for video in videos:
         entry_id = sub_entry_id_to_entry_id[video.sub_entry_id]
         entry = entry_id_to_entry[entry_id]

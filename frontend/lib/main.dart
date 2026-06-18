@@ -44,7 +44,8 @@ const String _kDebugBackendBaseUrlRaw =
 String get _debugBackendBaseUrl {
   if (!kDebugMode || _kDebugBackendBaseUrlRaw.isEmpty) return "";
   return _kDebugBackendBaseUrlRaw.endsWith("/")
-      ? _kDebugBackendBaseUrlRaw.substring(0, _kDebugBackendBaseUrlRaw.length - 1)
+      ? _kDebugBackendBaseUrlRaw.substring(
+          0, _kDebugBackendBaseUrlRaw.length - 1)
       : _kDebugBackendBaseUrlRaw;
 }
 

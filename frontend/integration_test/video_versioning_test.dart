@@ -79,7 +79,8 @@ MyEntry _demoEntry() => MyEntry(
 // and don't read the config, so the leaf callbacks can be stubs.
 final WordPageConfig _config = WordPageConfig(
   getRelatedEntry: (_) => null,
-  navigateToEntryPage: (context, entry, showFav, {focusVideo, saveToList}) async {},
+  navigateToEntryPage: (context, entry, showFav,
+      {focusVideo, saveToList}) async {},
   buildDefinition: (context, definition) => const SizedBox.shrink(),
   regionsString: (context, subEntry) => "",
   videoAspectRatio: 16 / 12,
@@ -151,8 +152,8 @@ void main() {
     expect(find.text("Source"), findsOneWidget);
     expect(find.text("Deaf School Archive, Kandy"), findsOneWidget);
     // The admin-authored note card.
-    expect(find.text("Retained for documentation and research."),
-        findsOneWidget);
+    expect(
+        find.text("Retained for documentation and research."), findsOneWidget);
   });
 
   testWidgets("current video shows a CURRENT pill + minimal source sheet",

@@ -12,10 +12,24 @@ cd "$DIR/.."
 . ./ios/publish.env
 
 [[ -z "${TEAM_ID:-}" ]] && echo 'Please set TEAM_ID' && exit 1
-[[ -z "${APP_STORE_CONNECT_API_KEY_ID:-}" ]] && echo 'Please set APP_STORE_CONNECT_API_KEY_ID' && exit 1
 [[ -z "${APP_STORE_CONNECT_API_ISSUER_ID:-}" ]] && echo 'Please set APP_STORE_CONNECT_API_ISSUER_ID' && exit 1
 [[ -z "${API_KEY_PATH:-}" ]] && echo 'Please set API_KEY_PATH' && exit 1
 [[ ! -f "$API_KEY_PATH" ]] && echo "API key not found at $API_KEY_PATH" && exit 1
+
+# The key ID is NOT stored inside the .p8 — Apple only encodes it in the
+# download filename "AuthKey_<ID>.p8". Derive it from that filename when the key
+# keeps Apple's name, otherwise fall back to APP_STORE_CONNECT_API_KEY_ID from
+# publish.env. (So you can drop that env var entirely by keeping the key named
+# AuthKey_<ID>.p8.)
+_kf="$(basename "$API_KEY_PATH")"
+if [[ "$_kf" == AuthKey_*.p8 ]]; then
+  _kf="${_kf#AuthKey_}"
+  APP_STORE_CONNECT_API_KEY_ID="${_kf%.p8}"
+fi
+if [[ -z "${APP_STORE_CONNECT_API_KEY_ID:-}" ]]; then
+  echo "Set APP_STORE_CONNECT_API_KEY_ID in ios/publish.env, or name the key file AuthKey_<ID>.p8" >&2
+  exit 1
+fi
 
 # --beta: after uploading, also promote this build to the external tester group.
 # The flag is parsed and the notes prompted up front so the prompt doesn't

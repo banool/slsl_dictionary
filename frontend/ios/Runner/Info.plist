@@ -71,6 +71,9 @@
 	<array>
 		<string>itms-beta</string>
 		<string>itms</string>
+		<!-- So canLaunchUrl(mailto:) works for the "email me" settings button;
+	     without it iOS answers false for the mailto scheme. -->
+		<string>mailto</string>
 		<!-- MSAL hands off to the Microsoft Authenticator app when installed. -->
 		<string>msauthv2</string>
 		<string>msauthv3</string>

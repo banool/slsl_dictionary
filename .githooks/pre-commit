@@ -3,7 +3,7 @@
 #   git config core.hooksPath .githooks
 #
 # 1. Block any commit that contains unformatted Dart.
-# 2. Bump the Flutter app's build number when the app itself changed.
+# 2. Bump the Flutter app's build number on every commit.
 #
 # The Flutter app lives in frontend/, so both steps operate there; the repo
 # also holds the admin site and the info site, which this hook leaves alone.
@@ -21,9 +21,12 @@ if [ -n "$files" ]; then
   fi
 fi
 
-# 2. Bump the build number when the app changed (mirrors CI's `frontend` path
-#    filter, minus screenshots/docs), then re-stage the bumped pubspec.
-if git diff --cached --name-only | grep -qE '^frontend/(lib|ios|android|web|assets)/|^frontend/pubspec\.yaml$'; then
-  (cd frontend && ./bump_version.sh)
-  git add frontend/pubspec.yaml
-fi
+# 2. Bump the Flutter app's build number on every commit, then re-stage the
+#    bumped pubspec. This is unconditional on purpose: a store upload rejects a
+#    reused version code, and CI builds/uploads on a broader set of changes
+#    (e.g. frontend/pubspec.lock, dependency bumps) than a narrow app-code path
+#    filter would catch. Bumping every time guarantees each commit — and so each
+#    build CI might upload — gets a fresh version code. Cheap, and matches the
+#    "random patch bumps are fine" convention (same as auslan's hook).
+(cd frontend && ./bump_version.sh)
+git add frontend/pubspec.yaml

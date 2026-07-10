@@ -4,6 +4,7 @@ import 'package:dictionarylib/error_fallback.dart';
 import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/page_force_upgrade.dart';
+import 'package:dictionarylib/root_app.dart' show systemLocale;
 import 'package:dictionarylib/sharing/sharing_config.dart';
 import 'package:flutter/foundation.dart' show kDebugMode, kIsWeb;
 import 'package:flutter/material.dart';

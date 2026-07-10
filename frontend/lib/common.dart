@@ -1,11 +1,8 @@
-import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/entry_list.dart';
 import 'package:dictionarylib/entry_types.dart';
-import 'package:dictionarylib/page_word.dart';
+import 'package:dictionarylib/root_app.dart' show defaultNavigateToEntryPage;
 import 'package:dictionarylib/saved_video.dart';
-import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import 'word_page.dart';
 
@@ -52,38 +49,18 @@ const Color APP_BAR_DISABLED_COLOR = Color.fromARGB(35, 35, 35, 0);
 const String IOS_APP_ID = "6445848879";
 const String ANDROID_APP_ID = "com.banool.slsl_dictionary";
 
-/// Open an entry. Matches dictionarylib's NavigateToEntryPageFn typedef.
-///
-/// Web: pushes a real `/word/<key>` go_router route so the URL reflects the
-/// entry and it's deep-linkable (a pasted link resolves the entry from the key).
-/// Native: keeps the proven imperative push — URLs are invisible there anyway,
-/// and going through go_router would clobber a raw-pushed parent (e.g. the list
-/// view) and break its back button. The non-serialisable bits ([focusVideo],
-/// [saveToList]) ride along as `extra`.
+/// Open an entry — dictionarylib's shared web-route / native-push navigation
+/// with this app's word-page config. Matches dictionarylib's
+/// NavigateToEntryPageFn typedef. A plain function (not a curried final):
+/// slslWordPageConfig itself references this, so eagerly evaluating the
+/// config here would recurse during lazy initialization.
 Future<void> navigateToEntryPage(
     BuildContext context, Entry entry, bool showFavouritesButton,
-    {SavedVideo? focusVideo, EntryList? saveToList}) async {
-  if (kIsWeb) {
-    await context.push(
-      "$WORD_ROUTE/${Uri.encodeComponent(entry.getKey())}",
-      extra: EntryPageArgs(
-        showFavouritesButton: showFavouritesButton,
-        focusVideo: focusVideo,
-        saveToList: saveToList,
-      ),
-    );
-  } else {
-    await Navigator.push(
-      context,
-      MaterialPageRoute(
-          builder: (context) => EntryPage(
-              entry: entry,
-              config: slslWordPageConfig,
-              showFavouritesButton: showFavouritesButton,
-              focusVideo: focusVideo,
-              saveToList: saveToList)),
-    );
-  }
+    {SavedVideo? focusVideo, EntryList? saveToList}) {
+  return defaultNavigateToEntryPage(context, entry, showFavouritesButton,
+      focusVideo: focusVideo,
+      saveToList: saveToList,
+      config: slslWordPageConfig);
 }
 
 // For example, en_US -> en. I'm pretty sure this isn't necessary because the

@@ -12,7 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:slsl_dictionary/entries_types.dart';
 
-import 'helpers.dart';
+import 'package:dictionarylib_test_support/helpers.dart';
 
 // End-to-end coverage for per-video versioning (the status pill + source sheet
 // on the entry page). It pumps the real shared EntryPage with a synthetic

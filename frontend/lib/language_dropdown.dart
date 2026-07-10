@@ -4,7 +4,7 @@ import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:dictionarylib/dictionarylib.dart'
     show DictLibLocalizations, LANGUAGE_CODE_TO_LOCALE;
-import 'package:slsl_dictionary/root.dart';
+import 'package:dictionarylib/root_app.dart' show DictRootApp, systemLocale;
 
 import 'common.dart';
 
@@ -53,13 +53,13 @@ class LanguageDropdownState extends State<LanguageDropdown> {
   Future<Locale?> setLocale(String language) async {
     if (language == NO_OVERRIDE_KEY) {
       // Unset locale override.
-      RootApp.clearLocaleOverride(context);
+      DictRootApp.clearLocaleOverride(context);
       await LocaleOverride.clearLocaleOverride();
       return null;
     }
     // Set locale override, both in the DB and in the app live right now.
     Locale localeOverride = LANGUAGE_CODE_TO_LOCALE[language]!;
-    RootApp.applyLocaleOverride(context, localeOverride);
+    DictRootApp.applyLocaleOverride(context, localeOverride);
     await LocaleOverride.writeLocaleOverride(localeOverride);
     return localeOverride;
   }

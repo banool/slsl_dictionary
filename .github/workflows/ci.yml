@@ -29,24 +29,13 @@ jobs:
 
   # Formatting gate for the Flutter app. Matches the local pre-commit hook
   # (.githooks/pre-commit) and the `dart format` style the repo is kept in.
+  # The job body is a reusable workflow in the dictionarylib repo.
   format:
     needs: [changes]
     if: needs.changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-    - uses: actions/checkout@v4
-    - uses: subosito/flutter-action@v1
-      with:
-        flutter-version: '3.44.5'
-        channel: stable
-    # `dart format` derives its style from the package's language version (the
-    # pubspec sdk lower bound), so resolve the package first — without pub get
-    # it falls back to the latest style and reformats everything.
-    - run: flutter pub get
-    - run: dart format --output=none --set-exit-if-changed lib test integration_test test_driver
+    uses: banool/dictionarylib/.github/workflows/app-format.yaml@main
+    with:
+      working_directory: frontend
 
   # Build the admin site image and publish to Docker Hub.
   build_push_admin_site:
@@ -125,43 +114,18 @@ jobs:
   # track. For that, run flutter build appbundle yourself (you'll have to copy the
   # secrets in to frontend/android temporarily). See more here:
   # https://stackoverflow.com/a/69899877/3846032
+  # The job body is a reusable workflow in the dictionarylib repo.
   release_android:
     needs: [changes]
     if: needs.changes.outputs.frontend == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./frontend
-    steps:
-    - uses: actions/checkout@v4
-
-    - run: echo "${{ secrets.UPLOAD_KEYSTORE }}" | base64 -d > android/upload_keystore.jks
-    - run: echo "${{ secrets.KEY_PROPERTIES }}" | base64 -d > android/key.properties
-
-    - uses: actions/setup-java@v3
-      with:
-        distribution: 'temurin'
-        java-version: '21'
-
-    - uses: subosito/flutter-action@v1
-      with:
-        flutter-version: '3.44.5'
-        channel: stable
-
-    - run: flutter pub get
-
-    - run: flutter test
-
-    # This will produce a signed appbundle.
-    - run: flutter build appbundle
-
-    - name: Publish Android build to internal track
-      uses: r0adkll/upload-google-play@v1.0.15
-      with:
-        serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
-        packageName: com.banool.slsl_dictionary
-        releaseFile: frontend/build/app/outputs/bundle/release/app-release.aab
-        track: internal
+    uses: banool/dictionarylib/.github/workflows/app-release-android.yaml@main
+    with:
+      package_name: com.banool.slsl_dictionary
+      working_directory: frontend
+    secrets:
+      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
+      KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
+      ANDROID_SERVICE_ACCOUNT_JSON: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
 
   # The web build now deploys to Cloudflare Pages (app.srilankansignlanguage.org)
   # via .github/workflows/web.yaml, replacing the old GitHub Pages deploy.

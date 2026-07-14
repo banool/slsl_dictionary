@@ -5,11 +5,11 @@ import 'package:dictionarylib/flashcards_logic.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:dictionarylib/hearth.dart';
 import 'package:dictionarylib/page_flashcards.dart';
+import 'package:dictionarylib/page_flashcards_help_en.dart';
 import 'package:dictionarylib/page_flashcards_landing.dart';
 import 'package:flutter/material.dart';
 
 import 'common.dart';
-import 'flashcards_help_page_en.dart';
 import 'language_dropdown.dart';
 import 'word_page.dart';
 
@@ -33,7 +33,7 @@ class MyFlashcardsLandingPageController
 
   @override
   Widget buildHelpPage(BuildContext context) {
-    return getFlashcardsHelpPageEn(context);
+    return getFlashcardsHelpPageEn(subjectNoun: "sign");
   }
 
   /// Revise every saved video in the chosen lists. SLSL has only two regions

@@ -58,7 +58,7 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
     // Order the bases by the useCdnUrl knob so playback prefers the CDN when
     // it's on, while keeping both listed so a path saved under one host still
     // resolves (and legacy full URLs strip) under the other. Must be set
-    // before setupPhaseThree so the list migration can resolve / strip it.
+    // before the entry load so the list migration can resolve / strip it.
     mediaBaseUrls = useCdnUrl
         ? const [DATA_URL_PREFIX_CDN, DATA_URL_PREFIX_DIRECT]
         : const [DATA_URL_PREFIX_DIRECT, DATA_URL_PREFIX_CDN];

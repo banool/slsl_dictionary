@@ -9,7 +9,10 @@ set -euo pipefail
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null 2>&1 && pwd )"
 cd "$DIR/.."
 
-. ./ios/publish.env
+ENV_FILE="ios/secrets.env"
+[[ -f "$ENV_FILE" ]] || ENV_FILE="ios/publish.env"
+# shellcheck disable=SC1090
+. "./$ENV_FILE"
 
 [[ -z "${APP_STORE_CONNECT_API_KEY_ID:-}" ]] && echo 'Please set APP_STORE_CONNECT_API_KEY_ID' && exit 1
 [[ -z "${APP_STORE_CONNECT_API_ISSUER_ID:-}" ]] && echo 'Please set APP_STORE_CONNECT_API_ISSUER_ID' && exit 1

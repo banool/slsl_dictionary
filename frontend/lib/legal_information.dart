@@ -22,11 +22,11 @@ List<Widget> buildLegalInformationChildren() {
       padding: const EdgeInsets.only(top: 10),
     ),
     TextButton(
-      child: Text("All app code is licensed under\nApache 2.0.",
+      child: Text("All app code is licensed under\nGPL v3.",
           textAlign: TextAlign.center),
       onPressed: () async {
         final url = Uri.parse(
-            'https://github.com/banool/slsl_dictionary/blob/main/LICENSE.md');
+            'https://github.com/banool/slsl_dictionary/blob/main/LICENSE');
         await launchUrl(url, mode: LaunchMode.externalApplication);
       },
     ),

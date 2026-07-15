@@ -47,17 +47,13 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   yankedVersionsUrl:
       "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
   knobUrlBase: KNOB_URL_BASE,
-  extraStartupTasks: [
-    // Get knob values (concurrently with the phase-two network calls).
-    () async => useCdnUrl = await readKnob(KNOB_URL_BASE, "use_cdn_url", true),
-  ],
   setupMediaAndEntryLoader: () async {
     // Configure how saved-video paths resolve to playable URLs. A saved
     // video's identity is the media path (see MySubEntry.getMedia in
     // entries_types.dart); the playable URL is `mediaBaseUrls.first + path`.
-    // Order the bases by the useCdnUrl knob so playback prefers the CDN when
-    // it's on, while keeping both listed so a path saved under one host still
-    // resolves (and legacy full URLs strip) under the other. Must be set
+    // Order the bases by useCdnUrl (hardcoded true; see globals) so playback
+    // prefers the CDN, while keeping both listed so a path saved under one host
+    // still resolves (and legacy full URLs strip) under the other. Must be set
     // before the entry load so the list migration can resolve / strip it.
     mediaBaseUrls = useCdnUrl
         ? const [DATA_URL_PREFIX_CDN, DATA_URL_PREFIX_DIRECT]

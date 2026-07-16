@@ -9,7 +9,7 @@ The app is a sibling of [Auslan Dictionary](https://github.com/banool/auslan_dic
 - **`frontend/`** — the Flutter app (iOS, Android, web). This is where most day-to-day work happens; see [`frontend/README.md`](frontend/README.md) for building, deploying, and taking screenshots.
 - **`site/`** — the public info + legal site (privacy policy, terms), deployed to Cloudflare Pages at [landing.srilankansignlanguage.org](https://landing.srilankansignlanguage.org). See [`site/README.md`](site/README.md).
 - **`admin_site/`** — the content-management admin site used to curate dictionary entries and their videos.
-- **`deployment/`** — infrastructure-as-code (TypeScript) for the data dump function, the admin site's Cloud Run service, and related Google Cloud resources.
+- **`deployment/`** — infrastructure-as-code (TypeScript) for the admin site's Cloud Run service, Cloud SQL, and related Google Cloud resources.
 
 ## Hosting
 

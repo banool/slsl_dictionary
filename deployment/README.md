@@ -18,19 +18,14 @@ The DB name can be found here: https://console.cloud.google.com/sql/instances/sl
 
 Note that sometimes deployment will fail due to this issue: https://github.com/banool/slsl_dictionary/issues/2. Just try again and it fixes it usually...
 
-## Cloud Function
-To run the cloud function manually do this:
-```
-gcloud functions call --region us-east1 `pulumi stack output functionName`
-```
+## Dump generation
+`dump/dump.json` (the app's data) is produced by the `slsl-dump` Cloudflare cron worker in the `dictionary_backend` repo (`dump_worker/`): every 30 minutes it fetches this admin site's `/dump` endpoint and writes the result into the R2 media mirror.
 
-You should see output like this:
+The worker authenticates to `/dump` with a bearer token that this admin site validates (the `dump_auth_token` secret — see `slsl_backend/views.py`). Retrieve the value with:
 ```
-executionId: 1h9fv0mejjid
-result: Uploaded dump containing 1419 entries to slsl-main-bucket-f32e475
+pulumi config get dump_auth_token
 ```
-
-To deploy any changes to the cloud function (e.g. to main.py or requirements.txt) just run the above, it will zip it all up for you.
+The dump refreshes automatically on the cron; to force a refresh manually see "Dump worker" in `dictionary_backend/MANUAL_SETUP.md`.
 
 ## Domains
-You need to point admin.srilankasignlanguage.org and cdn.srilankansignlanguge.org to the Cloud Run and LB (in front of the bucket) IP addresses respectively from where we manage the DNS for the domain (currently Bluehost).
+DNS for srilankansignlanguage.org is on Cloudflare. `admin.srilankansignlanguage.org` points at the admin Cloud Run service (the domain mapping in `lb.ts`). `cdn.srilankansignlanguage.org` is an R2 custom domain serving the media mirror — it is wired by `bun scripts/cf.ts r2 --project slsl` in the `dictionary_backend` repo, not from here.

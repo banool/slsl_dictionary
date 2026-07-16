@@ -88,6 +88,8 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    # Serve static files (admin CSS/JS) straight from the container.
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -156,22 +158,7 @@ DATABASES["default"]["CONN_HEALTH_CHECKS"] = True
 
 STATIC_URL = "/static/"
 
-# https://github.com/jschneier/django-storages/issues/941
-GS_QUERYSTRING_AUTH = False
-# Compress uploaded files with gzip.
-GS_IS_GZIPPED = True
-# Content types to compress.
-GZIP_CONTENT_TYPES = [
-    "text/css",
-    "text/javascript",
-    "application/javascript",
-    "application/x-javascript",
-    "image/svg+xml",
-]
-# If this is true, new uploads with the same filename overwrite the previous one.
-# Since the videos we're using share the same filename in some cases, we turn this
-# off, in which case it will instead add additional characters to the filename.
-GS_FILE_OVERWRITE = False
+STATIC_ROOT = "staticfiles"
 
 STORAGES: typing.Dict[str, typing.Dict[str, typing.Any]] = {
     "default": {
@@ -182,13 +169,14 @@ STORAGES: typing.Dict[str, typing.Dict[str, typing.Any]] = {
     },
 }
 
-if secrets.get("admin_bucket_name"):
+# Static files (Django admin CSS/JS) are served from the Cloud Run container by
+# whitenoise in prod — no bucket. collectstatic runs at image build (Dockerfile),
+# producing the hashed manifest CompressedManifestStaticFilesStorage needs. Dev
+# keeps Django's default static serving (runserver + finders; no manifest).
+if deployment_mode == "prod":
     STORAGES["staticfiles"] = {
-        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {"bucket_name": secrets["admin_bucket_name"], "location": "static"},
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     }
-else:
-    STATIC_ROOT = "static"
 
 # Media (uploaded sign videos) is served from the Cloudflare R2 mirror
 # (slsl-mirror at cdn.srilankansignlanguage.org) via django-storages' S3 backend.

@@ -18,17 +18,13 @@ uvloop = ">=0.22.1"
 httptools = ">=0.8"
 gunicorn = "^23.0"
 django-nested-admin = "^4.1"
-# [google] for the static-files GCS bucket (dropped in the whitenoise phase);
-# [s3] for the boto3 backend that writes media to Cloudflare R2.
-django-storages = {extras = ["google", "s3"], version = "^1.14"}
+# [s3] for the boto3 backend that writes media to Cloudflare R2. (GCS is gone:
+# media moved to R2 and static is served by whitenoise, so the [google] extra +
+# its protobuf-on-3.14 workaround were dropped.)
+django-storages = {extras = ["s3"], version = "^1.14"}
+# Serves the Django admin's static files straight from the Cloud Run container.
+whitenoise = "^6.8"
 psycopg2-binary = "^2.9.11"
-# django-storages[google] pulls protobuf via google-cloud-storage, which left to
-# itself resolves an old 4.25.x. That release's C extension (google._upb._message)
-# uses metaclasses Python 3.14 rejects ("Metaclasses with custom tp_new are not
-# supported"), so importing the GCS storage backend crashes on 3.14 — breaking
-# collectstatic and any runtime use of the bucket. 5.29+ ships a 3.14-compatible
-# upb, so float protobuf forward.
-protobuf = ">=5.29"
 # django-nested-admin -> monkeybiz imports pkg_resources, which Python 3.12+
 # venvs no longer ship by default. setuptools provides it, but it was removed in
 # setuptools 81, so stay on the 80.x line until nested-admin/monkeybiz drop it.

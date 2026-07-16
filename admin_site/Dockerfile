@@ -48,5 +48,16 @@ COPY run.sh .
 # Install the wheels we just built.
 RUN ./.venv/bin/pip install *.whl
 
+# Collect + hash the admin's static files into the image so whitenoise can serve
+# them at runtime (CompressedManifestStaticFilesStorage builds its manifest
+# here). Dummy required secrets just satisfy the settings import — collectstatic
+# touches no DB / network / R2. deployment_mode=prod selects the whitenoise
+# manifest storage.
+RUN secret_key=build sql_engine=django.db.backends.sqlite3 \
+    sql_database=build sql_user=build sql_password=build sql_unix_socket=/tmp/build \
+    deployment_mode=prod \
+    admin_username=build admin_password=build admin_email=build@example.com \
+    ./.venv/bin/python manage.py collectstatic --noinput
+
 # Run the program.
 ENTRYPOINT ["./run.sh"]

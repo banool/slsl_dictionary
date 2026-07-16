@@ -71,43 +71,6 @@ jobs:
         labels: ${{ steps.meta.outputs.labels }}
 
   # Build static and push it to the bucket
-  build_push_static_files:
-    needs: [changes]
-    if: needs.changes.outputs.admin_site == 'true'
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: ./admin_site
-    permissions:
-      contents: 'read'
-      id-token: 'write'
-    steps:
-    - uses: actions/checkout@v4
-
-    - uses: actions/setup-python@v5
-      with:
-        python-version: '3.14'
-    - uses: snok/install-poetry@d45b6d76012debf457ab49dffc7fb7b2efe8071d
-      with:
-        version: 2.2.1
-
-    - run: poetry install
-      shell: bash
-      working-directory: ./admin_site
-
-    - id: 'auth'
-      uses: 'google-github-actions/auth@v1'
-      with:
-        service_account: 'githubactions@slsl-dictionary.iam.gserviceaccount.com'
-        credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_JSON}}
-
-    # This collects static files directly to the bucket.
-    - name: Collect static files
-      env:
-        admin_bucket_name: "slsl-admin-bucket-31cc83f"
-        media_bucket_name: "ignored"
-      run: poetry run python manage.py collectstatic --noinput
-
   # Build and release the Android app. These secrets originate from the
   # slsl_dictionary_secrets repo. Note, this doesn't work until you've done a single
   # manual upload on the Google Play Console UI and submitted a release to the alpha

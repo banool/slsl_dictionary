@@ -16,11 +16,3 @@ Map<String, Entry> getEntriesGlobal(Locale locale) {
     throw Exception("Unknown locale $locale");
   }
 }
-
-// use_cdn_url has read `true` for everyone for years, so the app no longer
-// fetches it at startup — it's hardcoded here. The knob mechanism (readKnob,
-// KNOB_URL_BASE, extraStartupTasks) is kept for future use: to make this a live
-// knob again, restore the readKnob call in main.dart's extraStartupTasks. The
-// GitHub knob file is left in place so old app versions that still fetch it
-// keep working.
-bool useCdnUrl = true;

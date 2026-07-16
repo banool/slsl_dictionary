@@ -5,7 +5,6 @@ import 'package:slsl_dictionary/common.dart';
 import 'package:slsl_dictionary/entries_loader.dart';
 import 'package:intl/intl_standalone.dart';
 
-import 'globals.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
 
@@ -51,13 +50,10 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
     // Configure how saved-video paths resolve to playable URLs. A saved
     // video's identity is the media path (see MySubEntry.getMedia in
     // entries_types.dart); the playable URL is `mediaBaseUrls.first + path`.
-    // Order the bases by useCdnUrl (hardcoded true; see globals) so playback
-    // prefers the CDN, while keeping both listed so a path saved under one host
-    // still resolves (and legacy full URLs strip) under the other. Must be set
-    // before the entry load so the list migration can resolve / strip it.
-    mediaBaseUrls = useCdnUrl
-        ? const [DATA_URL_PREFIX_CDN, DATA_URL_PREFIX_DIRECT]
-        : const [DATA_URL_PREFIX_DIRECT, DATA_URL_PREFIX_CDN];
+    // Since the GCS migration there is a single origin (the R2 mirror at cdn.),
+    // so this is a one-element list. Must be set before the entry load so the
+    // list migration can resolve / strip legacy full URLs against it.
+    mediaBaseUrls = const [DATA_URL_PREFIX_CDN];
 
     // Debug-only: DEBUG_BACKEND_BASE_URL redirects ONLY the dump fetch to a
     // local backend; media keeps resolving from the bucket/CDN above (the

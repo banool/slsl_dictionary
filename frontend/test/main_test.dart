@@ -6,7 +6,6 @@ import 'package:slsl_dictionary/root.dart';
 import 'package:dolphinsr_dart/dolphinsr_dart.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:slsl_dictionary/globals.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
@@ -34,7 +33,6 @@ void main() async {
   sharedPreferences = await SharedPreferences.getInstance();
 
   enableFlashcardsKnob = true;
-  useCdnUrl = true;
 
   showFlashcards = true;
 

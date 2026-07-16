@@ -144,8 +144,8 @@ class MySubEntry implements SubEntry {
     // is keyed by), not a full URL — so a save survives the content moving
     // between hosts / CDNs. The dump stores just the filename; the path is
     // `/media/<file>`. Resolve to a playable URL with mediaUrlForPath
-    // (dictionarylib globals) + mediaBaseUrls, which main.dart configures from
-    // the useCdnUrl knob. See SubEntryPage in word_page.dart.
+    // (dictionarylib globals) + mediaBaseUrls, which main.dart configures to the
+    // R2 mirror at cdn. See SubEntryPage in word_page.dart.
     return videos.map((v) => "/media/${_videoFileName(v)}").toList();
   }
 

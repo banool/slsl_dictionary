@@ -42,10 +42,10 @@ SEEDED_WORDS = [
 # SLSL ships no local data file — the dictionary is downloaded at runtime. The
 # poster step fetches the same dump the app reads and resolves each video
 # filename ("0.mp4") to its media URL ("<base>/media/0.mp4"), matching
-# MySubEntry.getMedia (frontend/lib/entries_types.dart). The direct GCS bucket
-# is used over the CDN for reliability; the poster name only depends on the
-# trailing "/media/<file>", which both bases share.
-MEDIA_BASE = "https://storage.googleapis.com/slsl-media-bucket-d7f91f9"
+# MySubEntry.getMedia (frontend/lib/entries_types.dart). Media + the dump are
+# served from the Cloudflare R2 mirror at cdn. (the sole origin since the GCS
+# migration); the poster name only depends on the trailing "/media/<file>".
+MEDIA_BASE = "https://cdn.srilankansignlanguage.org"
 DATA_DUMP_URL = f"{MEDIA_BASE}/dump/dump.json"
 
 

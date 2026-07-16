@@ -12,16 +12,14 @@ import 'package:http/http.dart';
 import 'entries_types.dart';
 import 'globals.dart';
 
-const String DATA_URL_PREFIX_DIRECT =
-    "https://storage.googleapis.com/slsl-media-bucket-d7f91f9";
+// Media + the DB dump are served from the Cloudflare R2 mirror at cdn. (see
+// dictionary_backend: R2_MIRRORS / the slsl-dump worker). This is the sole
+// origin — the old storage.googleapis.com/slsl-media-bucket fallback was
+// removed when we migrated off GCS + Google Cloud CDN.
 const String DATA_URL_PREFIX_CDN = "https://cdn.srilankansignlanguage.org";
 
 String buildUrl(String path) {
-  if (useCdnUrl) {
-    return "$DATA_URL_PREFIX_CDN/$path";
-  } else {
-    return "$DATA_URL_PREFIX_DIRECT/$path";
-  }
+  return "$DATA_URL_PREFIX_CDN/$path";
 }
 
 class MyEntryLoader extends EntryLoader {

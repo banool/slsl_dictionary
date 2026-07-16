@@ -6,18 +6,17 @@ import 'package:slsl_dictionary/root.dart';
 
 /// SLSL's plug-in points for the shared multi-device sharing suite.
 ///
-/// SLSL ships no bundled dictionary; it's fetched at runtime. The loader is
-/// pinned at the direct bucket dump URL for determinism rather than going
-/// through the useCdnUrl knob.
+/// SLSL ships no bundled dictionary; it's fetched at runtime from the R2 mirror
+/// at cdn. (the sole origin since the GCS migration).
 final MdSuiteConfig mdSuiteConfig = MdSuiteConfig(
   appId: 'slsl',
   appName: 'SLSL Dictionary',
   advisoriesUrl: Uri.parse(
       'https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md'),
   knobUrlBase: KNOB_URL_BASE,
-  mediaBaseUrls: const [DATA_URL_PREFIX_DIRECT, DATA_URL_PREFIX_CDN],
+  mediaBaseUrls: const [DATA_URL_PREFIX_CDN],
   buildEntryLoader: () => MyEntryLoader(
-      dumpFileUrl: Uri.parse('$DATA_URL_PREFIX_DIRECT/dump/dump.json')),
+      dumpFileUrl: Uri.parse('$DATA_URL_PREFIX_CDN/dump/dump.json')),
   shareLinkBaseUrl: 'https://share.srilankansignlanguage.org/l',
   shareLinkHost: 'share.srilankansignlanguage.org',
   urlScheme: 'slsl',

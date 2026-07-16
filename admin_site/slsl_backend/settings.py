@@ -190,10 +190,38 @@ if secrets.get("admin_bucket_name"):
 else:
     STATIC_ROOT = "static"
 
-if secrets.get("media_bucket_name"):
+# Media (uploaded sign videos) is served from the Cloudflare R2 mirror
+# (slsl-mirror at cdn.srilankansignlanguage.org) via django-storages' S3 backend.
+# Gated on the R2 secrets so local dev (which sets none) keeps the filesystem
+# default above. This replaced the GCS media bucket + Google Cloud CDN.
+if secrets.get("r2_bucket_name"):
+    from botocore.config import Config
+
     STORAGES["default"] = {
-        "BACKEND": "storages.backends.gcloud.GoogleCloudStorage",
-        "OPTIONS": {"bucket_name": secrets["media_bucket_name"], "location": "media"},
+        "BACKEND": "storages.backends.s3.S3Storage",
+        "OPTIONS": {
+            "bucket_name": secrets["r2_bucket_name"],
+            "endpoint_url": secrets["r2_endpoint_url"],
+            "access_key": secrets["r2_access_key_id"],
+            "secret_key": secrets["r2_secret_access_key"],
+            "region_name": "auto",
+            "location": "media",
+            # Serve/display URLs through the CDN custom domain (what the app
+            # uses), not the private R2 S3 endpoint. Writes still go to
+            # endpoint_url; only url() generation uses this.
+            "custom_domain": "cdn.srilankansignlanguage.org",
+            # SLSL videos can share filenames, so don't overwrite — append a
+            # random suffix instead (mirrors the old GS_FILE_OVERWRITE=False).
+            "file_overwrite": False,
+            # Objects are served unauthenticated via the CDN (no signed URLs).
+            "querystring_auth": False,
+            # R2 rejects boto3's default flexible checksums; only send/validate a
+            # checksum when the operation actually requires one.
+            "client_config": Config(
+                request_checksum_calculation="when_required",
+                response_checksum_validation="when_required",
+            ),
+        },
     }
 
 

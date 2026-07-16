@@ -9,6 +9,13 @@ import { adminBucket, mediaBucket } from "./storage";
 const envRegular = [
   buildEnvObject("sql_engine", "django.db.backends.postgresql"),
   buildEnvObject("deployment_mode", "prod"),
+  // Cloudflare R2 (media storage). Bucket name + account endpoint are not
+  // secret; the access key id + secret are Pulumi secrets (SECRET_KEYS below).
+  buildEnvObject("r2_bucket_name", "slsl-mirror"),
+  buildEnvObject(
+    "r2_endpoint_url",
+    "https://47989fc190166b22bc15768dc41e8693.r2.cloudflarestorage.com",
+  ),
 ];
 
 const config = new pulumi.Config();
@@ -22,6 +29,8 @@ const SECRET_KEYS = [
   "admin_email",
   "additional_allowed_hosts",
   "dump_auth_token",
+  "r2_access_key_id",
+  "r2_secret_access_key",
 ];
 
 // Add to that env objects where the value is a pulumi.Output containing a secret.

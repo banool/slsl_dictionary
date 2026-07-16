@@ -19,6 +19,11 @@ OTHER = [
     "sql_unix_socket",
     "admin_bucket_name",
     "media_bucket_name",
+    # Cloudflare R2 (media storage) — django-storages S3 backend. See settings.py.
+    "r2_bucket_name",
+    "r2_endpoint_url",
+    "r2_access_key_id",
+    "r2_secret_access_key",
     "additional_allowed_hosts",
     "dump_auth_token",
     "dump_interval_secs",

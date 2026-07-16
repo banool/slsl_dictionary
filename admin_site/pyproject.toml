@@ -18,7 +18,9 @@ uvloop = ">=0.22.1"
 httptools = ">=0.8"
 gunicorn = "^23.0"
 django-nested-admin = "^4.1"
-django-storages = {extras = ["google"], version = "^1.14"}
+# [google] for the static-files GCS bucket (dropped in the whitenoise phase);
+# [s3] for the boto3 backend that writes media to Cloudflare R2.
+django-storages = {extras = ["google", "s3"], version = "^1.14"}
 psycopg2-binary = "^2.9.11"
 # django-storages[google] pulls protobuf via google-cloud-storage, which left to
 # itself resolves an old 4.25.x. That release's C extension (google._upb._message)

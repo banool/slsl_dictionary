@@ -16,3 +16,7 @@ config:
   deployment:sql_user:
     secure: AAABAJ6JH07B0TYp9itAKPAdgFlyAMZnm37teDTDQJRCRPeQaPTMO4Q=
   gcp:project: slsl-dictionary
+  deployment:r2_access_key_id:
+    secure: AAABACADO6fxAXaABOTSDZEKr+zPLmQ0Ucyai3bk/0ekJ0CD1D9rOGNZxrit/YX14F5X3+Ng4d6hivKExDnSBA==
+  deployment:r2_secret_access_key:
+    secure: AAABAA0vtaq8Q3bZwnaN6StOEQOGePpGbPdYNTJjsg7+ItixUuPNXR8AX4nJXyB/eK8K1jUdWpXAFqRpvfF4vPpRaLwvLSLnSq88eK+mMp713nzJWdSOagjOUz7aUsyW

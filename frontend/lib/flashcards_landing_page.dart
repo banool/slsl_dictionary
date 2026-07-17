@@ -1,3 +1,4 @@
+import 'package:dictionarylib/analytics.dart';
 import 'package:dictionarylib/common.dart';
 import 'package:dictionarylib/dictionarylib.dart' show DictLibLocalizations;
 import 'package:dictionarylib/entry_types.dart';
@@ -71,6 +72,8 @@ class MyFlashcardsLandingPageController
                 final selectedLocale = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
                 sharedPreferences.setString(
                     KEY_REVISION_LANGUAGE_CODE, languageCode);
+                Analytics.track('revision_language_selected',
+                    props: {'locale': languageCode});
                 updateRevisionSettings();
                 return selectedLocale;
               },

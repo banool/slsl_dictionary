@@ -14,6 +14,11 @@ import 'root.dart';
 const String KNOB_URL_BASE =
     "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/";
 
+/// Public Aptabase app key for privacy-first anonymous analytics (US region).
+/// An empty string disables analytics entirely — a safe no-op. This is a public
+/// client key (like the OAuth ids below), so hardcoding it is fine.
+const String APTABASE_APP_KEY = 'A-US-4527601061';
+
 /// Debug-only override: fetch the dictionary **dump** from a locally-running
 /// admin backend instead of the prod bucket. Set e.g.
 /// `--dart-define=DEBUG_BACKEND_BASE_URL=http://127.0.0.1:8080`. When set (and
@@ -46,6 +51,7 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   yankedVersionsUrl:
       "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
   knobUrlBase: KNOB_URL_BASE,
+  aptabaseAppKey: APTABASE_APP_KEY,
   setupMediaAndEntryLoader: () async {
     // Configure how saved-video paths resolve to playable URLs. A saved
     // video's identity is the media path (see MySubEntry.getMedia in

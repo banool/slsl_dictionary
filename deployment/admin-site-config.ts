@@ -1,7 +1,6 @@
 import * as pulumi from "@pulumi/pulumi";
 import { buildEnvObject } from "./utils";
 import { database, databaseInstance } from "./db";
-import { adminBucket, mediaBucket } from "./storage";
 
 // We start off with env vars that aren't secret / only known when we run `pulumi up`.
 // We know the host / port for the DB ahead of time because we're using the CloudSQL
@@ -55,10 +54,6 @@ const envUnixSocket = [
   ),
 ];
 
-// Add an env var for the bucket name.
-const envAdminBucket = [buildEnvObject("admin_bucket_name", adminBucket.name)];
-const envMediaBucket = [buildEnvObject("media_bucket_name", mediaBucket.name)];
-
 // We use pulumi.all to combine all that into a single Output. Some values for keys in
 // this output are themselves Outputs (the secrets).
 var envVars = pulumi.all([
@@ -67,8 +62,6 @@ var envVars = pulumi.all([
   ...envRandom,
   ...envDbName,
   ...envUnixSocket,
-  ...envAdminBucket,
-  ...envMediaBucket,
 ]);
 
 export { envVars };

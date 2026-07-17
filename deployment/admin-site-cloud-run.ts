@@ -4,8 +4,7 @@ import { ADMIN_LOCATION, SLSL } from "./common";
 import { envVars } from "./admin-site-config";
 import { database, databaseInstance, databaseUser } from "./db";
 import { gcpServices } from "./project";
-import { adminBucket } from "./storage";
-import { appServiceAccount, role1, role2, role3 } from "./iam";
+import { appServiceAccount, role1, role2 } from "./iam";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
@@ -95,11 +94,9 @@ export const adminSite = new gcp.cloudrun.Service(
       gcpServices.run,
       database,
       databaseUser,
-      adminBucket,
       appServiceAccount,
       role1,
       role2,
-      role3,
     ],
     customTimeouts: {
       create: "8m",

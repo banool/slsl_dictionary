@@ -17,8 +17,6 @@ OTHER = [
     "sql_host",
     "sql_port",
     "sql_unix_socket",
-    "admin_bucket_name",
-    "media_bucket_name",
     # Cloudflare R2 (media storage) — django-storages S3 backend. See settings.py.
     "r2_bucket_name",
     "r2_endpoint_url",

@@ -1,7 +1,6 @@
 import * as gcp from "@pulumi/gcp";
 import * as pulumi from "@pulumi/pulumi";
 import { SLSL } from "./common";
-import { adminBucket, mediaBucket } from "./storage";
 
 const projectId = new pulumi.Config("gcp").require("project");
 
@@ -33,26 +32,6 @@ export const role2 = new gcp.projects.IAMMember(
     member: appServiceAccountRef,
     project: projectId,
     role: "roles/cloudsql.client",
-  },
-  { dependsOn: [appServiceAccount] },
-);
-
-export const role3 = new gcp.storage.BucketIAMMember(
-  SLSL + "-sa-storage-admin-main",
-  {
-    member: appServiceAccountRef,
-    bucket: adminBucket.name,
-    role: "roles/storage.admin",
-  },
-  { dependsOn: [appServiceAccount] },
-);
-
-export const role4 = new gcp.storage.BucketIAMMember(
-  SLSL + "-sa-storage-media-main",
-  {
-    member: appServiceAccountRef,
-    bucket: mediaBucket.name,
-    role: "roles/storage.admin",
   },
   { dependsOn: [appServiceAccount] },
 );

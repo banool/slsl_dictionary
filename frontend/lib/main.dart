@@ -14,10 +14,12 @@ import 'root.dart';
 const String KNOB_URL_BASE =
     "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/";
 
-/// Public Aptabase app key for privacy-first anonymous analytics (US region).
-/// An empty string disables analytics entirely — a safe no-op. This is a public
-/// client key (like the OAuth ids below), so hardcoding it is fine.
-const String APTABASE_APP_KEY = 'A-US-4527601061';
+/// Public Aptabase app key for privacy-first anonymous analytics. `A-SH-…` =
+/// self-hosted (resolves to analytics.auslandictionary.org via dictionarylib's
+/// _regionHosts — a separate app on the shared self-hosted instance). An empty
+/// string disables analytics entirely — a safe no-op. This is a public client
+/// key (like the OAuth ids below), so hardcoding is fine.
+const String APTABASE_APP_KEY = 'A-SH-7124434184';
 
 /// Debug-only override: fetch the dictionary **dump** from a locally-running
 /// admin backend instead of the prod bucket. Set e.g.

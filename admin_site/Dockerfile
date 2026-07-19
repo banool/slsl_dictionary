@@ -9,24 +9,21 @@ WORKDIR /app
 
 FROM base as builder
 
-# Specifically pin Poetry version.
-ENV PIP_DEFAULT_TIMEOUT=90 \
-    PIP_DISABLE_PIP_VERSION_CHECK=1 \
-    PIP_NO_CACHE_DIR=1 \
-    POETRY_VERSION=2.2.1
+# Install uv (pinned) from the official image.
+COPY --from=ghcr.io/astral-sh/uv:0.11.29 /uv /uvx /bin/
 
-# Install Poetry.
-RUN pip install "poetry==$POETRY_VERSION"
+# Install deps into an in-project .venv as a separate cached layer (the project
+# itself is installed below, once its source has been copied in).
+COPY pyproject.toml uv.lock ./
+RUN uv sync --frozen --no-dev --no-install-project
 
-# Install deps.
-COPY pyproject.toml poetry.lock ./
-RUN poetry config virtualenvs.in-project true && poetry install --only=main --no-root
-
-# Build the actual app.
+# Build the actual app and install it into the venv (--no-editable installs
+# from a built wheel rather than pointing at /app, so the final image only
+# needs the venv).
 COPY manage.py ./
 COPY README.md ./
 COPY slsl_backend ./slsl_backend
-RUN poetry build
+RUN uv sync --frozen --no-dev --no-editable
 
 # Now we're building up the final image.
 FROM base as final
@@ -37,16 +34,13 @@ RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy across files from the build into the final image.
+# Copy across files from the build into the final image. The venv already
+# contains the app (installed from its wheel above).
 COPY --from=builder /app/.venv ./.venv
-COPY --from=builder /app/dist .
 COPY --from=builder /app/manage.py .
 
-# Copy in the run script and README.
+# Copy in the run script.
 COPY run.sh .
-
-# Install the wheels we just built.
-RUN ./.venv/bin/pip install *.whl
 
 # Collect + hash the admin's static files into the image so whitenoise can serve
 # them at runtime (CompressedManifestStaticFilesStorage builds its manifest

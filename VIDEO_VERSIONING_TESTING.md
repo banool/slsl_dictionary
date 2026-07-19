@@ -23,7 +23,7 @@ This describes the new "mark a video as Current / Historical, with structured da
 
 ## Prerequisites (one-time sanity checks)
 
-- **Tooling**: Poetry (backend) and Flutter (the apps). A booted iOS simulator (`xcrun simctl list devices booted`) for the on-device steps.
+- **Tooling**: uv (backend) and Flutter (the apps). A booted iOS simulator (`xcrun simctl list devices booted`) for the on-device steps.
 - **Dev secrets**: the backend's dev secrets file is `admin_site/secrets.json` — it's committed, contains no real secrets, and configures the local SQLite DB + the `admin` / `password` superuser. Nothing to create; it's used automatically (see the `prod_secrets.json` caveat in step 1).
 - **dictionarylib override (so the app sees the feature)**: this feature's UI lives in `dictionarylib`, which is uncommitted. The app only builds against your local working copy if the override is active. It already is — `slsl_dictionary/frontend/pubspec_overrides.yaml` contains:
   ```yaml
@@ -43,7 +43,7 @@ cd admin_site
 
 ```bash
 mv prod_secrets.json prod_secrets.json.bak     # use local SQLite dev DB
-poetry run ./run.sh 8080 dev                    # migrate + create admin + runserver
+uv run ./run.sh 8080 dev                    # migrate + create admin + runserver
 # ... when finished testing ...
 mv prod_secrets.json.bak prod_secrets.json      # restore the prod-DB config
 ```

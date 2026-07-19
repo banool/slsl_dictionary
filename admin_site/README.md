@@ -1,7 +1,7 @@
 # SLSL Dictionary: Backend
 
 ## Local development
-Install Poetry: https://python-poetry.org/docs/#installation.
+Install uv: https://docs.astral.sh/uv/getting-started/installation/.
 
 Change anything relevant in `secrets.json`. This contains no actual secrets, this file is just used for development. It configures the local SQLite DB and the `admin` / `password` superuser.
 
@@ -9,13 +9,13 @@ Note: if you have a `prod_secrets.json` (see "Running locally with the prod DB" 
 
 Run the local development server on port 8080:
 ```
-poetry run ./run.sh 8080 dev
+uv run ./run.sh 8080 dev
 ```
 
 To make migrations if you changed any models, do this:
 ```
-poetry run python manage.py makemigrations slsl_backend
-poetry run python manage.py makemigrations
+uv run python manage.py makemigrations slsl_backend
+uv run python manage.py makemigrations
 ```
 
 ## Running locally with the prod DB
@@ -57,7 +57,7 @@ You'll notice we don't set `admin_bucket_name`. That's because for dev we just u
 
 Finally, run the server locally like this:
 ```
-poetry run ./run.sh 8080 dev
+uv run ./run.sh 8080 dev
 ```
 
 If when logging in you are prompted for a password in the pane where the server is running, enter the password for your laptop, I believe this is some keychain stuff (just a guess right now though).
@@ -68,21 +68,21 @@ First run the Cloud SQL proxy (see above).
 Then:
 ```
 ln -s /Users/dport/gdrive/Videos\ for\ SLSL\ Dictionary/ blah
-poetry run python manage.py bootstrap_entries blah/1-1\ Sri\ Lankan\ Sign\ Language\ Vocabulary\ Words/ --limit 10
+uv run python manage.py bootstrap_entries blah/1-1\ Sri\ Lankan\ Sign\ Language\ Vocabulary\ Words/ --limit 10
 ```
 
 Note the symlink is necessary to avoid this issue: https://stackoverflow.com/questions/22019371/django-how-to-allow-a-suspicious-file-operation-copy-a-file.
 
 ## Formatting
 ```
-poetry run poe isort
-poetry run poe black
+uv run poe isort
+uv run poe black
 ```
 
 ## Generating csvs for translators
 For entries:
 ```
-poetry run python manage.py generate_csv entries ~/out.csv
+uv run python manage.py generate_csv entries ~/out.csv
 ```
 
 For the text of the app itself try just sharing the arb files as txt files.

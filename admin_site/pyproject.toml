@@ -1,47 +1,51 @@
-[tool.poetry]
+[project]
 name = "admin-site"
 version = "0.1.0"
 description = "Admin site for SLSL Dictionary"
-authors = ["Daniel Porteous <danielporteous1@gmail.com>"]
-packages = [{ include = "slsl_backend" }]
+authors = [{ name = "Daniel Porteous", email = "danielporteous1@gmail.com" }]
 readme = "README.md"
+requires-python = ">=3.14,<3.15"
+dependencies = [
+    "Django>=5.2,<6",
+    "uvicorn[standard]>=0.34,<0.35",
+    # uvicorn[standard]'s native transitive deps (watchfiles/uvloop/httptools) must
+    # be floated to releases that ship Python 3.14 (cp314) wheels — otherwise they
+    # build from source (Rust / C) and fail to install.
+    "watchfiles>=1.1",
+    "uvloop>=0.22.1",
+    "httptools>=0.8",
+    "gunicorn>=23.0,<24",
+    "django-nested-admin>=4.1,<5",
+    # [s3] for the boto3 backend that writes media to Cloudflare R2. (GCS is gone:
+    # media moved to R2 and static is served by whitenoise, so the [google] extra +
+    # its protobuf-on-3.14 workaround were dropped.)
+    "django-storages[s3]>=1.14,<2",
+    # Serves the Django admin's static files straight from the Cloud Run container.
+    "whitenoise>=6.8,<7",
+    "psycopg2-binary>=2.9.11,<3",
+    # django-nested-admin -> monkeybiz imports pkg_resources, which Python 3.12+
+    # venvs no longer ship by default. setuptools provides it, but it was removed in
+    # setuptools 81, so stay on the 80.x line until nested-admin/monkeybiz drop it.
+    "setuptools>=80,<81",
+]
 
-[tool.poetry.dependencies]
-python = ">=3.14,<3.15"
-Django = "^5.2"
-uvicorn = {extras = ["standard"], version = "^0.34"}
-# uvicorn[standard]'s native transitive deps (watchfiles/uvloop/httptools) must
-# be floated to releases that ship Python 3.14 (cp314) wheels — otherwise they
-# build from source (Rust / C) and fail to install.
-watchfiles = ">=1.1"
-uvloop = ">=0.22.1"
-httptools = ">=0.8"
-gunicorn = "^23.0"
-django-nested-admin = "^4.1"
-# [s3] for the boto3 backend that writes media to Cloudflare R2. (GCS is gone:
-# media moved to R2 and static is served by whitenoise, so the [google] extra +
-# its protobuf-on-3.14 workaround were dropped.)
-django-storages = {extras = ["s3"], version = "^1.14"}
-# Serves the Django admin's static files straight from the Cloud Run container.
-whitenoise = "^6.8"
-psycopg2-binary = "^2.9.11"
-# django-nested-admin -> monkeybiz imports pkg_resources, which Python 3.12+
-# venvs no longer ship by default. setuptools provides it, but it was removed in
-# setuptools 81, so stay on the 80.x line until nested-admin/monkeybiz drop it.
-setuptools = ">=80,<81"
-
-[tool.poetry.group.dev.dependencies]
-autoflake = "^2.3"
-black = "^25.1"
-googletrans = "3.1.0a0"
-isort = "^6.0"
-poethepoet = "^0.32"
-pytest = "^8.3"
+[dependency-groups]
+dev = [
+    "autoflake>=2.3,<3",
+    "black>=25.1,<26",
+    "googletrans==3.1.0a0",
+    "isort>=6.0,<7",
+    "poethepoet>=0.32,<0.33",
+    "pytest>=8.3,<9",
+]
 
 [tool.poe.tasks]
 isort = "isort . --skip .venv"
-black = "poetry run python -m black manage.py . --exclude .venv"
+black = "python -m black manage.py . --exclude .venv"
 
 [build-system]
-requires = ["poetry-core>=1.9.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["slsl_backend"]

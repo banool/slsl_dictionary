@@ -1,0 +1,32 @@
+/*
+ * Make nested_admin's drag-to-reorder affordance obvious on the entry page.
+ * The whole inline header (the "Sub-entry:" / "Video:" h3) is the drag handle,
+ * but nothing signals that — so add a grip glyph + a grab cursor + a hover
+ * highlight so admins can tell the headers are draggable to reorder.
+ */
+
+.djn-drag-handler {
+    cursor: grab;
+}
+
+.djn-drag-handler:active {
+    cursor: grabbing;
+}
+
+/* A six-dot grip glyph in front of the header label. */
+.djn-drag-handler > b:first-child::before {
+    content: "\283F"; /* ⠿ — the standard 2x3-dot drag grip */
+    margin-right: 8px;
+    color: #b4b4b4;
+    font-size: 15px;
+    line-height: 1;
+    vertical-align: -1px;
+}
+
+.djn-drag-handler:hover {
+    background-color: rgba(0, 0, 0, 0.04);
+}
+
+.djn-drag-handler:hover > b:first-child::before {
+    color: #555;
+}

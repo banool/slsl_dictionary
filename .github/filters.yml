@@ -21,3 +21,13 @@ frontend:
   - 'frontend/assets/**'
   - 'frontend/pubspec.yaml'
   - 'frontend/pubspec.lock'
+
+# Narrower than `frontend` on purpose: don't burn a macOS build on web-only
+# or asset-only changes.
+ios:
+  - *force
+  - *ci
+  - 'frontend/lib/**'
+  - 'frontend/ios/**'
+  - 'frontend/pubspec.yaml'
+  - 'frontend/pubspec.lock'

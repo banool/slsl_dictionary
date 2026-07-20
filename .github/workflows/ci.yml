@@ -3,17 +3,12 @@ name: All CI
 on:
   push:
     branches: [main]
-  # For smoke-testing the release jobs without a qualifying push (they are
-  # path-gated on push, dispatch bypasses the filter).
-  workflow_dispatch:
 
 permissions:
   contents: write
 
 # A newer push supersedes any in-flight run — cancel it rather than burning
-# minutes finishing a build nobody will ship. Every commit has a fresh build
-# number (pre-commit bump), so a cancelled upload just means a skipped number,
-# which the stores are fine with.
+# minutes finishing a build nobody will ship.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -25,7 +20,6 @@ jobs:
     outputs:
       admin_site: ${{ steps.filter.outputs.admin_site }}
       frontend: ${{ steps.filter.outputs.frontend }}
-      ios: ${{ steps.filter.outputs.ios }}
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -34,11 +28,10 @@ jobs:
       with:
         filters: '.github/filters.yml'
     - name: Print changes
-      run: printf "Admin site changed $ADMIN_SITE\nFrontend changed $FRONTEND\niOS changed $IOS\n"
+      run: printf "Admin site changed $ADMIN_SITE\nFrontend changed $FRONTEND\n"
       env:
         ADMIN_SITE: ${{ steps.filter.outputs.admin_site }}
         FRONTEND: ${{ steps.filter.outputs.frontend }}
-        IOS: ${{ steps.filter.outputs.ios }}
 
   # Formatting gate for the Flutter app. Matches the local pre-commit hook
   # (.githooks/pre-commit) and the `dart format` style the repo is kept in.
@@ -83,41 +76,17 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
 
-  # Build static and push it to the bucket
-  # Build and release the Android app. These secrets originate from the
-  # slsl_dictionary_secrets repo. Note, this doesn't work until you've done a single
-  # manual upload on the Google Play Console UI and submitted a release to the alpha
-  # track. For that, run flutter build appbundle yourself (you'll have to copy the
-  # secrets in to frontend/android temporarily). See more here:
-  # https://stackoverflow.com/a/69899877/3846032
-  # The job body is a reusable workflow in the appci repo.
-  release_android:
+  # Test-only: store uploads never happen from CI pushes — internal builds are
+  # released on demand via the iOS/Android upload workflows (use the appci
+  # CLI). The job body is a reusable workflow in the appci repo.
+  test_android:
     needs: [changes]
     if: needs.changes.outputs.frontend == 'true'
     uses: banool/appci/.github/workflows/app-release-android.yaml@main
     with:
       package_name: com.banool.slsl_dictionary
       working_directory: frontend
-    secrets:
-      UPLOAD_KEYSTORE: ${{ secrets.UPLOAD_KEYSTORE }}
-      KEY_PROPERTIES: ${{ secrets.KEY_PROPERTIES }}
-      ANDROID_SERVICE_ACCOUNT_JSON: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON }}
-
-  # Build and upload an internal TestFlight build on app-change pushes, the
-  # iOS counterpart of release_android. No test-only mode: a macOS runner adds
-  # nothing (flutter test already runs in release_android), so this only runs
-  # when it will actually upload.
-  release_ios:
-    needs: [changes]
-    if: github.event_name == 'workflow_dispatch' || (needs.changes.outputs.ios == 'true' && github.event_name == 'push')
-    uses: banool/appci/.github/workflows/app-release-ios.yaml@main
-    with:
-      team_id: 9N3SNHTGL7
-      working_directory: frontend
-    secrets:
-      APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
-      APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
-      APP_STORE_CONNECT_API_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_API_ISSUER_ID }}
+      upload: false
 
   # The web build now deploys to Cloudflare Pages (app.srilankansignlanguage.org)
   # via .github/workflows/web.yaml, replacing the old GitHub Pages deploy.

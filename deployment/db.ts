@@ -19,6 +19,17 @@ export const databaseInstance = new gcp.sql.DatabaseInstance(
     databaseVersion: "POSTGRES_18",
     settings: {
       tier: "db-f1-micro",
+      backupConfiguration: {
+        // Daily automated backups (7 retained, the GCP default). This DB is the
+        // hand-curated source of truth for all SLSL content; dump.json is a
+        // derived copy that the dump cron would overwrite within 30 minutes of
+        // the DB serving bad data, so it is not a substitute. PITR stays off —
+        // daily granularity is enough and log archiving costs storage.
+        enabled: true,
+        // 17:00 UTC ≈ 03:00 Sydney, same overnight window as the local backup
+        // jobs.
+        startTime: "17:00",
+      },
     },
     deletionProtection: true,
   },

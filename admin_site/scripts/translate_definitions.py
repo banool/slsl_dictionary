@@ -1,7 +1,7 @@
 """
 This works with the output of this command:
 
-poetry run python manage.py generate_csv definitions ~/definitions-to-translate.csv
+uv run python manage.py generate_csv definitions ~/definitions-to-translate.csv
 """
 
 import argparse

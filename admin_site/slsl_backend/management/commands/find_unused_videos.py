@@ -12,8 +12,8 @@ Run it from admin_site/ against prod: it needs the prod DB + R2 secrets, i.e.
 prod_secrets.json present (the same footgun as the other prod scripts — that
 file shadows secrets.json and points you at prod).
 
-    poetry run python manage.py find_unused_videos            # just list them
-    poetry run python manage.py find_unused_videos --archive  # list + move
+    uv run python manage.py find_unused_videos            # just list them
+    uv run python manage.py find_unused_videos --archive  # list + move
 
 SLSL only. Auslan has no content backend — its R2 bucket is only a fallback
 mirror of scraped media — so this deliberately lives in the SLSL admin site and

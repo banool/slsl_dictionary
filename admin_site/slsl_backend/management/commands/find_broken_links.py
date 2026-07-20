@@ -9,7 +9,7 @@ Run it from admin_site/ against prod (needs the prod DB + R2 secrets, i.e.
 prod_secrets.json present — that file shadows secrets.json and points you at
 prod):
 
-    poetry run python manage.py find_broken_links
+    uv run python manage.py find_broken_links
 
 SLSL only. Auslan has no content backend — its R2 bucket is only a fallback
 mirror of scraped media — so this deliberately lives in the SLSL admin site.

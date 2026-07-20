@@ -19,7 +19,7 @@
 #
 # From slsl_backend run this command like this:
 #
-#   poetry run python manage.py bootstrap_phrases ~/Phrases --dry-run
+#   uv run python manage.py bootstrap_phrases ~/Phrases --dry-run
 
 import os
 import re

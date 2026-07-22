@@ -66,15 +66,21 @@ for _ in $(seq 1 30); do
 done
 
 OUT="$DEST/slsl-db-$(date +%Y-%m-%d).sql.gz"
+TMP_OUT="/tmp/slsl-db-$(date +%Y-%m-%d).sql.gz"
 PGPASSWORD="$SQL_PASSWORD" "$PG_DUMP" \
     -h 127.0.0.1 -p "$PROXY_PORT" -U "$SQL_USER" -d "$SQL_DATABASE" \
-    --no-owner --no-acl | gzip > "$OUT"
+    --no-owner --no-acl | gzip > "$TMP_OUT"
 
 # A dump this small should never be empty; treat that as failure.
-[ -s "$OUT" ] || { echo "dump is empty" >&2; exit 1; }
+[ -s "$TMP_OUT" ] || { echo "dump is empty" >&2; rm -f "$TMP_OUT"; exit 1; }
 
-# Keep the newest 30 dumps.
-ls -1t "$DEST"/slsl-db-*.sql.gz | tail -n +31 | while read -r old; do rm -f "$old"; done
+rm -f "$OUT"
+mv "$TMP_OUT" "$OUT"
+
+# Keep the newest 30 dumps. We use || true because Google Drive File Provider
+# can be asynchronous; immediately after a mv, the directory glob might briefly
+# return empty, causing ls to fail and trip set -e.
+ls -1t "$DEST"/slsl-db-*.sql.gz 2>/dev/null | tail -n +31 | while read -r old; do rm -f "$old"; done || true
 
 mkdir -p "$MARKER_DIR" && touch "$MARKER"
 echo "$(date '+%Y-%m-%d %H:%M:%S') - $NAME backup completed: $(du -h "$OUT" | cut -f1) $(basename "$OUT")"

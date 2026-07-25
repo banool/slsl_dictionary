@@ -19,7 +19,7 @@
 set -euo pipefail
 
 NAME="slsl-db"
-MARKER_DIR="$HOME/.local/state/dictionary-backups"
+MARKER_DIR="$HOME/.local/state/job-markers"
 MARKER="$MARKER_DIR/$NAME.last-success"
 LOG_HINT="~/Library/Logs/me.dport.backup-slsl-db.log"
 PROXY_PID=""

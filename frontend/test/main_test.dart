@@ -3,7 +3,7 @@ import 'package:dictionarylib/globals.dart';
 import 'package:flutter/material.dart';
 import 'package:slsl_dictionary/entries_types.dart';
 import 'package:slsl_dictionary/root.dart';
-import 'package:dolphinsr_dart/dolphinsr_dart.dart';
+import 'package:dolphinsr/dolphinsr.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';

@@ -3,12 +3,13 @@ name: All CI
 on:
   push:
     branches: [main]
+  pull_request:
 
 permissions:
   contents: write
 
-# A newer push supersedes any in-flight run — cancel it rather than burning
-# minutes finishing a build nobody will ship.
+# A newer push supersedes any in-flight run for the same ref — cancel it
+# rather than burning minutes finishing a build nobody will ship.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -46,7 +47,12 @@ jobs:
   # Build the admin site image and publish to Docker Hub.
   build_push_admin_site:
     needs: [changes]
-    if: needs.changes.outputs.admin_site == 'true'
+    # Only publish from merged commits on main, never from PR branches.
+    # Without the push guard this would push an image built from unmerged
+    # code — and because the `admin_site` filter includes `.github/**/*`,
+    # even a PR that only touches a workflow would trigger it. Mirrors the
+    # same guard on auslan's mirror-to-r2 job.
+    if: needs.changes.outputs.admin_site == 'true' && github.event_name == 'push'
     runs-on: ubuntu-latest
     defaults:
       run:

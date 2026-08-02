@@ -301,17 +301,17 @@ packages:
     dependency: "direct main"
     description:
       path: "."
-      ref: "0b54a928019c2201291fd4e660525749e07ab44b"
-      resolved-ref: "0b54a928019c2201291fd4e660525749e07ab44b"
+      ref: "6dfa453982a403e80f8244c7cdcb020e3fb9d78a"
+      resolved-ref: "6dfa453982a403e80f8244c7cdcb020e3fb9d78a"
       url: "https://github.com/banool/dictionarylib.git"
     source: git
-    version: "0.3.110"
+    version: "0.3.112"
   dictionarylib_test_support:
     dependency: "direct dev"
     description:
       path: dictionarylib_test_support
-      ref: "0b54a928019c2201291fd4e660525749e07ab44b"
-      resolved-ref: "0b54a928019c2201291fd4e660525749e07ab44b"
+      ref: "6dfa453982a403e80f8244c7cdcb020e3fb9d78a"
+      resolved-ref: "6dfa453982a403e80f8244c7cdcb020e3fb9d78a"
       url: "https://github.com/banool/dictionarylib.git"
     source: git
     version: "0.0.1"

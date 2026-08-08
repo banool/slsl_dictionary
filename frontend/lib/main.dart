@@ -114,13 +114,11 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
       // console for attestation — never referenced in code.
       googleServerClientId:
           '587061140913-j0bunrlavqo2ds5et1ai1kq9rumgdngc.apps.googleusercontent.com',
-      // Facebook is globally disabled (kill switch); kept empty.
-      facebookAppId: '',
       // Microsoft Entra application (client) id + per-keystore Android redirect
       // URIs (URL-encoded base64 SHA-1; the raw form is in AndroidManifest's
       // BrowserTabActivity). The sign-in wrapper picks whichever matches the
       // running build's signature. Must match the Worker's MICROSOFT_CLIENT_ID
-      // and the Azure app registration. See MANUAL_SETUP.md §4.
+      // and the Azure app registration. See MANUAL_SETUP.md §3.
       microsoftClientId: 'ddf08a6a-a354-4122-8e72-e07f71f4355d',
       microsoftAndroidRedirectUri:
           'msauth://com.banool.slsl_dictionary/NteHMzzGTBV9TlUL3U7Iu2zFr6w%3D',

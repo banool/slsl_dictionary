@@ -26,6 +26,7 @@ jobs:
       project_name: slsl-web
       production_branch: main
       working_directory: frontend
+      wasm: true
     secrets:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

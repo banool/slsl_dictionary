@@ -1,11 +1,11 @@
 {
-    "name": "slsl_dictionary",
-    "short_name": "slsl_dictionary",
+    "name": "SLSL Dictionary",
+    "short_name": "SLSL Dictionary",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#FBF5EE",
+    "theme_color": "#BF5C36",
+    "description": "Free video dictionary for Sri Lankan Sign Language (SLSL).",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

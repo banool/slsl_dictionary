@@ -51,6 +51,9 @@ ios/Flutter/ephemeral
 .pub-cache/
 .pub/
 /build/
+# Gradle writes its problems report here on failure, before the buildDir
+# relocation in android/build.gradle takes effect.
+android/build/
 
 # Web related
 

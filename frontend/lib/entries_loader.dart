@@ -29,7 +29,9 @@ class MyEntryLoader extends EntryLoader {
 
   @override
   Future<NewData?> downloadNewData(
-      int currentVersion, bool forceDownload) async {
+    int currentVersion,
+    bool forceDownload,
+  ) async {
     // Previously we used to check if we needed to download the data again by
     // making two requests. First we'd make one request for just the headers, in
     // which we check the value of the Last-Modified header. If that time was
@@ -44,7 +46,7 @@ class MyEntryLoader extends EntryLoader {
     // the new data unconditionally.
     if (!forceDownload) {
       headers = {
-        "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion)
+        "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion),
       };
     }
     Response response = (await http

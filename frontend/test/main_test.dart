@@ -13,20 +13,23 @@ void main() async {
 
   entriesGlobal = {
     MyEntry(
-        word_in_english: "friend",
-        entry_type: "WORD",
-        categories: [],
-        sub_entries: [
-          MySubEntry(
-              videos: ["video.mp4"],
-              region: "ALL",
-              definitions: [
-                Definition(
-                    language: "en",
-                    category: "Relationships",
-                    definition: "Someone you love :)")
-              ])
-        ])
+      word_in_english: "friend",
+      entry_type: "WORD",
+      categories: [],
+      sub_entries: [
+        MySubEntry(
+          videos: ["video.mp4"],
+          region: "ALL",
+          definitions: [
+            Definition(
+              language: "en",
+              category: "Relationships",
+              definition: "Someone you love :)",
+            ),
+          ],
+        ),
+      ],
+    ),
   };
 
   SharedPreferences.setMockInitialValues({});
@@ -38,9 +41,7 @@ void main() async {
 
   testWidgets('Pump app test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const RootApp(
-      startingLocale: Locale("en"),
-    ));
+    await tester.pumpWidget(const RootApp(startingLocale: Locale("en")));
     print("Pump successful!");
   });
 
@@ -50,13 +51,14 @@ void main() async {
     List<Master> masters = [];
     for (Entry e in entriesGlobal) {
       for (SubEntry se in e.getSubEntries()) {
-        var m = Master(id: se.getKey(e), fields: [
-          e.getKey(),
-          se.getMedia().join("=====")
-        ], combinations: const [
-          Combination(front: [0], back: [1]),
-          Combination(front: [1], back: [0]),
-        ]);
+        var m = Master(
+          id: se.getKey(e),
+          fields: [e.getKey(), se.getMedia().join("=====")],
+          combinations: const [
+            Combination(front: [0], back: [1]),
+            Combination(front: [1], back: [0]),
+          ],
+        );
         masters.add(m);
       }
     }

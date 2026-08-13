@@ -32,8 +32,9 @@ const String APTABASE_APP_KEY = 'A-SH-7124434184';
 /// bucket. Empty by default. Note: on iOS the simulator still needs an ATS
 /// exception to allow the cleartext-HTTP dump fetch from localhost (see
 /// VIDEO_VERSIONING_TESTING.md).
-const String _kDebugBackendBaseUrlRaw =
-    String.fromEnvironment("DEBUG_BACKEND_BASE_URL");
+const String _kDebugBackendBaseUrlRaw = String.fromEnvironment(
+  "DEBUG_BACKEND_BASE_URL",
+);
 
 /// The above, normalised (trailing slash stripped) and gated on debug mode.
 /// Empty string means "not set / release build" → use the prod URLs.
@@ -41,7 +42,9 @@ String get _debugBackendBaseUrl {
   if (!kDebugMode || _kDebugBackendBaseUrlRaw.isEmpty) return "";
   return _kDebugBackendBaseUrlRaw.endsWith("/")
       ? _kDebugBackendBaseUrlRaw.substring(
-          0, _kDebugBackendBaseUrlRaw.length - 1)
+          0,
+          _kDebugBackendBaseUrlRaw.length - 1,
+        )
       : _kDebugBackendBaseUrlRaw;
 }
 
@@ -49,9 +52,9 @@ String get _debugBackendBaseUrl {
 /// (setupDictionaryApp / runDictionaryApp in dictionarylib).
 final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   advisoriesUrl: Uri.parse(
-      "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md"),
-  yankedVersionsUrl:
-      "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
+    "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md",
+  ),
+  yankedVersionsUrl: "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
   knobUrlBase: KNOB_URL_BASE,
   aptabaseAppKey: APTABASE_APP_KEY,
   setupMediaAndEntryLoader: () async {
@@ -69,8 +72,10 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
     // filenames play).
     final debugBackend = _debugBackendBaseUrl;
     if (debugBackend.isNotEmpty) {
-      printAndLog("DEBUG_BACKEND_BASE_URL set: fetching the dump from "
-          "$debugBackend/dump (media still resolves from the prod CDN)");
+      printAndLog(
+        "DEBUG_BACKEND_BASE_URL set: fetching the dump from "
+        "$debugBackend/dump (media still resolves from the prod CDN)",
+      );
     }
     return MyEntryLoader(
       dumpFileUrl: debugBackend.isNotEmpty
@@ -112,8 +117,7 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
       // additionally uses the iOS client via GIDClientID in Info.plist. The
       // Android OAuth clients (Play/upload/debug) only need to exist in the
       // console for attestation — never referenced in code.
-      googleServerClientId:
-          '587061140913-j0bunrlavqo2ds5et1ai1kq9rumgdngc.apps.googleusercontent.com',
+      googleServerClientId: '587061140913-j0bunrlavqo2ds5et1ai1kq9rumgdngc.apps.googleusercontent.com',
       // Microsoft Entra application (client) id + per-keystore Android redirect
       // URIs (URL-encoded base64 SHA-1; the raw form is in AndroidManifest's
       // BrowserTabActivity). The sign-in wrapper picks whichever matches the
@@ -122,17 +126,17 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
       microsoftClientId: 'ddf08a6a-a354-4122-8e72-e07f71f4355d',
       microsoftAndroidRedirectUri:
           'msauth://com.banool.slsl_dictionary/NteHMzzGTBV9TlUL3U7Iu2zFr6w%3D',
-      microsoftAndroidUploadRedirectUri:
-          'msauth://com.banool.slsl_dictionary/x7LGJXVDC1TRVjvRFCUCvufX%2FwQ%3D',
-      microsoftAndroidDebugRedirectUri:
-          'msauth://com.banool.slsl_dictionary/mLnUCgy8ygvZ%2B2jXJtHai%2FNmrCw%3D',
+      microsoftAndroidUploadRedirectUri: 'msauth://com.banool.slsl_dictionary/x7LGJXVDC1TRVjvRFCUCvufX%2FwQ%3D',
+      microsoftAndroidDebugRedirectUri: 'msauth://com.banool.slsl_dictionary/mLnUCgy8ygvZ%2B2jXJtHai%2FNmrCw%3D',
     ),
     // Debug-only "Sign in as test user" button (kDebugMode + non-empty token).
     // Pass --dart-define=TEST_AUTH_TOKEN=... matching the `wrangler dev`/staging
     // env so the full shared-lists flow can be driven without real accounts.
     testSignIn: TestSignInConfig(
-      testAuthToken:
-          String.fromEnvironment('TEST_AUTH_TOKEN', defaultValue: ''),
+      testAuthToken: String.fromEnvironment(
+        'TEST_AUTH_TOKEN',
+        defaultValue: '',
+      ),
       defaultUserIdPrefix: 'test:slsl-dev',
       defaultDisplayName: 'SLSL Tester',
     ),
@@ -142,32 +146,34 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
 /// Kept as an app-local entrypoint because the shared integration-test suites
 /// call it (see integration_test/test_config.dart).
 Future<void> setup({Set<Entry>? entriesGlobalReplacement}) =>
-    setupDictionaryApp(bootstrapConfig,
-        entriesGlobalReplacement: entriesGlobalReplacement);
+    setupDictionaryApp(
+      bootstrapConfig,
+      entriesGlobalReplacement: entriesGlobalReplacement,
+    );
 
 Future<void> main() => runDictionaryApp(
-      bootstrapConfig,
-      appName: APP_NAME,
-      iOSAppId: IOS_APP_ID,
-      androidAppId: ANDROID_APP_ID,
-      buildApp: (locale) => RootApp(startingLocale: locale),
-      resolveStartingLocale: () async {
-        systemLocale = Locale(await findSystemLocale());
-        Locale locale;
-        Locale? localeOverride = await LocaleOverride.getLocaleOverride();
-        if (localeOverride != null) {
-          locale = localeOverride;
-          printAndLog("Using locale override: $locale");
-        } else {
-          printAndLog("Using system locale: $systemLocale");
-          locale = systemLocale;
-        }
-        // We can only handle these 3 locales, if the system locale is
-        // something else we fall back to English.
-        if (!localeIsSupported(locale)) {
-          locale = LOCALE_ENGLISH;
-          printAndLog("Locale not supported, falling back to English: $locale");
-        }
-        return locale;
-      },
-    );
+  bootstrapConfig,
+  appName: APP_NAME,
+  iOSAppId: IOS_APP_ID,
+  androidAppId: ANDROID_APP_ID,
+  buildApp: (locale) => RootApp(startingLocale: locale),
+  resolveStartingLocale: () async {
+    systemLocale = Locale(await findSystemLocale());
+    Locale locale;
+    Locale? localeOverride = await LocaleOverride.getLocaleOverride();
+    if (localeOverride != null) {
+      locale = localeOverride;
+      printAndLog("Using locale override: $locale");
+    } else {
+      printAndLog("Using system locale: $systemLocale");
+      locale = systemLocale;
+    }
+    // We can only handle these 3 locales, if the system locale is
+    // something else we fall back to English.
+    if (!localeIsSupported(locale)) {
+      locale = LOCALE_ENGLISH;
+      printAndLog("Locale not supported, falling back to English: $locale");
+    }
+    return locale;
+  },
+);

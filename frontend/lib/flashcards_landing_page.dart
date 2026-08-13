@@ -23,8 +23,11 @@ final FlashcardsConfig slslFlashcardsConfig = FlashcardsConfig(
   navigateToEntryPage: navigateToEntryPage,
   buildRegionInfo: (context, resolved, shouldUseHorizontalDisplay, revealed) =>
       getRegionalInformationWidget(
-          context, resolved.subEntry, shouldUseHorizontalDisplay,
-          hide: !revealed),
+        context,
+        resolved.subEntry,
+        shouldUseHorizontalDisplay,
+        hide: !revealed,
+      ),
 );
 
 class MyFlashcardsLandingPageController
@@ -52,34 +55,42 @@ class MyFlashcardsLandingPageController
   /// builds the masters (an English-only app like Auslan has no such setting).
   @override
   List<Widget> getExtraBottomWidgets(
-      BuildContext context,
-      void Function(void Function() fn) setState,
-      void Function() updateRevisionSettings) {
+    BuildContext context,
+    void Function(void Function() fn) setState,
+    void Function() updateRevisionSettings,
+  ) {
     return [
       const SizedBox(height: 16),
       Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: HearthRowGroup(rows: [
-          HearthRow(
-            icon: Icons.translate,
-            title: DictLibLocalizations.of(context)!.settingsLanguage,
-            trailing: LanguageDropdown(
-              asPopUpMenu: true,
-              includeDeviceDefaultOption: false,
-              initialLanguageCode:
-                  sharedPreferences.getString(KEY_REVISION_LANGUAGE_CODE),
-              onChanged: (languageCode) {
-                final selectedLocale = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
-                sharedPreferences.setString(
-                    KEY_REVISION_LANGUAGE_CODE, languageCode);
-                Analytics.track('revision_language_selected',
-                    props: {'locale': languageCode});
-                updateRevisionSettings();
-                return selectedLocale;
-              },
+        child: HearthRowGroup(
+          rows: [
+            HearthRow(
+              icon: Icons.translate,
+              title: DictLibLocalizations.of(context)!.settingsLanguage,
+              trailing: LanguageDropdown(
+                asPopUpMenu: true,
+                includeDeviceDefaultOption: false,
+                initialLanguageCode: sharedPreferences.getString(
+                  KEY_REVISION_LANGUAGE_CODE,
+                ),
+                onChanged: (languageCode) {
+                  final selectedLocale = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
+                  sharedPreferences.setString(
+                    KEY_REVISION_LANGUAGE_CODE,
+                    languageCode,
+                  );
+                  Analytics.track(
+                    'revision_language_selected',
+                    props: {'locale': languageCode},
+                  );
+                  updateRevisionSettings();
+                  return selectedLocale;
+                },
+              ),
             ),
-          ),
-        ]),
+          ],
+        ),
       ),
     ];
   }

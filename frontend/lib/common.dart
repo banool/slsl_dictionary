@@ -26,21 +26,18 @@ const MaterialColor LIGHT_MAIN_COLOR = MaterialColor(
 );
 */
 
-const MaterialColor DARK_MAIN_COLOR = MaterialColor(
-  0xFFeb7400,
-  <int, Color>{
-    50: Color(0xFFFEF2E7),
-    100: Color(0xFFFDE0C3),
-    200: Color(0xFFFBCB94),
-    300: Color(0xFFF9B665),
-    400: Color(0xFFF7A741),
-    500: Color(0xFFeb7400),
-    600: Color(0xFFD96B00),
-    700: Color(0xFFB35800),
-    800: Color(0xFF8C4600),
-    900: Color(0xFF663300),
-  },
-);
+const MaterialColor DARK_MAIN_COLOR = MaterialColor(0xFFeb7400, <int, Color>{
+  50: Color(0xFFFEF2E7),
+  100: Color(0xFFFDE0C3),
+  200: Color(0xFFFBCB94),
+  300: Color(0xFFF9B665),
+  400: Color(0xFFF7A741),
+  500: Color(0xFFeb7400),
+  600: Color(0xFFD96B00),
+  700: Color(0xFFB35800),
+  800: Color(0xFF8C4600),
+  900: Color(0xFF663300),
+});
 
 const MaterialColor LIGHT_MAIN_COLOR = DARK_MAIN_COLOR;
 
@@ -55,12 +52,20 @@ const String ANDROID_APP_ID = "com.banool.slsl_dictionary";
 /// slslWordPageConfig itself references this, so eagerly evaluating the
 /// config here would recurse during lazy initialization.
 Future<void> navigateToEntryPage(
-    BuildContext context, Entry entry, bool showFavouritesButton,
-    {SavedVideo? focusVideo, EntryList? saveToList}) {
-  return defaultNavigateToEntryPage(context, entry, showFavouritesButton,
-      focusVideo: focusVideo,
-      saveToList: saveToList,
-      config: slslWordPageConfig);
+  BuildContext context,
+  Entry entry,
+  bool showFavouritesButton, {
+  SavedVideo? focusVideo,
+  EntryList? saveToList,
+}) {
+  return defaultNavigateToEntryPage(
+    context,
+    entry,
+    showFavouritesButton,
+    focusVideo: focusVideo,
+    saveToList: saveToList,
+    config: slslWordPageConfig,
+  );
 }
 
 // For example, en_US -> en. I'm pretty sure this isn't necessary because the

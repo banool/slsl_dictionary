@@ -13,10 +13,15 @@ import 'globals.dart';
 /// toggle (the region stays hidden until the card is revealed). The word page
 /// uses the shared footer (see [EntryPage]) for its richer styling.
 Widget getRegionalInformationWidget(
-    BuildContext context, SubEntry subEntry, bool shouldUseHorizontalDisplay,
-    {bool hide = false}) {
-  String regionsStr =
-      subEntry.getRegions().map((r) => getRegionPretty(context, r)).join(", ");
+  BuildContext context,
+  SubEntry subEntry,
+  bool shouldUseHorizontalDisplay, {
+  bool hide = false,
+}) {
+  String regionsStr = subEntry
+      .getRegions()
+      .map((r) => getRegionPretty(context, r))
+      .join(", ");
   if (hide) {
     regionsStr = "";
   }
@@ -31,16 +36,21 @@ Widget getRegionalInformationWidget(
 Widget slslDefinition(BuildContext context, dynamic d) {
   final definition = d as Definition;
   return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 15.0),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         Text(
           definition.categoryPretty,
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         Padding(
-            padding: const EdgeInsets.only(left: 10.0, top: 8.0),
-            child: Text(definition.definition))
-      ]));
+          padding: const EdgeInsets.only(left: 10.0, top: 8.0),
+          child: Text(definition.definition),
+        ),
+      ],
+    ),
+  );
 }
 
 /// SLSL's wiring for the shared [EntryPage]: related-word lookup across the
@@ -65,12 +75,13 @@ final WordPageConfig slslWordPageConfig = WordPageConfig(
   videoAspectRatio: 16 / 12,
   buildExtraAppBarActions: (context, ctx) => [
     LanguageDropdown(
-        asPopUpMenu: true,
-        includeDeviceDefaultOption: false,
-        onChanged: (languageCode) {
-          final locale = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
-          ctx.setLocaleOverride(locale);
-          return locale;
-        }),
+      asPopUpMenu: true,
+      includeDeviceDefaultOption: false,
+      onChanged: (languageCode) {
+        final locale = LANGUAGE_CODE_TO_LOCALE[languageCode]!;
+        ctx.setLocaleOverride(locale);
+        return locale;
+      },
+    ),
   ],
 );

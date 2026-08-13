@@ -11,12 +11,13 @@ import 'common.dart';
 const String NO_OVERRIDE_KEY = "NO_OVERRIDE";
 
 class LanguageDropdown extends StatefulWidget {
-  const LanguageDropdown(
-      {super.key,
-      this.asPopUpMenu = false,
-      this.includeDeviceDefaultOption = true,
-      this.initialLanguageCode,
-      this.onChanged});
+  const LanguageDropdown({
+    super.key,
+    this.asPopUpMenu = false,
+    this.includeDeviceDefaultOption = true,
+    this.initialLanguageCode,
+    this.onChanged,
+  });
 
   final bool asPopUpMenu;
   final bool includeDeviceDefaultOption;
@@ -75,28 +76,27 @@ class LanguageDropdownState extends State<LanguageDropdown> {
 
   Widget buildPopUpMenu(BuildContext context) {
     return PopupMenuButton<String>(
-      icon: const Icon(
-        Icons.language,
-      ),
+      icon: const Icon(Icons.language),
       itemBuilder: (BuildContext context) {
         // Build list of possible languages.
         List<PopupMenuItem<String>> languageOptions = [];
 
         // Add system locale.
         if (widget.includeDeviceDefaultOption) {
-          languageOptions.add(PopupMenuItem<String>(
+          languageOptions.add(
+            PopupMenuItem<String>(
               value: NO_OVERRIDE_KEY,
-              child: Text(DictLibLocalizations.of(context)!.deviceDefault)));
+              child: Text(DictLibLocalizations.of(context)!.deviceDefault),
+            ),
+          );
         }
 
         // Add the rest of the language options.
-        languageOptions
-            .addAll(LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
-          return PopupMenuItem<String>(
-            value: e.key,
-            child: Text(e.value),
-          );
-        }).toList());
+        languageOptions.addAll(
+          LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
+            return PopupMenuItem<String>(value: e.key, child: Text(e.value));
+          }).toList(),
+        );
 
         return languageOptions;
       },
@@ -117,64 +117,68 @@ class LanguageDropdownState extends State<LanguageDropdown> {
     // Add system locale. We don't add it even if includeDeviceDefaultOption is
     // set if the system locale is not one of the supported languages.
     if (includeDeviceDefaultOption) {
-      languageOptions.add(DropdownMenuItem<String>(
+      languageOptions.add(
+        DropdownMenuItem<String>(
           value: NO_OVERRIDE_KEY,
-          child: Text(DictLibLocalizations.of(context)!.deviceDefault)));
+          child: Text(DictLibLocalizations.of(context)!.deviceDefault),
+        ),
+      );
     }
 
     // Add the rest of the language options.
-    languageOptions.addAll(LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
-      return DropdownMenuItem<String>(
-        value: e.key,
-        child: Text(e.value),
-      );
-    }).toList());
+    languageOptions.addAll(
+      LANGUAGE_CODE_TO_PRETTY.entries.map((MapEntry e) {
+        return DropdownMenuItem<String>(value: e.key, child: Text(e.value));
+      }).toList(),
+    );
 
     return FutureBuilder(
-        future: initStateAsyncFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState != ConnectionState.done) {
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          }
+      future: initStateAsyncFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          // Determine which option should be selected. Either a language code
-          // or NO_OVERRIDE_KEY.
-          String selectedLanguageCode;
-          if (widget.initialLanguageCode != null) {
-            selectedLanguageCode =
-                normalizeLanguageCode(widget.initialLanguageCode!);
-          } else if (widgetLocaleOverride != null) {
-            selectedLanguageCode =
-                normalizeLanguageCode(widgetLocaleOverride!.languageCode);
-          } else if (includeDeviceDefaultOption) {
-            selectedLanguageCode = NO_OVERRIDE_KEY;
-          } else {
-            selectedLanguageCode =
-                normalizeLanguageCode(currentLocale.languageCode);
-          }
-
-          return DropdownButton<String>(
-            value: selectedLanguageCode,
-            items: languageOptions,
-            onChanged: (String? newValue) async {
-              Locale? newLocale;
-              if (widget.onChanged != null) {
-                newLocale = widget.onChanged!(newValue!);
-              } else {
-                newLocale = await setLocale(newValue!);
-              }
-              setState(() {
-                if (newLocale != null) {
-                  widgetLocaleOverride = newLocale;
-                } else {
-                  widgetLocaleOverride = null;
-                }
-              });
-            },
+        // Determine which option should be selected. Either a language code
+        // or NO_OVERRIDE_KEY.
+        String selectedLanguageCode;
+        if (widget.initialLanguageCode != null) {
+          selectedLanguageCode = normalizeLanguageCode(
+            widget.initialLanguageCode!,
           );
-        });
+        } else if (widgetLocaleOverride != null) {
+          selectedLanguageCode = normalizeLanguageCode(
+            widgetLocaleOverride!.languageCode,
+          );
+        } else if (includeDeviceDefaultOption) {
+          selectedLanguageCode = NO_OVERRIDE_KEY;
+        } else {
+          selectedLanguageCode = normalizeLanguageCode(
+            currentLocale.languageCode,
+          );
+        }
+
+        return DropdownButton<String>(
+          value: selectedLanguageCode,
+          items: languageOptions,
+          onChanged: (String? newValue) async {
+            Locale? newLocale;
+            if (widget.onChanged != null) {
+              newLocale = widget.onChanged!(newValue!);
+            } else {
+              newLocale = await setLocale(newValue!);
+            }
+            setState(() {
+              if (newLocale != null) {
+                widgetLocaleOverride = newLocale;
+              } else {
+                widgetLocaleOverride = null;
+              }
+            });
+          },
+        );
+      },
+    );
   }
 }
 

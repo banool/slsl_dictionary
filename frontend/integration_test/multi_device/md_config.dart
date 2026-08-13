@@ -12,11 +12,13 @@ final MdSuiteConfig mdSuiteConfig = MdSuiteConfig(
   appId: 'slsl',
   appName: 'SLSL Dictionary',
   advisoriesUrl: Uri.parse(
-      'https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md'),
+    'https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/advisories.md',
+  ),
   knobUrlBase: KNOB_URL_BASE,
   mediaBaseUrls: const [DATA_URL_PREFIX_CDN],
   buildEntryLoader: () => MyEntryLoader(
-      dumpFileUrl: Uri.parse('$DATA_URL_PREFIX_CDN/dump/dump.json')),
+    dumpFileUrl: Uri.parse('$DATA_URL_PREFIX_CDN/dump/dump.json'),
+  ),
   shareLinkBaseUrl: 'https://share.srilankansignlanguage.org/l',
   shareLinkHost: 'share.srilankansignlanguage.org',
   urlScheme: 'slsl',

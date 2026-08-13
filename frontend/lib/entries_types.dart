@@ -17,13 +17,14 @@ class MyEntry implements Entry {
 
   final List<MySubEntry> sub_entries;
 
-  MyEntry(
-      {required this.word_in_english,
-      this.word_in_sinhala,
-      this.word_in_tamil,
-      required this.categories,
-      required this.entry_type,
-      required this.sub_entries});
+  MyEntry({
+    required this.word_in_english,
+    this.word_in_sinhala,
+    this.word_in_tamil,
+    required this.categories,
+    required this.entry_type,
+    required this.sub_entries,
+  });
 
   factory MyEntry.fromJson(Map<String, dynamic> json) =>
       _$MyEntryFromJson(json);
@@ -207,10 +208,11 @@ class Definition {
     return getCategoryPretty(category);
   }
 
-  Definition(
-      {required this.language,
-      required this.category,
-      required this.definition});
+  Definition({
+    required this.language,
+    required this.category,
+    required this.definition,
+  });
   factory Definition.fromJson(Map<String, dynamic> json) =>
       _$DefinitionFromJson(json);
 
@@ -219,10 +221,7 @@ class Definition {
 
 // IMPORTANT:
 // Keep this in sync with Region in scripts/scrape_signbank.py, the order is important.
-enum Region {
-  ALL,
-  NORTH_EAST,
-}
+enum Region { ALL, NORTH_EAST }
 
 String getRegionPretty(BuildContext context, Region region) {
   switch (region) {

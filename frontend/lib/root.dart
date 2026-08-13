@@ -37,15 +37,20 @@ final DictRootAppConfig appRootConfig = DictRootAppConfig(
   buildSettingsTopWidgets: (context) => [
     Padding(
       padding: const EdgeInsets.only(left: 35, top: 15),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(
-          DictLibLocalizations.of(context)!.settingsLanguage,
-          style: const TextStyle(
-              fontSize: 13, color: Color.fromARGB(255, 100, 100, 100)),
-          textAlign: TextAlign.start,
-        ),
-        const Center(child: LanguageDropdown()),
-      ]),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            DictLibLocalizations.of(context)!.settingsLanguage,
+            style: const TextStyle(
+              fontSize: 13,
+              color: Color.fromARGB(255, 100, 100, 100),
+            ),
+            textAlign: TextAlign.start,
+          ),
+          const Center(child: LanguageDropdown()),
+        ],
+      ),
     ),
   ],
   buildLegalInformationChildren: buildLegalInformationChildren,

@@ -54,8 +54,10 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   yankedVersionsUrl: "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
   knobUrlBase: KNOB_URL_BASE,
   aptabaseAppKey: APTABASE_APP_KEY,
-  // Linked from the startup error screen.
-  faqUrl: "https://srilankansignlanguage.org/faq.html",
+  // Linked from the startup error screen. The landing subdomain is ours (the
+  // apex is run by the SLSL organisation itself); the anchor lands on the
+  // "app won't load" section, which lists the domains the app needs to reach.
+  faqUrl: "https://landing.srilankansignlanguage.org/faq#app-wont-load",
   // Same artwork as the native splash (bundled in pubspec assets), so the
   // splash → loading screen handoff on a cold start is visually continuous.
   buildStartupLogo: (context) =>

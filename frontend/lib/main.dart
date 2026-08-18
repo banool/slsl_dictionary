@@ -8,9 +8,6 @@ import 'package:intl/intl_standalone.dart';
 import 'language_dropdown.dart';
 import 'root.dart';
 
-// TODO: More elegantly handle startup when there is no local data cache
-// and loading data from the internet fails.
-
 const String KNOB_URL_BASE =
     "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/knobs/";
 
@@ -57,6 +54,12 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   yankedVersionsUrl: "https://raw.githubusercontent.com/banool/slsl_dictionary/main/frontend/assets/yanked_versions",
   knobUrlBase: KNOB_URL_BASE,
   aptabaseAppKey: APTABASE_APP_KEY,
+  // Linked from the startup error screen.
+  faqUrl: "https://srilankansignlanguage.org/faq.html",
+  // Same artwork as the native splash (bundled in pubspec assets), so the
+  // splash → loading screen handoff on a cold start is visually continuous.
+  buildStartupLogo: (context) =>
+      Image.asset('assets/icon/logo.png', width: 140),
   setupMediaAndEntryLoader: () async {
     // Configure how saved-video paths resolve to playable URLs. A saved
     // video's identity is the media path (see MySubEntry.getMedia in

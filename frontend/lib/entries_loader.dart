@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:dictionarylib/common.dart';
+import 'package:dictionarylib/data_fetch.dart';
 import 'package:dictionarylib/entry_loader.dart';
 import 'package:dictionarylib/entry_types.dart';
 import 'package:dictionarylib/entry_list_categories.dart';
 import 'package:dictionarylib/globals.dart';
 import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 import 'entries_types.dart';
 import 'globals.dart';
@@ -25,13 +25,18 @@ String buildUrl(String path) {
 class MyEntryLoader extends EntryLoader {
   final Uri dumpFileUrl;
 
-  MyEntryLoader({required this.dumpFileUrl});
+  /// Injectable for tests; null means fetchWithProgress creates (and closes)
+  /// its own client per request.
+  final http.Client? client;
+
+  MyEntryLoader({required this.dumpFileUrl, this.client});
 
   @override
   Future<NewData?> downloadNewData(
     int currentVersion,
-    bool forceDownload,
-  ) async {
+    bool forceDownload, {
+    Duration requestTimeout = kDataFetchTimeout,
+  }) async {
     // Previously we used to check if we needed to download the data again by
     // making two requests. First we'd make one request for just the headers, in
     // which we check the value of the Last-Modified header. If that time was
@@ -49,16 +54,39 @@ class MyEntryLoader extends EntryLoader {
         "If-Modified-Since": convertUnixTimeToHttpDate(currentVersion),
       };
     }
-    Response response = (await http
-        .get(dumpFileUrl, headers: headers)
-        .timeout(const Duration(seconds: 15)));
+    // Bounded per request (headers + body-stall — NOT a whole-request timeout,
+    // which would kill a slow-but-alive download of the ~16mb dump), with
+    // progress reported for the cold-start loading screen.
+    reportDownloadStatus(
+      DictionaryDownloadStatus(
+        stage: DictionaryDownloadStage.checking,
+        url: dumpFileUrl,
+      ),
+    );
+    DataFetchResult response = await fetchWithProgress(
+      dumpFileUrl,
+      headers: headers,
+      client: client,
+      headersTimeout: requestTimeout,
+      stallTimeout: requestTimeout,
+      onProgress: (receivedBytes, totalBytes) => reportDownloadStatus(
+        DictionaryDownloadStatus(
+          stage: DictionaryDownloadStage.downloading,
+          url: dumpFileUrl,
+          receivedBytes: receivedBytes,
+          totalBytes: totalBytes,
+        ),
+      ),
+    );
 
     if (response.statusCode == 304) {
       return null;
     }
 
     if (response.statusCode != 200) {
-      throw "Failed to download dictionary data: ${response.statusCode}: ${response.body}";
+      throw Exception(
+        "Failed to download dictionary data: ${response.statusCode}: ${response.body}",
+      );
     }
 
     // At this point we know we got a 200, we can look at the body of the response.

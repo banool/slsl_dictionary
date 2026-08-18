@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 2.0.91+297
+version: 2.0.92+298
 
 environment:
   sdk: '>=3.13.0 <4.0.0'
@@ -18,7 +18,7 @@ dependencies:
       url: https://github.com/banool/dictionarylib.git
       # NOTE: keep this ref and dictionarylib_test_support's ref (below, in
       # dev_dependencies) on the SAME commit when repinning.
-      ref: 9e7c0b876ca34bca8c39dd7feea96598d0250862
+      ref: f7b8e89485360474e86fc15418aa74b0a2cf3bc4
   dolphinsr: ^4.0.0
   dots_indicator:
   flutter:
@@ -44,7 +44,7 @@ dev_dependencies:
   dictionarylib_test_support:
     git:
       url: https://github.com/banool/dictionarylib.git
-      ref: 9e7c0b876ca34bca8c39dd7feea96598d0250862
+      ref: f7b8e89485360474e86fc15418aa74b0a2cf3bc4
       path: dictionarylib_test_support
   build_runner: ^2.3.3
   dependency_validator: ^5.0.5
@@ -75,4 +75,8 @@ flutter:
   # SharingAuthConfig, so they're absent here. See the backend MANUAL_SETUP.md §4.
   assets:
     - assets/msal_config.json
+    # The splash logo, bundled so the cold-start loading screen (see
+    # buildStartupLogo in lib/main.dart) can hand off from the native splash
+    # with the same artwork.
+    - assets/icon/logo.png
 

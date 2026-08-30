@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 2.1.0+301
+version: 2.1.2+303
 
 environment:
   sdk: '>=3.13.0 <4.0.0'
@@ -18,7 +18,7 @@ dependencies:
       url: https://github.com/banool/dictionarylib.git
       # NOTE: keep this ref and dictionarylib_test_support's ref (below, in
       # dev_dependencies) on the SAME commit when repinning.
-      ref: f7b8e89485360474e86fc15418aa74b0a2cf3bc4
+      ref: d9eec5851c7e50b4eee25cfe70318862ccb5d464
   dolphinsr: ^4.0.0
   dots_indicator:
   flutter:
@@ -44,7 +44,7 @@ dev_dependencies:
   dictionarylib_test_support:
     git:
       url: https://github.com/banool/dictionarylib.git
-      ref: f7b8e89485360474e86fc15418aa74b0a2cf3bc4
+      ref: d9eec5851c7e50b4eee25cfe70318862ccb5d464
       path: dictionarylib_test_support
   build_runner: ^2.3.3
   dependency_validator: ^5.0.5

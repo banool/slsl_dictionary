@@ -35,7 +35,21 @@ if_stale_guard "$@"
 require_network
 require_gdrive
 
-DEST="$HOME/gdrive/backups/dictionary/slsl-db"
+# …/slsl-db on every machine but the Mac mini, which gets …/slsl-db-mini
+# (job_host_tag, dotfiles/jobs/lib.sh; the `type` guard is for a dotfiles
+# checkout that predates it). Two things below act on files ALREADY in this
+# directory: the rm of a same-day dump, and the prune to 30. Under launchd the
+# Google Drive mount refuses unlink, overwrite and rename of any file some
+# other process created (EPERM; the gdrive skill in dotfiles has the table), so
+# against the laptop's dumps the first would fail the run and the second could
+# never remove one. In a directory of its own every dump is the mini's, and the
+# laptop-era directory stays as it is, an archive. For the same reason a forced
+# run on the mini belongs under launchd (remove the marker, then
+# `launchctl kickstart gui/$UID/me.dport.backup-slsl-db`), not in a terminal: a
+# dump a terminal run leaves here is one the launchd run cannot replace or prune.
+HOST_TAG=""
+if type job_host_tag >/dev/null 2>&1; then HOST_TAG="$(job_host_tag)"; fi
+DEST="$HOME/gdrive/backups/dictionary/slsl-db${HOST_TAG:+-$HOST_TAG}"
 SECRETS="$(cd "$(dirname "$0")/.." && pwd)/prod_secrets.json"
 CONNECTION_NAME="slsl-dictionary:us-east1:slsl-admin-db-instance-02833a6"
 PROXY_PORT=54321
@@ -72,7 +86,14 @@ mv "$TMP_OUT" "$OUT"
 # Keep the newest 30 dumps. We use || true because Google Drive File Provider
 # can be asynchronous; immediately after a mv, the directory glob might briefly
 # return empty, causing ls to fail and trip set -e.
-ls -1t "$DEST"/slsl-db-*.sql.gz 2>/dev/null | tail -n +31 | while read -r old; do rm -f "$old"; done || true
+#
+# A prune that is refused still does not fail the backup (the dump is safely
+# written by now), but it no longer passes in silence either: `rm -f || true`
+# swallowed exactly the EPERM described above, and dumps piling up unpruned on
+# a machine nobody looks at should at least be in the log.
+ls -1t "$DEST"/slsl-db-*.sql.gz 2>/dev/null | tail -n +31 | while read -r old; do
+    rm -f "$old" || log "WARNING: could not prune $old"
+done || true
 
 mark_success
 log "$NAME backup completed: $(du -h "$OUT" | cut -f1) $(basename "$OUT")"

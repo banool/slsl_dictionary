@@ -45,6 +45,28 @@ String get _debugBackendBaseUrl {
       : _kDebugBackendBaseUrlRaw;
 }
 
+/// The language to start in: the user's stored choice, else the system's,
+/// else English. Runs during setup, before the user's lists load.
+Future<Locale> _resolveStartingLocale() async {
+  systemLocale = Locale(await findSystemLocale());
+  Locale locale;
+  Locale? localeOverride = await LocaleOverride.getLocaleOverride();
+  if (localeOverride != null) {
+    locale = localeOverride;
+    printAndLog("Using locale override: $locale");
+  } else {
+    printAndLog("Using system locale: $systemLocale");
+    locale = systemLocale;
+  }
+  // We can only handle these 3 locales, if the system locale is
+  // something else we fall back to English.
+  if (!localeIsSupported(locale)) {
+    locale = LOCALE_ENGLISH;
+    printAndLog("Locale not supported, falling back to English: $locale");
+  }
+  return locale;
+}
+
 /// SLSL's plug-in points for the shared startup orchestration
 /// (setupDictionaryApp / runDictionaryApp in dictionarylib).
 final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
@@ -58,6 +80,7 @@ final DictAppBootstrapConfig bootstrapConfig = DictAppBootstrapConfig(
   // apex is run by the SLSL organisation itself); the anchor lands on the
   // "app won't load" section, which lists the domains the app needs to reach.
   faqUrl: "https://landing.srilankansignlanguage.org/faq#app-wont-load",
+  resolveStartingLocale: _resolveStartingLocale,
   // Same artwork as the native splash (bundled in pubspec assets), so the
   // splash → loading screen handoff on a cold start is visually continuous.
   buildStartupLogo: (context) =>
@@ -162,23 +185,4 @@ Future<void> main() => runDictionaryApp(
   iOSAppId: IOS_APP_ID,
   androidAppId: ANDROID_APP_ID,
   buildApp: (locale) => RootApp(startingLocale: locale),
-  resolveStartingLocale: () async {
-    systemLocale = Locale(await findSystemLocale());
-    Locale locale;
-    Locale? localeOverride = await LocaleOverride.getLocaleOverride();
-    if (localeOverride != null) {
-      locale = localeOverride;
-      printAndLog("Using locale override: $locale");
-    } else {
-      printAndLog("Using system locale: $systemLocale");
-      locale = systemLocale;
-    }
-    // We can only handle these 3 locales, if the system locale is
-    // something else we fall back to English.
-    if (!localeIsSupported(locale)) {
-      locale = LOCALE_ENGLISH;
-      printAndLog("Locale not supported, falling back to English: $locale");
-    }
-    return locale;
-  },
 );

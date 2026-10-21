@@ -116,7 +116,7 @@ Widget _app(MyEntry entry, {SavedVideo? focusVideo}) => MaterialApp(
   home: EntryPage(
     entry: entry,
     config: _config,
-    showFavouritesButton: false,
+    showSaveButton: false,
     focusVideo: focusVideo,
   ),
 );

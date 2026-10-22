@@ -14,6 +14,13 @@ final DictAppTestConfig appTestConfig = DictAppTestConfig(
   // seed or clear.
   seedFlashcardSettings: null,
   clearFlashcardSettings: null,
+  // The first read off a device running a released build, the others
+  // written the same way from the dictionary data.
+  storedVideos: const [
+    'apple|/media/SLCFDFruits_Apple.mp4',
+    'dog|/media/SLCFDAnimals_Dog_fz3q2O0.mp4',
+    'cat|/media/SLCFDAnimals_Cat.mp4',
+  ],
 );
 
 const ScreenshotSuiteConfig screenshotConfig = ScreenshotSuiteConfig(

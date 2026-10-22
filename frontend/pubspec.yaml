@@ -3,7 +3,7 @@ description: Free video dictionary for Sri Lankan Sign Language
 
 publish_to: 'none'
 
-version: 2.1.22+323
+version: 2.1.23+324
 
 environment:
   sdk: '>=3.13.0 <4.0.0'
@@ -18,7 +18,7 @@ dependencies:
       url: https://github.com/banool/dictionarylib.git
       # NOTE: keep this ref and dictionarylib_test_support's ref (below, in
       # dev_dependencies) on the SAME commit when repinning.
-      ref: b4754a4958c0dbdbbb05885469bc991559bdf016
+      ref: fc86e5b0ec7711f58adb73e08464a4946d7d4fb0
   dolphinsr: ^4.0.0
   dots_indicator:
   flutter:
@@ -44,7 +44,7 @@ dev_dependencies:
   dictionarylib_test_support:
     git:
       url: https://github.com/banool/dictionarylib.git
-      ref: b4754a4958c0dbdbbb05885469bc991559bdf016
+      ref: fc86e5b0ec7711f58adb73e08464a4946d7d4fb0
       path: dictionarylib_test_support
   build_runner: ^2.3.3
   dependency_validator: ^5.0.5
@@ -66,6 +66,18 @@ flutter_icons:
 flutter_native_splash:
   color: "#FFFFFF"
   image: "assets/icon/logo.png"
+
+# Held back on 2026-10-22. shared_preferences_android 2.5.0 and
+# shared_preferences_foundation 2.6.0 (both published 2026-10-17) rewrote how
+# the plugin talks to the platform (JNI and FFI in place of method channels).
+# The Android one crashed release builds at startup until 2.5.2, published the
+# day of this upgrade, and the iOS one can't be run in release mode off a
+# device. Every setting and every saved list goes through this plugin, so it
+# stays on the versions the app has been shipping until the rewrites have had
+# some time in the wild. Drop both lines at a later dependency upgrade.
+dependency_overrides:
+  shared_preferences_android: 2.4.28
+  shared_preferences_foundation: 2.5.7
 
 flutter:
   uses-material-design: true
